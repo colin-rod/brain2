@@ -1,0 +1,66 @@
+import type { TaskPriority } from './database';
+
+/* ============================================================
+   Domain types — used in the review flow and parser
+   ============================================================ */
+
+export type ParseMode = 'meeting_note' | 'plain_text_note' | 'chat_transcript';
+
+/** Output shape from the parser provider */
+export interface ParsedNote {
+  title: string;
+  summary: string;
+  cleaned_text: string;
+  tasks: TaskDraft[];
+  people: PersonDraft[];
+  projects: ProjectDraft[];
+  decisions: DecisionDraft[];
+  open_questions: QuestionDraft[];
+}
+
+export interface TaskDraft {
+  id: string; // client-generated for keying
+  title: string;
+  due_date: string | null;
+  priority: TaskPriority | null;
+}
+
+export interface PersonDraft {
+  id: string;
+  name: string;
+  role: string | null;
+  /** If set, link to this existing person instead of creating new */
+  matchedPersonId: string | null;
+}
+
+export interface ProjectDraft {
+  id: string;
+  name: string;
+  /** If set, link to this existing project instead of creating new */
+  matchedProjectId: string | null;
+}
+
+export interface DecisionDraft {
+  id: string;
+  decision_text: string;
+  rationale: string | null;
+  decision_date: string | null;
+}
+
+export interface QuestionDraft {
+  id: string;
+  question_text: string;
+}
+
+/** Payload sent from review page to the save action */
+export interface ReviewPayload {
+  captureId: string;
+  title: string;
+  summary: string;
+  cleaned_text: string;
+  tasks: TaskDraft[];
+  people: PersonDraft[];
+  projects: ProjectDraft[];
+  decisions: DecisionDraft[];
+  open_questions: QuestionDraft[];
+}

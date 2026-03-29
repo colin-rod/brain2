@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//Users/colinrodrigues/Taskmaster/**)",
+      "Read(//Users/colinrodrigues/NorthStar/**)",
+      "Bash(find /Users/colinrodrigues/NorthStar/.husky -type f -not -path */.*)",
+      "Bash(xargs cat:*)",
+      "Bash(git -C /Users/colinrodrigues/Taskmaster config --local user.name)",
+      "Bash(git -C /Users/colinrodrigues/Taskmaster log --oneline)",
+      "Bash(xargs ls:*)",
+      "Read(//Users/colinrodrigues/**)",
+      "Bash(pnpm create:*)",
+      "Bash(pnpm init:*)",
+      "Bash(rm package.json)",
+      "Bash(rm -rf /Users/colinrodrigues/brain2-app)",
+      "Bash(cp -a /Users/colinrodrigues/brain2-temp/. /Users/colinrodrigues/Brain2/)",
+      "Bash(rm -rf /Users/colinrodrigues/brain2-temp)",
+      "Bash(/dev/null -type f)",
+      "Bash(pnpm add:*)",
+      "Bash(pnpm exec:*)",
+      "Bash(pnpm dlx:*)"
+    ]
+  }
+}

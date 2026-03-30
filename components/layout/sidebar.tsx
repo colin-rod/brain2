@@ -12,8 +12,10 @@ import {
   Download,
   Settings,
   Brain,
+  LogOut,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { signOut } from '@/lib/actions/auth';
 
 const navItems = [
   { href: '/inbox', label: 'Inbox', icon: Inbox },
@@ -56,6 +58,18 @@ export function Sidebar() {
           );
         })}
       </nav>
+
+      <div className="px-north-sm py-north-base border-t border-sidebar-border">
+        <form action={signOut}>
+          <button
+            type="submit"
+            className="flex w-full items-center gap-north-md px-north-md py-north-sm rounded-md text-body text-foreground-secondary hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
+          >
+            <LogOut className="h-4 w-4 shrink-0" />
+            Sign out
+          </button>
+        </form>
+      </div>
     </aside>
   );
 }

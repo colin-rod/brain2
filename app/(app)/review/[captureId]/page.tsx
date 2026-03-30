@@ -1,12 +1,47 @@
-export default function ReviewPage({
-  params: _params,
-}: {
+import { notFound } from 'next/navigation';
+import { createClient } from '@/lib/supabase/server';
+import { ReviewClient } from '@/components/review/review-client';
+import type { Capture } from '@/types/database';
+
+interface ReviewPageProps {
   params: Promise<{ captureId: string }>;
-}) {
+}
+
+export default async function ReviewPage({ params }: ReviewPageProps) {
+  const { captureId } = await params;
+  const supabase = await createClient();
+
+  const { data: capture, error } = await supabase
+    .from('captures')
+    .select('*')
+    .eq('id', captureId)
+    .single();
+
+  if (error || !capture) {
+    notFound();
+  }
+
+  const typedCapture = capture as Capture;
+
+  // Generate signed URL for image captures
+  let imageUrl: string | null = null;
+  if (typedCapture.source_type === 'image' && typedCapture.file_path) {
+    const { data: signedData } = await supabase.storage
+      .from('captures')
+      .createSignedUrl(typedCapture.file_path, 3600);
+    imageUrl = signedData?.signedUrl ?? null;
+  }
+
   return (
     <div className="space-y-north-lg">
-      <h1 className="text-page-title">Review</h1>
-      <p className="text-foreground-secondary">Review and edit extracted content before saving.</p>
+      <div>
+        <h1 className="text-page-title">Review</h1>
+        <p className="text-foreground-secondary mt-north-xs">
+          Review and edit extracted content before saving.
+        </p>
+      </div>
+
+      <ReviewClient capture={typedCapture} imageUrl={imageUrl} />
     </div>
   );
 }

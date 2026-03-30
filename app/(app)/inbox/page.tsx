@@ -1,8 +1,27 @@
-export default function InboxPage() {
+import { fetchCaptures } from '@/lib/actions/capture';
+import { CaptureForm } from '@/components/inbox/capture-form';
+import { CaptureList } from '@/components/inbox/capture-list';
+import type { Capture } from '@/types/database';
+
+export default async function InboxPage() {
+  const { data } = await fetchCaptures();
+  const captures = (data as Capture[]) ?? [];
+
   return (
     <div className="space-y-north-lg">
-      <h1 className="text-page-title">Inbox</h1>
-      <p className="text-foreground-secondary">Upload images or paste text to create captures.</p>
+      <div>
+        <h1 className="text-page-title">Inbox</h1>
+        <p className="text-foreground-secondary mt-north-xs">
+          Upload images or paste text to create captures.
+        </p>
+      </div>
+
+      <CaptureForm />
+
+      <div>
+        <h2 className="text-section-header mb-north-md">Recent Captures</h2>
+        <CaptureList captures={captures} />
+      </div>
     </div>
   );
 }

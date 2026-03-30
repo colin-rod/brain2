@@ -1,0 +1,162 @@
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+import type {
+  TaskDraft,
+  PersonDraft,
+  ProjectDraft,
+  DecisionDraft,
+  QuestionDraft,
+} from '@/types/domain';
+import type { ParsedNoteJson } from '@/types/database';
+
+interface ReviewState {
+  captureId: string | null;
+  title: string;
+  summary: string;
+  cleaned_text: string;
+  tasks: TaskDraft[];
+  people: PersonDraft[];
+  projects: ProjectDraft[];
+  decisions: DecisionDraft[];
+  open_questions: QuestionDraft[];
+
+  // Actions
+  initFromParsed: (captureId: string, parsed: ParsedNoteJson) => void;
+  reset: () => void;
+
+  setTitle: (title: string) => void;
+  setSummary: (summary: string) => void;
+  setCleanedText: (text: string) => void;
+
+  // Tasks
+  updateTask: (id: string, updates: Partial<TaskDraft>) => void;
+  addTask: () => void;
+  removeTask: (id: string) => void;
+
+  // People
+  updatePerson: (id: string, updates: Partial<PersonDraft>) => void;
+  addPerson: () => void;
+  removePerson: (id: string) => void;
+
+  // Projects
+  updateProject: (id: string, updates: Partial<ProjectDraft>) => void;
+  addProject: () => void;
+  removeProject: (id: string) => void;
+
+  // Decisions
+  updateDecision: (id: string, updates: Partial<DecisionDraft>) => void;
+  addDecision: () => void;
+  removeDecision: (id: string) => void;
+
+  // Questions
+  updateQuestion: (id: string, updates: Partial<QuestionDraft>) => void;
+  addQuestion: () => void;
+  removeQuestion: (id: string) => void;
+}
+
+function uid(): string {
+  return crypto.randomUUID();
+}
+
+const emptyState = {
+  captureId: null as string | null,
+  title: '',
+  summary: '',
+  cleaned_text: '',
+  tasks: [] as TaskDraft[],
+  people: [] as PersonDraft[],
+  projects: [] as ProjectDraft[],
+  decisions: [] as DecisionDraft[],
+  open_questions: [] as QuestionDraft[],
+};
+
+export const useReviewStore = create<ReviewState>()(
+  persist(
+    (set) => ({
+      ...emptyState,
+
+      initFromParsed: (captureId, parsed) =>
+        set({
+          captureId,
+          title: parsed.title,
+          summary: parsed.summary,
+          cleaned_text: parsed.cleaned_text,
+          tasks: parsed.tasks.map((t) => ({ ...t, id: uid() })),
+          people: parsed.people.map((p) => ({ ...p, id: uid(), matchedPersonId: null })),
+          projects: parsed.projects.map((p) => ({ ...p, id: uid(), matchedProjectId: null })),
+          decisions: parsed.decisions.map((d) => ({ ...d, id: uid() })),
+          open_questions: parsed.open_questions.map((q) => ({ ...q, id: uid() })),
+        }),
+
+      reset: () => set(emptyState),
+
+      setTitle: (title) => set({ title }),
+      setSummary: (summary) => set({ summary }),
+      setCleanedText: (cleaned_text) => set({ cleaned_text }),
+
+      // Tasks
+      updateTask: (id, updates) =>
+        set((s) => ({
+          tasks: s.tasks.map((t) => (t.id === id ? { ...t, ...updates } : t)),
+        })),
+      addTask: () =>
+        set((s) => ({
+          tasks: [...s.tasks, { id: uid(), title: '', due_date: null, priority: null }],
+        })),
+      removeTask: (id) => set((s) => ({ tasks: s.tasks.filter((t) => t.id !== id) })),
+
+      // People
+      updatePerson: (id, updates) =>
+        set((s) => ({
+          people: s.people.map((p) => (p.id === id ? { ...p, ...updates } : p)),
+        })),
+      addPerson: () =>
+        set((s) => ({
+          people: [...s.people, { id: uid(), name: '', role: null, matchedPersonId: null }],
+        })),
+      removePerson: (id) => set((s) => ({ people: s.people.filter((p) => p.id !== id) })),
+
+      // Projects
+      updateProject: (id, updates) =>
+        set((s) => ({
+          projects: s.projects.map((p) => (p.id === id ? { ...p, ...updates } : p)),
+        })),
+      addProject: () =>
+        set((s) => ({
+          projects: [...s.projects, { id: uid(), name: '', matchedProjectId: null }],
+        })),
+      removeProject: (id) => set((s) => ({ projects: s.projects.filter((p) => p.id !== id) })),
+
+      // Decisions
+      updateDecision: (id, updates) =>
+        set((s) => ({
+          decisions: s.decisions.map((d) => (d.id === id ? { ...d, ...updates } : d)),
+        })),
+      addDecision: () =>
+        set((s) => ({
+          decisions: [
+            ...s.decisions,
+            { id: uid(), decision_text: '', rationale: null, decision_date: null },
+          ],
+        })),
+      removeDecision: (id) => set((s) => ({ decisions: s.decisions.filter((d) => d.id !== id) })),
+
+      // Questions
+      updateQuestion: (id, updates) =>
+        set((s) => ({
+          open_questions: s.open_questions.map((q) => (q.id === id ? { ...q, ...updates } : q)),
+        })),
+      addQuestion: () =>
+        set((s) => ({
+          open_questions: [...s.open_questions, { id: uid(), question_text: '' }],
+        })),
+      removeQuestion: (id) =>
+        set((s) => ({
+          open_questions: s.open_questions.filter((q) => q.id !== id),
+        })),
+    }),
+    {
+      name: 'brain2-review-draft',
+    },
+  ),
+);

@@ -18,7 +18,20 @@
       "Bash(/dev/null -type f)",
       "Bash(pnpm add:*)",
       "Bash(pnpm exec:*)",
-      "Bash(pnpm dlx:*)"
-    ]
+      "Bash(pnpm dlx:*)",
+      "Bash(pnpm run:*)",
+      "Bash(git add:*)",
+      "Bash(git rm:*)",
+      "Bash(git commit:*)",
+      "Bash(git -C /Users/colinrodrigues/Brain2 status)",
+      "Bash(git -C /Users/colinrodrigues/Brain2 remote -v)",
+      "Bash(git -C /Users/colinrodrigues/Brain2 log --oneline -3)",
+      "Bash(git -C /Users/colinrodrigues/Brain2 remote add origin https://github.com/colin-rod/brain2.git)",
+      "Bash(git -C /Users/colinrodrigues/Brain2 push -u origin main)",
+      "Bash(git checkout:*)",
+      "Bash(git push:*)",
+      "Bash(pnpm --version)"
+    ],
+    "additionalDirectories": ["/Users/colinrodrigues/Brain2/app/(app)/review"]
   }
 }

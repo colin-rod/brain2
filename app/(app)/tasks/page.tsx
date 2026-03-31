@@ -5,16 +5,20 @@ import { EmptyState } from '@/components/shared/empty-state';
 import { TaskStatusBadge } from '@/components/shared/status-badge';
 import { Badge } from '@/components/ui/badge';
 import { CheckSquare } from 'lucide-react';
+import { formatDate } from '@/lib/format-date';
 import type { Task } from '@/types/database';
 
 export default async function TasksPage() {
   const supabase = await createClient();
   const { data } = await supabase
     .from('tasks')
-    .select('*, notes(id, title)')
+    .select('*, notes(id, title), actionee:people!actionee_id(id, name)')
     .order('created_at', { ascending: false });
 
-  const tasks = (data ?? []) as (Task & { notes: { id: string; title: string } | null })[];
+  const tasks = (data ?? []) as (Task & {
+    notes: { id: string; title: string } | null;
+    actionee: { id: string; name: string } | null;
+  })[];
 
   return (
     <div className="space-y-north-lg">
@@ -43,8 +47,16 @@ export default async function TasksPage() {
                   )}
                   {task.due_date && (
                     <span className="text-metadata text-foreground-muted">
-                      Due: {task.due_date}
+                      Due: {formatDate(task.due_date)}
                     </span>
+                  )}
+                  {task.actionee && (
+                    <Link
+                      href={`/people/${task.actionee.id}`}
+                      className="text-metadata text-primary hover:underline"
+                    >
+                      @{task.actionee.name}
+                    </Link>
                   )}
                   {task.notes && (
                     <Link

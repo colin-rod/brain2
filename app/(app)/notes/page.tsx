@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { PageHeader } from '@/components/shared/page-header';
 import { EmptyState } from '@/components/shared/empty-state';
 import { FileText } from 'lucide-react';
+import { formatDate } from '@/lib/format-date';
 import type { Note } from '@/types/database';
 
 export default async function NotesPage() {
@@ -39,7 +40,7 @@ export default async function NotesPage() {
                 </p>
               )}
               <p className="text-metadata text-foreground-muted mt-north-xs">
-                {new Date(note.created_at).toLocaleDateString()}
+                {formatDate(note.created_at)}
               </p>
             </Link>
           ))}

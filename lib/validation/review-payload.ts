@@ -16,9 +16,19 @@ export function validateReviewPayload(payload: ReviewPayload): ValidationError[]
     errors.push({ field: 'title', message: 'Title is required' });
   }
 
+  const peopleIds = new Set(payload.people.map((p) => p.id));
   for (let i = 0; i < payload.tasks.length; i++) {
     if (!payload.tasks[i].title.trim()) {
       errors.push({ field: `tasks[${i}].title`, message: `Task ${i + 1} needs a title` });
+    }
+    if (
+      payload.tasks[i].actionee_person_id &&
+      !peopleIds.has(payload.tasks[i].actionee_person_id!)
+    ) {
+      errors.push({
+        field: `tasks[${i}].actionee_person_id`,
+        message: `Task ${i + 1} actionee does not match any person in this note`,
+      });
     }
   }
 

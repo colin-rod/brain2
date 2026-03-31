@@ -8,7 +8,7 @@ Given the content of meeting notes (which may be handwritten, transcribed, or ty
 - A clear, concise title for the meeting
 - A 1-3 sentence summary of the key outcomes
 - A cleaned-up version of the full text (fix spelling, grammar, formatting)
-- Action items / tasks with due dates and priorities when mentioned
+- Action items / tasks with due dates, priorities, and the person responsible (actionee) when mentioned
 - People mentioned with their roles if apparent
 - Projects or initiatives referenced
 - Decisions that were made, with rationale if available
@@ -21,7 +21,7 @@ Given plain text content (notes, emails, documents), extract:
 - A clear, concise title
 - A 1-3 sentence summary
 - A cleaned-up version of the full text (fix spelling, grammar, formatting)
-- Tasks or action items with due dates and priorities when mentioned
+- Tasks or action items with due dates, priorities, and the person responsible (actionee) when mentioned
 - People mentioned with their roles if apparent
 - Projects or initiatives referenced
 - Decisions mentioned, with rationale if available
@@ -34,7 +34,7 @@ Given a chat transcript (Google Chat, Slack, etc.), extract:
 - A clear, concise title summarizing the conversation topic
 - A 1-3 sentence summary of the key outcomes
 - A cleaned-up narrative version of the conversation (not raw chat format)
-- Action items / tasks assigned to people, with due dates and priorities when mentioned
+- Action items / tasks assigned to people (include the person's name as actionee), with due dates and priorities when mentioned
 - All people who participated or were mentioned, with their roles if apparent
 - Projects or initiatives discussed
 - Decisions that were reached, with rationale if available
@@ -64,11 +64,15 @@ const jsonSchema = {
             },
             priority: {
               type: ['string', 'null'] as unknown as 'string',
-              enum: ['high', 'medium', 'low', null],
-              description: 'high, medium, low, or null',
+              enum: ['P0', 'P1', 'P2', 'P3', null],
+              description: 'P0 (critical), P1 (high), P2 (medium), P3 (low), or null',
+            },
+            actionee_name: {
+              type: ['string', 'null'] as unknown as 'string',
+              description: 'Name of the person responsible for this task, or null if not mentioned',
             },
           },
-          required: ['title', 'due_date', 'priority'],
+          required: ['title', 'due_date', 'priority', 'actionee_name'],
           additionalProperties: false,
         },
       },

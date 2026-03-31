@@ -4,6 +4,7 @@ import { PageHeader } from '@/components/shared/page-header';
 import { EmptyState } from '@/components/shared/empty-state';
 import { ExportsActions } from '@/components/exports/exports-actions';
 import { Download, FileText } from 'lucide-react';
+import { formatDate } from '@/lib/format-date';
 import type { Note } from '@/types/database';
 
 export default async function ExportsPage() {
@@ -42,7 +43,7 @@ export default async function ExportsPage() {
                   <span className="text-body font-medium truncate">{note.title}</span>
                 </Link>
                 <p className="text-metadata text-foreground-muted mt-0.5">
-                  {new Date(note.created_at).toLocaleDateString()}
+                  {formatDate(note.created_at)}
                 </p>
               </div>
               <ExportsActions noteId={note.id} />

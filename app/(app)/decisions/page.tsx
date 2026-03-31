@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { PageHeader } from '@/components/shared/page-header';
 import { EmptyState } from '@/components/shared/empty-state';
 import { Scale } from 'lucide-react';
+import { formatDate } from '@/lib/format-date';
 import type { Decision } from '@/types/database';
 
 export default async function DecisionsPage() {
@@ -39,7 +40,9 @@ export default async function DecisionsPage() {
               )}
               <div className="flex items-center gap-north-md mt-north-xs">
                 {d.decision_date && (
-                  <span className="text-metadata text-foreground-muted">{d.decision_date}</span>
+                  <span className="text-metadata text-foreground-muted">
+                    {formatDate(d.decision_date)}
+                  </span>
                 )}
                 {d.notes && (
                   <Link

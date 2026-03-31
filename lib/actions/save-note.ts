@@ -58,30 +58,13 @@ export async function saveReviewedNote(payload: ReviewPayload): Promise<SaveResu
 
   const noteId = note.id;
 
-  // Insert tasks
-  if (payload.tasks.length > 0) {
-    const { error: tasksError } = await supabase.from('tasks').insert(
-      payload.tasks.map((t) => ({
-        user_id: user.id,
-        note_id: noteId,
-        title: t.title.trim(),
-        due_date: t.due_date || null,
-        priority: t.priority || null,
-        status: 'todo',
-      })),
-    );
-    if (tasksError) {
-      return { error: `Failed to save tasks: ${tasksError.message}` };
-    }
-  }
-
-  // Insert people (new ones) and collect IDs for junction table
-  const personIds: string[] = [];
+  // Insert people FIRST (tasks may reference them as actionees)
+  const personIdMap = new Map<string, string>(); // draft ID → real DB ID
 
   for (const p of payload.people) {
     if (p.matchedPersonId) {
       // Link to existing person
-      personIds.push(p.matchedPersonId);
+      personIdMap.set(p.id, p.matchedPersonId);
     } else {
       // Create new person
       const { data: newPerson, error: personError } = await supabase
@@ -97,11 +80,12 @@ export async function saveReviewedNote(payload: ReviewPayload): Promise<SaveResu
       if (personError || !newPerson) {
         return { error: `Failed to save person "${p.name}": ${personError?.message}` };
       }
-      personIds.push(newPerson.id);
+      personIdMap.set(p.id, newPerson.id);
     }
   }
 
   // Insert note_people junction rows
+  const personIds = Array.from(personIdMap.values());
   if (personIds.length > 0) {
     const { error: npError } = await supabase.from('note_people').insert(
       personIds.map((personId) => ({
@@ -111,6 +95,24 @@ export async function saveReviewedNote(payload: ReviewPayload): Promise<SaveResu
     );
     if (npError) {
       return { error: `Failed to link people: ${npError.message}` };
+    }
+  }
+
+  // Insert tasks (with resolved actionee_id)
+  if (payload.tasks.length > 0) {
+    const { error: tasksError } = await supabase.from('tasks').insert(
+      payload.tasks.map((t) => ({
+        user_id: user.id,
+        note_id: noteId,
+        title: t.title.trim(),
+        due_date: t.due_date || null,
+        priority: t.priority || null,
+        status: 'todo',
+        actionee_id: t.actionee_person_id ? (personIdMap.get(t.actionee_person_id) ?? null) : null,
+      })),
+    );
+    if (tasksError) {
+      return { error: `Failed to save tasks: ${tasksError.message}` };
     }
   }
 

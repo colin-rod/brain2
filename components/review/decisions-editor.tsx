@@ -1,6 +1,7 @@
 'use client';
 
 import { Input } from '@/components/ui/input';
+import { DateInputWithShortcuts } from '@/components/ui/date-input-with-shortcuts';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Plus, X } from 'lucide-react';
@@ -65,14 +66,13 @@ export function DecisionsEditor() {
                   placeholder="Why was this decided?"
                 />
               </div>
-              <div className="w-40">
+              <div className="w-48">
                 <label className="text-metadata text-foreground-muted block mb-1">Date</label>
-                <Input
-                  type="date"
+                <DateInputWithShortcuts
                   value={decision.decision_date || ''}
-                  onChange={(e) =>
+                  onChange={(v) =>
                     updateDecision(decision.id, {
-                      decision_date: e.target.value || null,
+                      decision_date: v || null,
                     })
                   }
                 />

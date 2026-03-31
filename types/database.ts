@@ -15,7 +15,7 @@ export type CaptureStatus =
 
 export type TaskStatus = 'todo' | 'in_progress' | 'done' | 'canceled';
 
-export type TaskPriority = 'high' | 'medium' | 'low';
+export type TaskPriority = 'P0' | 'P1' | 'P2' | 'P3';
 
 export type QuestionStatus = 'open' | 'resolved';
 
@@ -61,6 +61,7 @@ export interface Task {
   status: TaskStatus;
   priority: TaskPriority | null;
   due_date: string | null;
+  actionee_id: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -125,6 +126,7 @@ export interface ParsedNoteJson {
     title: string;
     due_date: string | null;
     priority: TaskPriority | null;
+    actionee_name: string | null;
   }[];
   people: {
     name: string;

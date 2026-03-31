@@ -30,7 +30,21 @@
       "Bash(git -C /Users/colinrodrigues/Brain2 push -u origin main)",
       "Bash(git checkout:*)",
       "Bash(git push:*)",
-      "Bash(pnpm --version)"
+      "Bash(pnpm --version)",
+      "Bash(ls -la /Users/colinrodrigues/Brain2/app/\\\\\\(auth\\\\\\)/)",
+      "Bash(ls -la /Users/colinrodrigues/Brain2/app/\\\\\\(auth\\\\\\)/login/)",
+      "Bash(ls -la /Users/colinrodrigues/Brain2/app/\\\\\\(app\\\\\\)/)",
+      "Bash(grep -r priority /Users/colinrodrigues/Brain2 --include=*.ts --include=*.tsx)",
+      "Bash(grep -r \"High\\\\|Medium\\\\|Low\" /Users/colinrodrigues/Brain2 --include=*.ts --include=*.tsx)",
+      "Bash(grep -r \"SelectItem.*high\\\\|SelectItem.*medium\\\\|SelectItem.*low\" /Users/colinrodrigues/Brain2 --include=*.ts --include=*.tsx)",
+      "Bash(find /Users/colinrodrigues/Brain2/app -type d -name *inbox*)",
+      "Bash(ls -la /Users/colinrodrigues/Brain2/app/\\\\\\(app\\\\\\)/inbox/)",
+      "Bash(find /Users/colinrodrigues/Brain2/supabase -name *.sql -type f)",
+      "Bash(ls -la /Users/colinrodrigues/Brain2/app/\\\\\\(app\\\\\\)/notes/)",
+      "Bash(ls -la /Users/colinrodrigues/Brain2/app/\\\\\\(app\\\\\\)/notes/[noteId\\\\\\)/)",
+      "Bash(find /Users/colinrodrigues/Brain2/app/\\\\\\(app\\\\\\)/notes/[noteId] -type f)",
+      "Bash(grep -r fuse /Users/colinrodrigues/Brain2 --include=*.ts --include=*.tsx)",
+      "Bash(grep -r \"combobox\\\\|Combobox\" /Users/colinrodrigues/Brain2 --include=*.ts --include=*.tsx)"
     ],
     "additionalDirectories": ["/Users/colinrodrigues/Brain2/app/(app)/review"]
   }

@@ -5,6 +5,7 @@ import { PageHeader } from '@/components/shared/page-header';
 import { TaskStatusBadge } from '@/components/shared/status-badge';
 import { Separator } from '@/components/ui/separator';
 import { ArrowLeft, FileText, CheckSquare } from 'lucide-react';
+import { formatDate } from '@/lib/format-date';
 import type { Person, Note, Task } from '@/types/database';
 
 interface PersonDetailPageProps {
@@ -30,6 +31,17 @@ export default async function PersonDetailPage({ params }: PersonDetailPageProps
     .from('note_people')
     .select('note_id')
     .eq('person_id', personId);
+
+  // Load tasks directly assigned to this person
+  const assignedTasksRes = await supabase
+    .from('tasks')
+    .select('*, notes(id, title)')
+    .eq('actionee_id', personId)
+    .order('created_at');
+
+  const assignedTasks = (assignedTasksRes.data ?? []) as (Task & {
+    notes: { id: string; title: string } | null;
+  })[];
 
   const noteIds = (junctions ?? []).map((j) => j.note_id);
   let notes: Note[] = [];
@@ -64,6 +76,39 @@ export default async function PersonDetailPage({ params }: PersonDetailPageProps
         <p className="text-body text-foreground-secondary">{typedPerson.role}</p>
       )}
 
+      {assignedTasks.length > 0 && (
+        <>
+          <Separator />
+          <div>
+            <h2 className="text-section-header mb-north-md flex items-center gap-north-sm">
+              <CheckSquare className="h-4 w-4" />
+              Assigned Tasks ({assignedTasks.length})
+            </h2>
+            <div className="space-y-north-xs">
+              {assignedTasks.map((task) => (
+                <div
+                  key={task.id}
+                  className="flex items-center justify-between rounded-md border border-border bg-surface px-north-md py-north-sm"
+                >
+                  <div>
+                    <p className="text-body">{task.title}</p>
+                    {task.notes && (
+                      <Link
+                        href={`/notes/${task.notes.id}`}
+                        className="text-metadata text-primary hover:underline"
+                      >
+                        {task.notes.title}
+                      </Link>
+                    )}
+                  </div>
+                  <TaskStatusBadge status={task.status} />
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+
       {notes.length > 0 && (
         <>
           <Separator />
@@ -81,7 +126,7 @@ export default async function PersonDetailPage({ params }: PersonDetailPageProps
                 >
                   <p className="text-body font-medium">{note.title}</p>
                   <p className="text-metadata text-foreground-muted">
-                    {new Date(note.created_at).toLocaleDateString()}
+                    {formatDate(note.created_at)}
                   </p>
                 </Link>
               ))}

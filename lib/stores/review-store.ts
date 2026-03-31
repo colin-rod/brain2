@@ -75,18 +75,43 @@ export const useReviewStore = create<ReviewState>()(
     (set) => ({
       ...emptyState,
 
-      initFromParsed: (captureId, parsed) =>
+      initFromParsed: (captureId, parsed) => {
+        const people = parsed.people.map((p) => ({
+          ...p,
+          id: uid(),
+          matchedPersonId: null,
+        }));
+
+        const tasks = parsed.tasks.map((t) => {
+          const actioneeName = t.actionee_name ?? null;
+          // Auto-match actionee to a person draft by case-insensitive name
+          const matched = actioneeName
+            ? people.find((p) => p.name.toLowerCase() === actioneeName.toLowerCase())
+            : null;
+          return {
+            ...t,
+            id: uid(),
+            actionee_name: actioneeName,
+            actionee_person_id: matched?.id ?? null,
+          };
+        });
+
         set({
           captureId,
           title: parsed.title,
           summary: parsed.summary,
           cleaned_text: parsed.cleaned_text,
-          tasks: parsed.tasks.map((t) => ({ ...t, id: uid() })),
-          people: parsed.people.map((p) => ({ ...p, id: uid(), matchedPersonId: null })),
-          projects: parsed.projects.map((p) => ({ ...p, id: uid(), matchedProjectId: null })),
+          tasks,
+          people,
+          projects: parsed.projects.map((p) => ({
+            ...p,
+            id: uid(),
+            matchedProjectId: null,
+          })),
           decisions: parsed.decisions.map((d) => ({ ...d, id: uid() })),
           open_questions: parsed.open_questions.map((q) => ({ ...q, id: uid() })),
-        }),
+        });
+      },
 
       reset: () => set(emptyState),
 
@@ -101,7 +126,17 @@ export const useReviewStore = create<ReviewState>()(
         })),
       addTask: () =>
         set((s) => ({
-          tasks: [...s.tasks, { id: uid(), title: '', due_date: null, priority: null }],
+          tasks: [
+            ...s.tasks,
+            {
+              id: uid(),
+              title: '',
+              due_date: null,
+              priority: null,
+              actionee_name: null,
+              actionee_person_id: null,
+            },
+          ],
         })),
       removeTask: (id) => set((s) => ({ tasks: s.tasks.filter((t) => t.id !== id) })),
 
@@ -114,7 +149,16 @@ export const useReviewStore = create<ReviewState>()(
         set((s) => ({
           people: [...s.people, { id: uid(), name: '', role: null, matchedPersonId: null }],
         })),
-      removePerson: (id) => set((s) => ({ people: s.people.filter((p) => p.id !== id) })),
+      removePerson: (id) =>
+        set((s) => ({
+          people: s.people.filter((p) => p.id !== id),
+          // Clear actionee on any task referencing the removed person
+          tasks: s.tasks.map((t) =>
+            t.actionee_person_id === id
+              ? { ...t, actionee_person_id: null, actionee_name: null }
+              : t,
+          ),
+        })),
 
       // Projects
       updateProject: (id, updates) =>

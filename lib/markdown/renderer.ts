@@ -1,3 +1,4 @@
+import { formatDate } from '@/lib/format-date';
 import type {
   Note,
   Task,
@@ -11,7 +12,7 @@ import type {
 interface RenderInput {
   note: Note;
   capture: Capture;
-  tasks: Task[];
+  tasks: (Task & { actionee?: { name: string } | null })[];
   people: Person[];
   projects: Project[];
   decisions: Decision[];
@@ -27,7 +28,7 @@ export function renderNoteMarkdown(input: RenderInput): string {
   lines.push('');
 
   // Metadata
-  lines.push(`> **Created:** ${new Date(note.created_at).toLocaleDateString()}`);
+  lines.push(`> **Created:** ${formatDate(note.created_at)}`);
   lines.push(`> **Source:** ${capture.source_type.replace('_', ' ')}`);
   lines.push('');
 
@@ -54,8 +55,9 @@ export function renderNoteMarkdown(input: RenderInput): string {
     for (const task of tasks) {
       const check = task.status === 'done' ? 'x' : ' ';
       const parts = [`- [${check}] ${task.title}`];
+      if (task.actionee?.name) parts.push(`(@${task.actionee.name})`);
       if (task.priority) parts.push(`[${task.priority}]`);
-      if (task.due_date) parts.push(`(due: ${task.due_date})`);
+      if (task.due_date) parts.push(`(due: ${formatDate(task.due_date)})`);
       lines.push(parts.join(' '));
     }
     lines.push('');
@@ -93,7 +95,7 @@ export function renderNoteMarkdown(input: RenderInput): string {
         lines.push(`**Rationale:** ${decision.rationale}`);
       }
       if (decision.decision_date) {
-        lines.push(`**Date:** ${decision.decision_date}`);
+        lines.push(`**Date:** ${formatDate(decision.decision_date)}`);
       }
       lines.push('');
     }

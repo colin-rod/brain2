@@ -1,6 +1,7 @@
 'use client';
 
 import { Input } from '@/components/ui/input';
+import { DateInputWithShortcuts } from '@/components/ui/date-input-with-shortcuts';
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -15,6 +16,7 @@ import type { TaskPriority } from '@/types/database';
 
 export function TasksEditor() {
   const tasks = useReviewStore((s) => s.tasks);
+  const people = useReviewStore((s) => s.people);
   const updateTask = useReviewStore((s) => s.updateTask);
   const addTask = useReviewStore((s) => s.addTask);
   const removeTask = useReviewStore((s) => s.removeTask);
@@ -59,10 +61,9 @@ export function TasksEditor() {
             <div className="flex gap-north-sm">
               <div className="flex-1">
                 <label className="text-metadata text-foreground-muted block mb-1">Due date</label>
-                <Input
-                  type="date"
+                <DateInputWithShortcuts
                   value={task.due_date || ''}
-                  onChange={(e) => updateTask(task.id, { due_date: e.target.value || null })}
+                  onChange={(v) => updateTask(task.id, { due_date: v || null })}
                 />
               </div>
               <div className="w-32">
@@ -80,9 +81,35 @@ export function TasksEditor() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">None</SelectItem>
-                    <SelectItem value="high">High</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="low">Low</SelectItem>
+                    <SelectItem value="P0">P0</SelectItem>
+                    <SelectItem value="P1">P1</SelectItem>
+                    <SelectItem value="P2">P2</SelectItem>
+                    <SelectItem value="P3">P3</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="w-40">
+                <label className="text-metadata text-foreground-muted block mb-1">Actionee</label>
+                <Select
+                  value={task.actionee_person_id || 'none'}
+                  onValueChange={(v) =>
+                    updateTask(task.id, {
+                      actionee_person_id: v === 'none' ? null : v,
+                      actionee_name:
+                        v === 'none' ? null : (people.find((p) => p.id === v)?.name ?? null),
+                    })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Unassigned" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Unassigned</SelectItem>
+                    {people.map((p) => (
+                      <SelectItem key={p.id} value={p.id}>
+                        {p.name || '(unnamed)'}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>

@@ -111,6 +111,7 @@ export async function fetchCaptures() {
     .from('captures')
     .select('*')
     .eq('user_id', user.id)
+    .neq('status', 'saved')
     .order('created_at', { ascending: false });
 
   if (error) {

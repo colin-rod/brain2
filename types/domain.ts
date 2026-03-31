@@ -23,6 +23,9 @@ export interface TaskDraft {
   title: string;
   due_date: string | null;
   priority: TaskPriority | null;
+  actionee_name: string | null;
+  /** Draft person ID selected during review — resolved to real DB ID at save time */
+  actionee_person_id: string | null;
 }
 
 export interface PersonDraft {

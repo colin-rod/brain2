@@ -48,7 +48,11 @@ export async function exportNoteMarkdown(noteId: string): Promise<ExportResult> 
 
   // Load related entities
   const [tasksRes, peopleRes, projectsRes, decisionsRes, questionsRes] = await Promise.all([
-    supabase.from('tasks').select('*').eq('note_id', noteId).order('created_at'),
+    supabase
+      .from('tasks')
+      .select('*, actionee:people!actionee_id(name)')
+      .eq('note_id', noteId)
+      .order('created_at'),
     supabase
       .from('note_people')
       .select('person_id')
@@ -74,7 +78,7 @@ export async function exportNoteMarkdown(noteId: string): Promise<ExportResult> 
   const markdown = renderNoteMarkdown({
     note: note as Note,
     capture: (capture ?? { source_type: 'text' }) as Capture,
-    tasks: (tasksRes.data ?? []) as Task[],
+    tasks: (tasksRes.data ?? []) as (Task & { actionee: { name: string } | null })[],
     people: (peopleRes.data ?? []) as Person[],
     projects: (projectsRes.data ?? []) as Project[],
     decisions: (decisionsRes.data ?? []) as Decision[],

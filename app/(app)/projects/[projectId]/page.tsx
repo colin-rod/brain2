@@ -5,6 +5,7 @@ import { PageHeader } from '@/components/shared/page-header';
 import { TaskStatusBadge } from '@/components/shared/status-badge';
 import { Separator } from '@/components/ui/separator';
 import { ArrowLeft, FileText, CheckSquare, Scale } from 'lucide-react';
+import { formatDate } from '@/lib/format-date';
 import type { Project, Note, Task, Decision } from '@/types/database';
 
 interface ProjectDetailPageProps {
@@ -84,7 +85,7 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
                 >
                   <p className="text-body font-medium">{note.title}</p>
                   <p className="text-metadata text-foreground-muted">
-                    {new Date(note.created_at).toLocaleDateString()}
+                    {formatDate(note.created_at)}
                   </p>
                 </Link>
               ))}

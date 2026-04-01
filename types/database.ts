@@ -56,12 +56,13 @@ export interface Note {
 export interface Task {
   id: string;
   user_id: string;
-  note_id: string;
+  note_id: string | null;
   title: string;
   status: TaskStatus;
   priority: TaskPriority | null;
   due_date: string | null;
   actionee_id: string | null;
+  project_id: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -89,10 +90,11 @@ export interface Project {
 export interface Decision {
   id: string;
   user_id: string;
-  note_id: string;
+  note_id: string | null;
   decision_text: string;
   rationale: string | null;
   decision_date: string | null;
+  project_id: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -115,6 +117,16 @@ export interface NotePerson {
 export interface NoteProject {
   note_id: string;
   project_id: string;
+}
+
+export interface ProjectPerson {
+  project_id: string;
+  person_id: string;
+}
+
+export interface DecisionPerson {
+  decision_id: string;
+  person_id: string;
 }
 
 /* JSON shape stored in captures.parsed_json */

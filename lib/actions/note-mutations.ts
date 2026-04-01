@@ -51,6 +51,8 @@ export async function updateTask(
     due_date?: string | null;
     priority?: TaskPriority | null;
     status?: TaskStatus;
+    actionee_id?: string | null;
+    project_id?: string | null;
   },
 ): Promise<MutationResult> {
   const { supabase, user } = await getUser();
@@ -108,6 +110,7 @@ export async function updateDecision(
     decision_text?: string;
     rationale?: string | null;
     decision_date?: string | null;
+    project_id?: string | null;
   },
 ): Promise<MutationResult> {
   const { supabase, user } = await getUser();

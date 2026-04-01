@@ -44,7 +44,17 @@
       "Bash(ls -la /Users/colinrodrigues/Brain2/app/\\\\\\(app\\\\\\)/notes/[noteId\\\\\\)/)",
       "Bash(find /Users/colinrodrigues/Brain2/app/\\\\\\(app\\\\\\)/notes/[noteId] -type f)",
       "Bash(grep -r fuse /Users/colinrodrigues/Brain2 --include=*.ts --include=*.tsx)",
-      "Bash(grep -r \"combobox\\\\|Combobox\" /Users/colinrodrigues/Brain2 --include=*.ts --include=*.tsx)"
+      "Bash(grep -r \"combobox\\\\|Combobox\" /Users/colinrodrigues/Brain2 --include=*.ts --include=*.tsx)",
+      "Bash(xargs -I {} basename {} .tsx)",
+      "Bash(wc -l /Users/colinrodrigues/Brain2/supabase/migrations/*.sql)",
+      "Bash(cat \"/Users/colinrodrigues/Brain2/app/\\(app\\)/notes/page.tsx\")",
+      "Bash(cat \"/Users/colinrodrigues/Brain2/app/\\(app\\)/tasks/page.tsx\")",
+      "Bash(cat \"/Users/colinrodrigues/Brain2/app/\\(app\\)/people/page.tsx\")",
+      "Bash(cat \"/Users/colinrodrigues/Brain2/app/\\(app\\)/projects/page.tsx\")",
+      "Bash(cat \"/Users/colinrodrigues/Brain2/app/\\(app\\)/decisions/page.tsx\")",
+      "Bash(cat \"/Users/colinrodrigues/Brain2/app/\\(app\\)/inbox/page.tsx\")",
+      "Bash(ls /Users/colinrodrigues/Brain2/app/\\\\\\(app\\\\\\)/)",
+      "Bash(ls \"/Users/colinrodrigues/Brain2/app/\\(app\\)/\")"
     ],
     "additionalDirectories": ["/Users/colinrodrigues/Brain2/app/(app)/review"]
   }

@@ -4,8 +4,9 @@ import { createClient } from '@/lib/supabase/server';
 import { PageHeader } from '@/components/shared/page-header';
 import { TaskStatusBadge } from '@/components/shared/status-badge';
 import { Separator } from '@/components/ui/separator';
-import { ArrowLeft, FileText, CheckSquare, Scale } from 'lucide-react';
+import { ArrowLeft, FileText, CheckSquare, Scale, Users } from 'lucide-react';
 import { formatDate } from '@/lib/format-date';
+import { ProjectPeopleSection } from '@/components/projects/project-people-section';
 import type { Project, Note, Task, Decision } from '@/types/database';
 
 interface ProjectDetailPageProps {
@@ -33,24 +34,70 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
     .eq('project_id', projectId);
 
   const noteIds = (junctions ?? []).map((j) => j.note_id);
-  let notes: Note[] = [];
-  let tasks: Task[] = [];
-  let decisions: Decision[] = [];
 
-  if (noteIds.length > 0) {
-    const [notesRes, tasksRes, decisionsRes] = await Promise.all([
-      supabase
-        .from('notes')
-        .select('*')
-        .in('id', noteIds)
-        .order('created_at', { ascending: false }),
-      supabase.from('tasks').select('*').in('note_id', noteIds).order('created_at'),
-      supabase.from('decisions').select('*').in('note_id', noteIds).order('created_at'),
-    ]);
-    notes = (notesRes.data ?? []) as Note[];
-    tasks = (tasksRes.data ?? []) as Task[];
-    decisions = (decisionsRes.data ?? []) as Decision[];
-  }
+  // Fetch note-linked + direct-linked tasks/decisions in parallel
+  const [
+    notesRes,
+    noteTasksRes,
+    noteDecisionsRes,
+    directTasksRes,
+    directDecisionsRes,
+    linkedPeopleRes,
+    allPeopleRes,
+  ] = await Promise.all([
+    noteIds.length > 0
+      ? supabase
+          .from('notes')
+          .select('*')
+          .in('id', noteIds)
+          .order('created_at', { ascending: false })
+      : Promise.resolve({ data: [] }),
+    noteIds.length > 0
+      ? supabase.from('tasks').select('*').in('note_id', noteIds).order('created_at')
+      : Promise.resolve({ data: [] }),
+    noteIds.length > 0
+      ? supabase.from('decisions').select('*').in('note_id', noteIds).order('created_at')
+      : Promise.resolve({ data: [] }),
+    supabase
+      .from('tasks')
+      .select('*, actionee:people!actionee_id(id, name)')
+      .eq('project_id', projectId)
+      .order('created_at'),
+    supabase.from('decisions').select('*').eq('project_id', projectId).order('created_at'),
+    supabase
+      .from('project_people')
+      .select('person_id, people(id, name, role)')
+      .eq('project_id', projectId),
+    supabase.from('people').select('id, name').order('name'),
+  ]);
+
+  const notes = (notesRes.data ?? []) as Note[];
+
+  // Merge note-linked and direct-linked tasks, deduplicate by id
+  const allTasks = [
+    ...((noteTasksRes.data ?? []) as Task[]),
+    ...((directTasksRes.data ?? []) as Task[]),
+  ];
+  const taskMap = new Map<string, Task>();
+  for (const t of allTasks) taskMap.set(t.id, t);
+  const tasks = Array.from(taskMap.values());
+
+  // Merge decisions similarly
+  const allDecisions = [
+    ...((noteDecisionsRes.data ?? []) as Decision[]),
+    ...((directDecisionsRes.data ?? []) as Decision[]),
+  ];
+  const decisionMap = new Map<string, Decision>();
+  for (const d of allDecisions) decisionMap.set(d.id, d);
+  const decisions = Array.from(decisionMap.values());
+
+  const linkedPeople = (
+    (linkedPeopleRes.data ?? []) as unknown as {
+      person_id: string;
+      people: { id: string; name: string; role: string | null };
+    }[]
+  ).map((lp) => lp.people);
+  const allPeople = (allPeopleRes.data ?? []) as { id: string; name: string }[];
 
   return (
     <div className="space-y-north-lg">
@@ -67,6 +114,20 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
       {typedProject.status && (
         <p className="text-body text-foreground-secondary">Status: {typedProject.status}</p>
       )}
+
+      {/* People section */}
+      <Separator />
+      <div>
+        <h2 className="text-section-header mb-north-md flex items-center gap-north-sm">
+          <Users className="h-4 w-4" />
+          People ({linkedPeople.length})
+        </h2>
+        <ProjectPeopleSection
+          projectId={projectId}
+          linkedPeople={linkedPeople}
+          allPeople={allPeople}
+        />
+      </div>
 
       {notes.length > 0 && (
         <>

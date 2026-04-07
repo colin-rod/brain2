@@ -114,7 +114,7 @@ export function ReviewClient({ capture, imageUrl }: ReviewClientProps) {
       </div>
 
       {/* Mobile fixed save bar */}
-      <div className="lg:hidden fixed bottom-14 inset-x-0 bg-surface border-t border-border p-north-sm z-40">
+      <div className="lg:hidden fixed bottom-[calc(3.5rem+env(safe-area-inset-bottom,0px))] inset-x-0 bg-surface border-t border-border p-north-sm z-40">
         <Button onClick={handleSave} disabled={isSaving || isSaved} className="w-full" size="lg">
           {isSaving ? (
             <Loader2 className="h-4 w-4 mr-2 animate-spin" />

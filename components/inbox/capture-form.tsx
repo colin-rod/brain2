@@ -57,15 +57,15 @@ export function CaptureForm() {
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="image" className="gap-1.5">
             <ImageIcon className="h-4 w-4" />
-            <span className="hidden sm:inline">Image</span>
+            <span>Image</span>
           </TabsTrigger>
           <TabsTrigger value="text" className="gap-1.5">
             <FileText className="h-4 w-4" />
-            <span className="hidden sm:inline">Text</span>
+            <span>Text</span>
           </TabsTrigger>
           <TabsTrigger value="chat_transcript" className="gap-1.5">
             <MessageSquare className="h-4 w-4" />
-            <span className="hidden sm:inline">Chat</span>
+            <span>Chat</span>
           </TabsTrigger>
         </TabsList>
 

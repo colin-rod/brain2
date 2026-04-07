@@ -365,7 +365,7 @@ export function TasksList({ tasks, allPeople, allProjects }: TasksListProps) {
                   size="sm"
                   onClick={() => handleDelete(task.id)}
                   disabled={isPending}
-                  className="shrink-0 text-foreground-muted hover:text-destructive h-7 w-7 p-0"
+                  className="shrink-0 text-foreground-muted hover:text-destructive h-9 w-9 p-0"
                 >
                   <X className="h-3.5 w-3.5" />
                 </Button>

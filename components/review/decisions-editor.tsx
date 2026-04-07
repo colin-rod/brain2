@@ -20,7 +20,9 @@ export function DecisionsEditor() {
     <div className="space-y-north-sm">
       <EditorSectionHeader title="Decisions" onAdd={addDecision} />
 
-      {decisions.length === 0 && <EditorEmptyMessage message="Nothing decided yet." />}
+      {decisions.length === 0 && (
+        <EditorEmptyMessage message="No decisions found — add one if needed." />
+      )}
 
       <div className="space-y-north-sm">
         {decisions.map((decision) => (

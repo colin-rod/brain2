@@ -80,13 +80,13 @@ export function NoteDetailClient({
 
       {(note.cleaned_text || true) && (
         <div>
-          <h2 className="text-section-header mb-north-xs">Notes</h2>
+          <h2 className="text-section-header mb-north-xs">Content</h2>
           <InlineEditableText
             value={note.cleaned_text || ''}
             onSave={async (v) => updateNote(note.id, { cleaned_text: v })}
             className="text-body text-foreground-secondary whitespace-pre-wrap"
             inputClassName="text-body"
-            placeholder="Add notes..."
+            placeholder="Add content..."
             multiline
             rows={8}
           />

@@ -40,7 +40,7 @@ export function CaptureForm() {
         return;
       }
 
-      toast.success('Capture created');
+      toast.success('Added to inbox');
       setText('');
       setFile(null);
       router.refresh();
@@ -97,7 +97,7 @@ export function CaptureForm() {
       <div className="mt-north-base flex justify-end">
         <Button onClick={handleSubmit} disabled={!canSubmit}>
           {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          Create Capture
+          Add to Inbox
         </Button>
       </div>
     </div>

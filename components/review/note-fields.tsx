@@ -52,13 +52,13 @@ export function NoteFields() {
           htmlFor="cleaned-text"
           className="text-metadata text-foreground-secondary block mb-north-xs"
         >
-          Cleaned Text
+          Full Notes
         </label>
         <Textarea
           id="cleaned-text"
           value={cleaned_text}
           onChange={(e) => setCleanedText(e.target.value)}
-          placeholder="Cleaned-up version of the full content..."
+          placeholder="Full content of the note..."
           rows={8}
           className="resize-y"
         />

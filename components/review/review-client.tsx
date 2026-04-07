@@ -63,7 +63,7 @@ export function ReviewClient({ capture, imageUrl }: ReviewClientProps) {
         return;
       }
 
-      toast.success('Note saved');
+      toast.success('Saved to Notes');
       setIsSaved(true);
       const noteId = result.noteId;
       setTimeout(() => {
@@ -107,7 +107,7 @@ export function ReviewClient({ capture, imageUrl }: ReviewClientProps) {
               ) : (
                 <Save className="h-4 w-4 mr-2" />
               )}
-              {isSaving ? 'Saving…' : isSaved ? 'Saved' : 'Save Note'}
+              {isSaving ? 'Saving…' : isSaved ? 'Saved' : 'Save to Notes'}
             </Button>
           </div>
         </div>
@@ -123,7 +123,7 @@ export function ReviewClient({ capture, imageUrl }: ReviewClientProps) {
           ) : (
             <Save className="h-4 w-4 mr-2" />
           )}
-          {isSaving ? 'Saving…' : isSaved ? 'Saved' : 'Save Note'}
+          {isSaving ? 'Saving…' : isSaved ? 'Saved' : 'Save to Notes'}
         </Button>
       </div>
     </>

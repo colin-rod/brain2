@@ -4,13 +4,13 @@ import { Separator } from '@/components/ui/separator';
 export default function SettingsPage() {
   return (
     <div className="space-y-north-lg">
-      <PageHeader title="Settings" description="Application configuration." />
+      <PageHeader title="Settings" description="Brain2 is powered by these services." />
 
       <div className="rounded-lg border border-border bg-surface p-north-lg space-y-north-base">
         <div>
           <h2 className="text-section-header">Parser</h2>
           <p className="text-body text-foreground-secondary mt-north-xs">
-            OpenAI GPT-4o with Structured Outputs
+            OpenAI GPT-4o — used to extract structure from your notes
           </p>
         </div>
 
@@ -19,7 +19,7 @@ export default function SettingsPage() {
         <div>
           <h2 className="text-section-header">Storage</h2>
           <p className="text-body text-foreground-secondary mt-north-xs">
-            Supabase (Postgres + Storage)
+            Supabase — stores your notes, tasks, and uploads
           </p>
         </div>
 
@@ -28,7 +28,7 @@ export default function SettingsPage() {
         <div>
           <h2 className="text-section-header">Authentication</h2>
           <p className="text-body text-foreground-secondary mt-north-xs">
-            Supabase Auth (email/password)
+            Supabase Auth — email and password sign-in
           </p>
         </div>
 

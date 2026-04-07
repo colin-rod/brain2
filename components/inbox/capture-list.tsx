@@ -31,8 +31,8 @@ const statusStyles: Record<CaptureStatus, string> = {
 const statusLabels: Record<CaptureStatus, string> = {
   new: 'New',
   processing: 'Processing',
-  ocr_complete: 'OCR Done',
-  parsed: 'Parsed',
+  ocr_complete: 'Extracted',
+  parsed: 'Ready to review',
   in_review: 'In Review',
   saved: 'Saved',
   failed: 'Failed',
@@ -58,9 +58,9 @@ function getPreviewText(capture: Capture): string {
     return capture.raw_text.slice(0, 120) + (capture.raw_text.length > 120 ? '...' : '');
   }
   if (capture.source_type === 'image') {
-    return 'Image capture';
+    return 'Image uploaded';
   }
-  return 'No preview';
+  return 'No content preview';
 }
 
 interface CaptureListProps {
@@ -131,7 +131,7 @@ function CaptureCard({ capture, index }: { capture: Capture; index: number }) {
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success('Parsed successfully');
+        toast.success('Ready to review');
         router.refresh();
       }
     });
@@ -195,7 +195,7 @@ function CaptureCard({ capture, index }: { capture: Capture; index: number }) {
           ) : (
             <>
               <Sparkles className="h-3.5 w-3.5 mr-1.5" />
-              Parse
+              Extract
             </>
           )}
         </Button>

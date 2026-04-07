@@ -17,7 +17,9 @@ export function QuestionsEditor() {
     <div className="space-y-north-sm">
       <EditorSectionHeader title="Open Questions" onAdd={addQuestion} />
 
-      {questions.length === 0 && <EditorEmptyMessage message="No loose threads." />}
+      {questions.length === 0 && (
+        <EditorEmptyMessage message="No open questions found — add one if needed." />
+      )}
 
       <div className="space-y-north-xs">
         {questions.map((q) => (

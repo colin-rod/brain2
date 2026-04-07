@@ -37,7 +37,7 @@ export default async function ReviewPage({ params }: ReviewPageProps) {
       <div>
         <h1 className="text-page-title">Review</h1>
         <p className="text-foreground-secondary mt-north-xs">
-          Review and edit extracted content before saving.
+          Check what was extracted, make any edits, then save.
         </p>
       </div>
 

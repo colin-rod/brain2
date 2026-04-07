@@ -17,7 +17,7 @@ export function PeopleEditor() {
     <div className="space-y-north-sm">
       <EditorSectionHeader title="People" onAdd={addPerson} />
 
-      {people.length === 0 && <EditorEmptyMessage message="No people extracted." />}
+      {people.length === 0 && <EditorEmptyMessage message="No one mentioned." />}
 
       <div className="space-y-north-xs">
         {people.map((person) => (

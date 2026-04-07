@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useTransition } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { useReviewStore } from '@/lib/stores/review-store';
@@ -14,7 +14,7 @@ import { DecisionsEditor } from './decisions-editor';
 import { QuestionsEditor } from './questions-editor';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
-import { Loader2, Save } from 'lucide-react';
+import { Check, Loader2, Save } from 'lucide-react';
 import type { Capture, ParsedNoteJson } from '@/types/database';
 
 interface ReviewClientProps {
@@ -25,6 +25,7 @@ interface ReviewClientProps {
 export function ReviewClient({ capture, imageUrl }: ReviewClientProps) {
   const router = useRouter();
   const [isSaving, startTransition] = useTransition();
+  const [isSaved, setIsSaved] = useState(false);
 
   const store = useReviewStore();
   const captureId = store.captureId;
@@ -62,9 +63,13 @@ export function ReviewClient({ capture, imageUrl }: ReviewClientProps) {
         return;
       }
 
-      toast.success('Note saved successfully');
-      reset();
-      router.push(`/notes/${result.noteId}`);
+      toast.success('Note saved');
+      setIsSaved(true);
+      const noteId = result.noteId;
+      setTimeout(() => {
+        reset();
+        router.push(`/notes/${noteId}`);
+      }, 800);
     });
   }
 
@@ -94,13 +99,15 @@ export function ReviewClient({ capture, imageUrl }: ReviewClientProps) {
 
           {/* Desktop save button */}
           <div className="hidden lg:flex justify-end pt-north-base">
-            <Button onClick={handleSave} disabled={isSaving} size="lg">
+            <Button onClick={handleSave} disabled={isSaving || isSaved} size="lg">
               {isSaving ? (
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : isSaved ? (
+                <Check className="h-4 w-4 mr-2" />
               ) : (
                 <Save className="h-4 w-4 mr-2" />
               )}
-              Save Note
+              {isSaving ? 'Saving…' : isSaved ? 'Saved' : 'Save Note'}
             </Button>
           </div>
         </div>
@@ -108,13 +115,15 @@ export function ReviewClient({ capture, imageUrl }: ReviewClientProps) {
 
       {/* Mobile fixed save bar */}
       <div className="lg:hidden fixed bottom-14 inset-x-0 bg-surface border-t border-border p-north-sm z-40">
-        <Button onClick={handleSave} disabled={isSaving} className="w-full" size="lg">
+        <Button onClick={handleSave} disabled={isSaving || isSaved} className="w-full" size="lg">
           {isSaving ? (
             <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+          ) : isSaved ? (
+            <Check className="h-4 w-4 mr-2" />
           ) : (
             <Save className="h-4 w-4 mr-2" />
           )}
-          Save Note
+          {isSaving ? 'Saving…' : isSaved ? 'Saved' : 'Save Note'}
         </Button>
       </div>
     </>

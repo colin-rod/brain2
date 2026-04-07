@@ -28,7 +28,7 @@ export function TasksEditor() {
     <div className="space-y-north-sm">
       <EditorSectionHeader title="Tasks" onAdd={addTask} />
 
-      {tasks.length === 0 && <EditorEmptyMessage message="No tasks extracted." />}
+      {tasks.length === 0 && <EditorEmptyMessage message="Nothing to act on — yet." />}
 
       <div className="space-y-north-sm">
         {tasks.map((task) => (

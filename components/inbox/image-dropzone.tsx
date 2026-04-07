@@ -88,13 +88,18 @@ export function ImageDropzone({ file, onFileChange }: ImageDropzoneProps) {
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       className={cn(
-        'flex flex-col items-center justify-center gap-north-sm rounded-md border-2 border-dashed p-north-xl cursor-pointer transition-colors',
+        'flex flex-col items-center justify-center gap-north-sm rounded-md border-2 border-dashed p-north-xl cursor-pointer transition-all duration-200 ease-out',
         isDragging
-          ? 'border-primary bg-primary-tint'
-          : 'border-border hover:border-foreground-muted hover:bg-surface-subtle',
+          ? 'border-primary bg-primary-tint scale-[1.015] shadow-md'
+          : 'border-border hover:border-foreground-muted hover:bg-surface-subtle scale-100 shadow-none',
       )}
     >
-      <Upload className="h-8 w-8 text-foreground-muted" />
+      <Upload
+        className={cn(
+          'h-8 w-8 transition-all duration-200',
+          isDragging ? 'text-primary -translate-y-0.5' : 'text-foreground-muted translate-y-0',
+        )}
+      />
       <div className="text-center">
         <p className="text-body font-medium">Drop an image here or click to browse</p>
         <p className="text-metadata text-foreground-muted mt-1">PNG, JPG, HEIC up to 10MB</p>

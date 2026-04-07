@@ -17,7 +17,7 @@ export function ProjectsEditor() {
     <div className="space-y-north-sm">
       <EditorSectionHeader title="Projects" onAdd={addProject} />
 
-      {projects.length === 0 && <EditorEmptyMessage message="No projects extracted." />}
+      {projects.length === 0 && <EditorEmptyMessage message="No projects in view." />}
 
       <div className="space-y-north-xs">
         {projects.map((project) => (

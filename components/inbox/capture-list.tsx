@@ -1,6 +1,6 @@
 'use client';
 
-import { useTransition } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
@@ -70,12 +70,12 @@ interface CaptureListProps {
 export function CaptureList({ captures }: CaptureListProps) {
   if (captures.length === 0) {
     return (
-      <div className="border-t border-border pt-north-md">
+      <div className="border-t border-border pt-north-md animate-in fade-in slide-in-from-bottom-2 duration-700">
         <p className="text-metadata font-mono text-foreground-muted uppercase tracking-widest">
-          <span className="text-primary">{'// '}</span>NO CAPTURES
+          <span className="text-primary">{'// '}</span>INBOX CLEAR
         </p>
         <p className="text-metadata font-mono text-foreground-muted mt-1 uppercase tracking-wider">
-          Upload an image or paste text above to get started.
+          Drop an image or paste text above — Brain2 will find what matters.
         </p>
       </div>
     );
@@ -86,6 +86,33 @@ export function CaptureList({ captures }: CaptureListProps) {
       {captures.map((capture, index) => (
         <CaptureCard key={capture.id} capture={capture} index={index} />
       ))}
+    </div>
+  );
+}
+
+const PROCESSING_MESSAGES = [
+  'Extracting tasks...',
+  'Identifying people...',
+  'Reading between the lines...',
+  'Connecting the dots...',
+  'Finding what matters...',
+];
+
+function ProcessingIndicator() {
+  const [index, setIndex] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setIndex((i) => (i + 1) % PROCESSING_MESSAGES.length), 2500);
+    return () => clearInterval(id);
+  }, []);
+  return (
+    <div className="flex items-center gap-north-sm shrink-0">
+      <Loader2 className="h-4 w-4 text-status-processing animate-spin" />
+      <span
+        key={index}
+        className="text-metadata text-status-processing animate-in fade-in duration-500"
+      >
+        {PROCESSING_MESSAGES[index]}
+      </span>
     </div>
   );
 }
@@ -174,9 +201,7 @@ function CaptureCard({ capture, index }: { capture: Capture; index: number }) {
         </Button>
       )}
 
-      {capture.status === 'processing' && (
-        <Loader2 className="h-4 w-4 shrink-0 text-status-processing animate-spin" />
-      )}
+      {capture.status === 'processing' && <ProcessingIndicator />}
     </div>
   );
 

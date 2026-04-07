@@ -150,6 +150,19 @@
   --foreground-disabled: hsl(214 14% 82%);
   --primary-hover: hsl(16 95% 30%);
   --primary-tint: hsl(17 90% 88%);
+
+  /* Entity type tokens */
+  --entity-notes:          hsl(16 95% 37%);
+  --entity-notes-tint:     hsl(16 90% 95%);
+  --entity-tasks:          hsl(217 91% 60%);
+  --entity-tasks-tint:     hsl(217 85% 95%);
+  --entity-people:         hsl(142 71% 45%);
+  --entity-people-tint:    hsl(142 60% 94%);
+  --entity-decisions:      hsl(258 90% 66%);
+  --entity-decisions-tint: hsl(258 80% 95%);
+  --entity-projects:       hsl(32 95% 54%);
+  --entity-projects-tint:  hsl(32 90% 94%);
+
   --border-divider: hsl(35 18% 88%);
 
   /* Capture status colors */

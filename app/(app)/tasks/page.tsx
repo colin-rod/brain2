@@ -30,13 +30,20 @@ export default async function TasksPage() {
 
   return (
     <div className="space-y-north-lg">
-      <PageHeader title="Tasks" description="All tasks extracted from your notes." />
+      <PageHeader
+        title="Tasks"
+        description="All tasks extracted from your notes."
+        icon={CheckSquare}
+        iconColor="var(--entity-tasks)"
+      />
 
       {tasks.length === 0 ? (
         <EmptyState
           icon={CheckSquare}
           title="No tasks yet"
           description="Tasks appear here after you save notes with action items."
+          iconColor="var(--entity-tasks)"
+          bgColor="var(--entity-tasks-tint)"
         />
       ) : (
         <TasksList tasks={tasks} allPeople={allPeople} allProjects={allProjects} />

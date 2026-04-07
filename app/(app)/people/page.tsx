@@ -21,13 +21,20 @@ export default async function PeoplePage() {
 
   return (
     <div className="space-y-north-lg">
-      <PageHeader title="People" description="People mentioned across your notes." />
+      <PageHeader
+        title="People"
+        description="People mentioned across your notes."
+        icon={Users}
+        iconColor="var(--entity-people)"
+      />
 
       {people.length === 0 ? (
         <EmptyState
           icon={Users}
           title="No people yet"
           description="People appear here after you save notes that mention them."
+          iconColor="var(--entity-people)"
+          bgColor="var(--entity-people-tint)"
         />
       ) : (
         <PeopleList people={people} allProjects={allProjects} />

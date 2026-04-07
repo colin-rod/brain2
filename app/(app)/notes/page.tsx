@@ -16,13 +16,20 @@ export default async function NotesPage() {
 
   return (
     <div className="space-y-north-lg">
-      <PageHeader title="Notes" description="Browse all saved notes." />
+      <PageHeader
+        title="Notes"
+        description="Browse all saved notes."
+        icon={FileText}
+        iconColor="var(--entity-notes)"
+      />
 
       {notes.length === 0 ? (
         <EmptyState
           icon={FileText}
           title="No notes yet"
           description="Notes appear here after you save a reviewed capture."
+          iconColor="var(--entity-notes)"
+          bgColor="var(--entity-notes-tint)"
         />
       ) : (
         <NotesList notes={notes} />

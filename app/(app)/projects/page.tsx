@@ -21,13 +21,20 @@ export default async function ProjectsPage() {
 
   return (
     <div className="space-y-north-lg">
-      <PageHeader title="Projects" description="Projects referenced across your notes." />
+      <PageHeader
+        title="Projects"
+        description="Projects referenced across your notes."
+        icon={FolderOpen}
+        iconColor="var(--entity-projects)"
+      />
 
       {projects.length === 0 ? (
         <EmptyState
           icon={FolderOpen}
           title="No projects yet"
           description="Projects appear here after you save notes that reference them."
+          iconColor="var(--entity-projects)"
+          bgColor="var(--entity-projects-tint)"
         />
       ) : (
         <ProjectsList projects={projects} allPeople={allPeople} />

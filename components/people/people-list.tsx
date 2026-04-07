@@ -130,7 +130,7 @@ export function PeopleList({ people, allProjects }: PeopleListProps) {
         {filtered.map((person) => (
           <div
             key={person.id}
-            className="group relative rounded-lg border border-border bg-surface px-north-base py-north-md hover:bg-surface-subtle transition-colors"
+            className="group relative rounded-lg border border-border bg-surface px-north-base py-north-md hover:bg-surface-subtle transition-colors border-l-[3px] border-l-(--entity-people)"
           >
             <Button
               variant="ghost"

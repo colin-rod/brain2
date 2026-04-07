@@ -201,7 +201,7 @@ export function TasksList({ tasks, allPeople, allProjects }: TasksListProps) {
         {filtered.map((task, index) => (
           <div
             key={task.id}
-            className="px-north-sm py-north-xs border-l-2 border-transparent hover:border-primary/40"
+            className="px-north-sm py-north-xs border-l-[3px] border-l-(--entity-tasks)"
           >
             {/* Desktop: grid layout */}
             <div className="hidden sm:grid sm:grid-cols-[24px_1fr_100px_60px_90px_100px_100px_32px] gap-north-sm items-center">

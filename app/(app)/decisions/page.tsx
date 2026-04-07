@@ -30,13 +30,20 @@ export default async function DecisionsPage() {
 
   return (
     <div className="space-y-north-lg">
-      <PageHeader title="Decisions" description="All decisions extracted from your notes." />
+      <PageHeader
+        title="Decisions"
+        description="All decisions extracted from your notes."
+        icon={Scale}
+        iconColor="var(--entity-decisions)"
+      />
 
       {decisions.length === 0 ? (
         <EmptyState
           icon={Scale}
           title="No decisions yet"
           description="Decisions appear here after you save notes that contain them."
+          iconColor="var(--entity-decisions)"
+          bgColor="var(--entity-decisions-tint)"
         />
       ) : (
         <DecisionsList decisions={decisions} allProjects={allProjects} allPeople={allPeople} />

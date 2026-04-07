@@ -6,8 +6,11 @@ import { Button } from '@/components/ui/button';
 import { DateInputWithShortcuts } from '@/components/ui/date-input-with-shortcuts';
 import { Separator } from '@/components/ui/separator';
 import { InlineEditableText } from './inline-editable-text';
-import { Scale, Plus, X } from 'lucide-react';
+import { Scale, X } from 'lucide-react';
 import { updateDecision, addDecision, deleteDecision } from '@/lib/actions/note-mutations';
+import { EditorSectionHeader } from '@/components/shared/editor-section-header';
+import { EditorEmptyMessage } from '@/components/shared/editor-empty-message';
+import { EditorItemCard } from '@/components/shared/editor-item-card';
 import type { Decision } from '@/types/database';
 
 interface NoteDecisionsSectionProps {
@@ -64,22 +67,15 @@ export function NoteDecisionsSection({ noteId, decisions, onMutate }: NoteDecisi
     <>
       <Separator />
       <div>
-        <div className="flex items-center justify-between mb-north-md">
-          <h2 className="text-section-header flex items-center gap-north-sm">
-            <Scale className="h-4 w-4" />
-            Decisions ({decisions.length})
-          </h2>
-          <Button variant="ghost" size="sm" onClick={() => setIsAdding(true)} className="gap-1">
-            <Plus className="h-3.5 w-3.5" />
-            Add
-          </Button>
-        </div>
+        <EditorSectionHeader
+          title="Decisions"
+          onAdd={() => setIsAdding(true)}
+          icon={Scale}
+          count={decisions.length}
+        />
         <div className="space-y-north-sm">
           {decisions.map((d) => (
-            <div
-              key={d.id}
-              className="rounded-md border border-border bg-surface px-north-md py-north-sm"
-            >
+            <EditorItemCard key={d.id}>
               <div className="flex items-start justify-between gap-north-sm">
                 <div className="flex-1">
                   <InlineEditableText
@@ -124,10 +120,10 @@ export function NoteDecisionsSection({ noteId, decisions, onMutate }: NoteDecisi
                   />
                 </div>
               </div>
-            </div>
+            </EditorItemCard>
           ))}
           {isAdding && (
-            <div className="rounded-md border border-border bg-surface px-north-md py-north-sm">
+            <EditorItemCard>
               <InlineEditableText
                 value=""
                 onSave={async (v) => {
@@ -137,12 +133,10 @@ export function NoteDecisionsSection({ noteId, decisions, onMutate }: NoteDecisi
                 placeholder="What was decided?"
                 className="text-body"
               />
-            </div>
+            </EditorItemCard>
           )}
         </div>
-        {decisions.length === 0 && !isAdding && (
-          <p className="text-metadata text-foreground-muted py-north-sm">No decisions.</p>
-        )}
+        {decisions.length === 0 && !isAdding && <EditorEmptyMessage message="No decisions." />}
       </div>
     </>
   );

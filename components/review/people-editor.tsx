@@ -2,8 +2,10 @@
 
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Plus, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { useReviewStore } from '@/lib/stores/review-store';
+import { EditorSectionHeader } from '@/components/shared/editor-section-header';
+import { EditorEmptyMessage } from '@/components/shared/editor-empty-message';
 
 export function PeopleEditor() {
   const people = useReviewStore((s) => s.people);
@@ -13,17 +15,9 @@ export function PeopleEditor() {
 
   return (
     <div className="space-y-north-sm">
-      <div className="flex items-center justify-between">
-        <h3 className="text-section-header">People</h3>
-        <Button variant="ghost" size="sm" onClick={addPerson} className="gap-1">
-          <Plus className="h-3.5 w-3.5" />
-          Add
-        </Button>
-      </div>
+      <EditorSectionHeader title="People" onAdd={addPerson} />
 
-      {people.length === 0 && (
-        <p className="text-metadata text-foreground-muted py-north-sm">No people extracted.</p>
-      )}
+      {people.length === 0 && <EditorEmptyMessage message="No people extracted." />}
 
       <div className="space-y-north-xs">
         {people.map((person) => (

@@ -2,8 +2,10 @@
 
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Plus, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { useReviewStore } from '@/lib/stores/review-store';
+import { EditorSectionHeader } from '@/components/shared/editor-section-header';
+import { EditorEmptyMessage } from '@/components/shared/editor-empty-message';
 
 export function QuestionsEditor() {
   const questions = useReviewStore((s) => s.open_questions);
@@ -13,19 +15,9 @@ export function QuestionsEditor() {
 
   return (
     <div className="space-y-north-sm">
-      <div className="flex items-center justify-between">
-        <h3 className="text-section-header">Open Questions</h3>
-        <Button variant="ghost" size="sm" onClick={addQuestion} className="gap-1">
-          <Plus className="h-3.5 w-3.5" />
-          Add
-        </Button>
-      </div>
+      <EditorSectionHeader title="Open Questions" onAdd={addQuestion} />
 
-      {questions.length === 0 && (
-        <p className="text-metadata text-foreground-muted py-north-sm">
-          No open questions extracted.
-        </p>
-      )}
+      {questions.length === 0 && <EditorEmptyMessage message="No open questions extracted." />}
 
       <div className="space-y-north-xs">
         {questions.map((q) => (

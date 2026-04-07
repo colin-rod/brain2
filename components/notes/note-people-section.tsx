@@ -2,11 +2,12 @@
 
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
-import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { EntityCombobox } from './entity-combobox';
-import { Users, Plus, X } from 'lucide-react';
+import { Users, X } from 'lucide-react';
 import { linkPerson, unlinkPerson, createAndLinkPerson } from '@/lib/actions/note-mutations';
+import { EditorSectionHeader } from '@/components/shared/editor-section-header';
+import { EditorEmptyMessage } from '@/components/shared/editor-empty-message';
 import type { Person } from '@/types/database';
 
 interface NotePeopleSectionProps {
@@ -61,16 +62,12 @@ export function NotePeopleSection({ noteId, people, allPeople, onMutate }: NoteP
     <>
       <Separator />
       <div>
-        <div className="flex items-center justify-between mb-north-md">
-          <h2 className="text-section-header flex items-center gap-north-sm">
-            <Users className="h-4 w-4" />
-            People ({people.length})
-          </h2>
-          <Button variant="ghost" size="sm" onClick={() => setShowCombobox(true)} className="gap-1">
-            <Plus className="h-3.5 w-3.5" />
-            Add
-          </Button>
-        </div>
+        <EditorSectionHeader
+          title="People"
+          onAdd={() => setShowCombobox(true)}
+          icon={Users}
+          count={people.length}
+        />
         <div className="flex flex-wrap gap-north-sm">
           {people.map((person) => (
             <div
@@ -106,9 +103,7 @@ export function NotePeopleSection({ noteId, people, allPeople, onMutate }: NoteP
             />
           </div>
         )}
-        {people.length === 0 && !showCombobox && (
-          <p className="text-metadata text-foreground-muted py-north-sm">No people linked.</p>
-        )}
+        {people.length === 0 && !showCombobox && <EditorEmptyMessage message="No people linked." />}
       </div>
     </>
   );

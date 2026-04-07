@@ -2,11 +2,12 @@
 
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
-import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { EntityCombobox } from './entity-combobox';
-import { FolderOpen, Plus, X } from 'lucide-react';
+import { FolderOpen, X } from 'lucide-react';
 import { linkProject, unlinkProject, createAndLinkProject } from '@/lib/actions/note-mutations';
+import { EditorSectionHeader } from '@/components/shared/editor-section-header';
+import { EditorEmptyMessage } from '@/components/shared/editor-empty-message';
 import type { Project } from '@/types/database';
 
 interface NoteProjectsSectionProps {
@@ -66,16 +67,12 @@ export function NoteProjectsSection({
     <>
       <Separator />
       <div>
-        <div className="flex items-center justify-between mb-north-md">
-          <h2 className="text-section-header flex items-center gap-north-sm">
-            <FolderOpen className="h-4 w-4" />
-            Projects ({projects.length})
-          </h2>
-          <Button variant="ghost" size="sm" onClick={() => setShowCombobox(true)} className="gap-1">
-            <Plus className="h-3.5 w-3.5" />
-            Add
-          </Button>
-        </div>
+        <EditorSectionHeader
+          title="Projects"
+          onAdd={() => setShowCombobox(true)}
+          icon={FolderOpen}
+          count={projects.length}
+        />
         <div className="flex flex-wrap gap-north-sm">
           {projects.map((project) => (
             <div
@@ -107,7 +104,7 @@ export function NoteProjectsSection({
           </div>
         )}
         {projects.length === 0 && !showCombobox && (
-          <p className="text-metadata text-foreground-muted py-north-sm">No projects linked.</p>
+          <EditorEmptyMessage message="No projects linked." />
         )}
       </div>
     </>

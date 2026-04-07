@@ -13,8 +13,11 @@ import {
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { InlineEditableText } from './inline-editable-text';
-import { CheckSquare, Plus, X } from 'lucide-react';
+import { CheckSquare, X } from 'lucide-react';
 import { updateTask, addTask, deleteTask } from '@/lib/actions/note-mutations';
+import { EditorSectionHeader } from '@/components/shared/editor-section-header';
+import { EditorEmptyMessage } from '@/components/shared/editor-empty-message';
+import { EditorItemCard } from '@/components/shared/editor-item-card';
 import type { Task, TaskPriority, TaskStatus } from '@/types/database';
 
 interface NoteTasksSectionProps {
@@ -76,22 +79,15 @@ export function NoteTasksSection({ noteId, tasks, onMutate }: NoteTasksSectionPr
     <>
       <Separator />
       <div>
-        <div className="flex items-center justify-between mb-north-md">
-          <h2 className="text-section-header flex items-center gap-north-sm">
-            <CheckSquare className="h-4 w-4" />
-            Tasks ({tasks.length})
-          </h2>
-          <Button variant="ghost" size="sm" onClick={handleAdd} className="gap-1">
-            <Plus className="h-3.5 w-3.5" />
-            Add
-          </Button>
-        </div>
+        <EditorSectionHeader
+          title="Tasks"
+          onAdd={handleAdd}
+          icon={CheckSquare}
+          count={tasks.length}
+        />
         <div className="space-y-north-xs">
           {tasks.map((task) => (
-            <div
-              key={task.id}
-              className="rounded-md border border-border bg-surface px-north-md py-north-sm"
-            >
+            <EditorItemCard key={task.id}>
               <div className="flex items-center justify-between gap-north-sm">
                 <div className="flex-1">
                   <InlineEditableText
@@ -153,10 +149,10 @@ export function NoteTasksSection({ noteId, tasks, onMutate }: NoteTasksSectionPr
                   />
                 </div>
               </div>
-            </div>
+            </EditorItemCard>
           ))}
           {isAdding && (
-            <div className="rounded-md border border-border bg-surface px-north-md py-north-sm">
+            <EditorItemCard>
               <InlineEditableText
                 value=""
                 onSave={async (v) => {
@@ -166,12 +162,10 @@ export function NoteTasksSection({ noteId, tasks, onMutate }: NoteTasksSectionPr
                 placeholder="New task title..."
                 className="text-body"
               />
-            </div>
+            </EditorItemCard>
           )}
         </div>
-        {tasks.length === 0 && !isAdding && (
-          <p className="text-metadata text-foreground-muted py-north-sm">No tasks.</p>
-        )}
+        {tasks.length === 0 && !isAdding && <EditorEmptyMessage message="No tasks." />}
       </div>
     </>
   );

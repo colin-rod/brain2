@@ -2,8 +2,10 @@
 
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Plus, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { useReviewStore } from '@/lib/stores/review-store';
+import { EditorSectionHeader } from '@/components/shared/editor-section-header';
+import { EditorEmptyMessage } from '@/components/shared/editor-empty-message';
 
 export function ProjectsEditor() {
   const projects = useReviewStore((s) => s.projects);
@@ -13,17 +15,9 @@ export function ProjectsEditor() {
 
   return (
     <div className="space-y-north-sm">
-      <div className="flex items-center justify-between">
-        <h3 className="text-section-header">Projects</h3>
-        <Button variant="ghost" size="sm" onClick={addProject} className="gap-1">
-          <Plus className="h-3.5 w-3.5" />
-          Add
-        </Button>
-      </div>
+      <EditorSectionHeader title="Projects" onAdd={addProject} />
 
-      {projects.length === 0 && (
-        <p className="text-metadata text-foreground-muted py-north-sm">No projects extracted.</p>
-      )}
+      {projects.length === 0 && <EditorEmptyMessage message="No projects extracted." />}
 
       <div className="space-y-north-xs">
         {projects.map((project) => (

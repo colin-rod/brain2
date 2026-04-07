@@ -10,8 +10,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Plus, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { useReviewStore } from '@/lib/stores/review-store';
+import { EditorSectionHeader } from '@/components/shared/editor-section-header';
+import { EditorEmptyMessage } from '@/components/shared/editor-empty-message';
+import { EditorItemCard } from '@/components/shared/editor-item-card';
 import type { TaskPriority } from '@/types/database';
 
 export function TasksEditor() {
@@ -23,24 +26,13 @@ export function TasksEditor() {
 
   return (
     <div className="space-y-north-sm">
-      <div className="flex items-center justify-between">
-        <h3 className="text-section-header">Tasks</h3>
-        <Button variant="ghost" size="sm" onClick={addTask} className="gap-1">
-          <Plus className="h-3.5 w-3.5" />
-          Add
-        </Button>
-      </div>
+      <EditorSectionHeader title="Tasks" onAdd={addTask} />
 
-      {tasks.length === 0 && (
-        <p className="text-metadata text-foreground-muted py-north-sm">No tasks extracted.</p>
-      )}
+      {tasks.length === 0 && <EditorEmptyMessage message="No tasks extracted." />}
 
       <div className="space-y-north-sm">
         {tasks.map((task) => (
-          <div
-            key={task.id}
-            className="rounded-md border border-border bg-surface-subtle p-north-md space-y-north-sm"
-          >
+          <EditorItemCard key={task.id} variant="subtle">
             <div className="flex items-start gap-north-sm">
               <Input
                 value={task.title}
@@ -114,7 +106,7 @@ export function TasksEditor() {
                 </Select>
               </div>
             </div>
-          </div>
+          </EditorItemCard>
         ))}
       </div>
     </div>

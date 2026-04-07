@@ -4,8 +4,11 @@ import { Input } from '@/components/ui/input';
 import { DateInputWithShortcuts } from '@/components/ui/date-input-with-shortcuts';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Plus, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { useReviewStore } from '@/lib/stores/review-store';
+import { EditorSectionHeader } from '@/components/shared/editor-section-header';
+import { EditorEmptyMessage } from '@/components/shared/editor-empty-message';
+import { EditorItemCard } from '@/components/shared/editor-item-card';
 
 export function DecisionsEditor() {
   const decisions = useReviewStore((s) => s.decisions);
@@ -15,24 +18,13 @@ export function DecisionsEditor() {
 
   return (
     <div className="space-y-north-sm">
-      <div className="flex items-center justify-between">
-        <h3 className="text-section-header">Decisions</h3>
-        <Button variant="ghost" size="sm" onClick={addDecision} className="gap-1">
-          <Plus className="h-3.5 w-3.5" />
-          Add
-        </Button>
-      </div>
+      <EditorSectionHeader title="Decisions" onAdd={addDecision} />
 
-      {decisions.length === 0 && (
-        <p className="text-metadata text-foreground-muted py-north-sm">No decisions extracted.</p>
-      )}
+      {decisions.length === 0 && <EditorEmptyMessage message="No decisions extracted." />}
 
       <div className="space-y-north-sm">
         {decisions.map((decision) => (
-          <div
-            key={decision.id}
-            className="rounded-md border border-border bg-surface-subtle p-north-md space-y-north-sm"
-          >
+          <EditorItemCard key={decision.id} variant="subtle">
             <div className="flex items-start gap-north-sm">
               <Textarea
                 value={decision.decision_text}
@@ -78,7 +70,7 @@ export function DecisionsEditor() {
                 />
               </div>
             </div>
-          </div>
+          </EditorItemCard>
         ))}
       </div>
     </div>

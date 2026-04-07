@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useSearchData } from './search-provider';
 import { SearchResultItem } from './search-result-item';
@@ -95,8 +94,8 @@ export function GlobalSearch() {
 
   return (
     <div ref={containerRef} className="relative w-full max-w-md">
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground-muted" />
+      <div className="relative flex items-center border border-input rounded-none bg-transparent focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/30">
+        <span className="pl-2.5 font-mono text-sm text-primary select-none shrink-0">&gt;</span>
         <Input
           ref={inputRef}
           value={query}
@@ -107,16 +106,16 @@ export function GlobalSearch() {
           onFocus={() => setIsOpen(true)}
           onKeyDown={handleKeyDown}
           placeholder={isLoading ? 'Loading...' : 'Search everything...'}
-          className="pl-9 pr-16"
+          className="border-0 rounded-none pl-1.5 pr-16 focus-visible:border-0 focus-visible:ring-0 placeholder:uppercase placeholder:tracking-wider placeholder:font-mono placeholder:text-[12px] bg-transparent"
           disabled={isLoading}
         />
-        <kbd className="absolute right-3 top-1/2 -translate-y-1/2 hidden sm:inline-flex items-center gap-0.5 rounded border border-border bg-surface-subtle px-1.5 py-0.5 text-[11px] font-ui text-foreground-muted">
+        <kbd className="absolute right-3 top-1/2 -translate-y-1/2 hidden sm:inline-flex items-center gap-0.5 rounded-none border border-border bg-surface-subtle px-1.5 py-0.5 text-[11px] font-mono text-foreground-muted">
           <span className="text-xs">⌘</span>K
         </kbd>
       </div>
 
       {isOpen && query.length >= 2 && (
-        <div className="absolute top-full left-0 right-0 z-50 mt-north-xs max-h-[400px] overflow-y-auto rounded-lg border border-border bg-surface shadow-lg">
+        <div className="absolute top-full left-0 right-0 z-50 mt-0.5 max-h-[400px] overflow-y-auto rounded-none border border-border bg-surface shadow-lg">
           {flatResults.length === 0 ? (
             <div className="px-north-base py-north-lg text-center text-metadata text-foreground-muted">
               No results for &ldquo;{query}&rdquo;
@@ -127,7 +126,7 @@ export function GlobalSearch() {
                 const meta = getEntityMeta(group.type);
                 return (
                   <div key={group.type}>
-                    <p className="px-north-base py-north-xs text-metadata font-semibold text-foreground-muted">
+                    <p className="px-north-base py-north-xs text-metadata font-mono uppercase tracking-widest text-foreground-muted border-b border-border">
                       {meta.pluralLabel}
                     </p>
                     {group.items.map((item) => {

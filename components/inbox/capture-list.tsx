@@ -7,30 +7,15 @@ import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { formatDate } from '@/lib/format-date';
-import {
-  ImageIcon,
-  FileText,
-  MessageSquare,
-  ChevronRight,
-  Sparkles,
-  RotateCcw,
-  Loader2,
-  AlertCircle,
-} from 'lucide-react';
+import { Sparkles, RotateCcw, Loader2, AlertCircle } from 'lucide-react';
 import { parseCapture } from '@/lib/actions/parse';
 import type { Capture, CaptureSourceType, CaptureStatus } from '@/types/database';
 import { cn } from '@/lib/utils';
 
-const sourceIcons: Record<CaptureSourceType, typeof ImageIcon> = {
-  image: ImageIcon,
-  text: FileText,
-  chat_transcript: MessageSquare,
-};
-
-const sourceLabels: Record<CaptureSourceType, string> = {
-  image: 'Image',
-  text: 'Text',
-  chat_transcript: 'Chat',
+const sourceShort: Record<CaptureSourceType, string> = {
+  image: 'IMG',
+  text: 'TXT',
+  chat_transcript: 'CHT',
 };
 
 const statusStyles: Record<CaptureStatus, string> = {
@@ -85,10 +70,11 @@ interface CaptureListProps {
 export function CaptureList({ captures }: CaptureListProps) {
   if (captures.length === 0) {
     return (
-      <div className="rounded-lg border border-border bg-surface p-north-xl text-center">
-        <FileText className="mx-auto h-10 w-10 text-foreground-muted mb-north-sm" />
-        <p className="text-body text-foreground-secondary">No captures yet</p>
-        <p className="text-metadata text-foreground-muted mt-1">
+      <div className="border-t border-border pt-north-md">
+        <p className="text-metadata font-mono text-foreground-muted uppercase tracking-widest">
+          <span className="text-primary">{'// '}</span>NO CAPTURES
+        </p>
+        <p className="text-metadata font-mono text-foreground-muted mt-1 uppercase tracking-wider">
           Upload an image or paste text above to get started.
         </p>
       </div>
@@ -96,18 +82,17 @@ export function CaptureList({ captures }: CaptureListProps) {
   }
 
   return (
-    <div className="space-y-north-xs">
-      {captures.map((capture) => (
-        <CaptureCard key={capture.id} capture={capture} />
+    <div className="divide-y divide-border">
+      {captures.map((capture, index) => (
+        <CaptureCard key={capture.id} capture={capture} index={index} />
       ))}
     </div>
   );
 }
 
-function CaptureCard({ capture }: { capture: Capture }) {
+function CaptureCard({ capture, index }: { capture: Capture; index: number }) {
   const router = useRouter();
   const [isParsing, startTransition] = useTransition();
-  const Icon = sourceIcons[capture.source_type];
   const isClickable = capture.status === 'parsed' || capture.status === 'in_review';
   const canParse = capture.status === 'new' || capture.status === 'failed';
 
@@ -128,22 +113,27 @@ function CaptureCard({ capture }: { capture: Capture }) {
   const content = (
     <div
       className={cn(
-        'flex items-center gap-north-md rounded-lg border border-border bg-surface px-north-base py-north-md transition-colors',
-        isClickable && 'hover:bg-surface-subtle cursor-pointer',
+        'flex items-center gap-north-md px-north-sm py-north-xs rounded-none border-l-2 border-transparent transition-colors',
+        isClickable && 'hover:border-primary hover:bg-surface-subtle cursor-pointer',
       )}
     >
-      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-surface-subtle">
-        <Icon className="h-5 w-5 text-foreground-secondary" />
+      <div className="flex flex-col items-center shrink-0 w-8 gap-0.5">
+        <span className="font-mono text-[10px] tabular-nums text-foreground-muted">
+          {String(index + 1).padStart(2, '0')}
+        </span>
+        <span className="font-mono text-[9px] uppercase text-foreground-muted opacity-60">
+          {sourceShort[capture.source_type]}
+        </span>
       </div>
 
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-north-sm mb-0.5">
-          <span className="text-metadata text-foreground-secondary">
-            {sourceLabels[capture.source_type]}
-          </span>
           <Badge
             variant="outline"
-            className={cn('text-[11px] px-1.5 py-0', statusStyles[capture.status])}
+            className={cn(
+              'text-[11px] px-1.5 py-px rounded-none uppercase font-mono tracking-wider',
+              statusStyles[capture.status],
+            )}
           >
             {statusLabels[capture.status]}
           </Badge>
@@ -155,7 +145,7 @@ function CaptureCard({ capture }: { capture: Capture }) {
             {capture.error_message.slice(0, 80)}
           </p>
         )}
-        <p className="text-metadata text-foreground-muted mt-0.5">
+        <p className="font-mono text-[11px] tabular-nums text-foreground-muted mt-0.5">
           {formatRelativeTime(capture.created_at)}
         </p>
       </div>
@@ -187,8 +177,6 @@ function CaptureCard({ capture }: { capture: Capture }) {
       {capture.status === 'processing' && (
         <Loader2 className="h-4 w-4 shrink-0 text-status-processing animate-spin" />
       )}
-
-      {isClickable && <ChevronRight className="h-4 w-4 shrink-0 text-foreground-muted" />}
     </div>
   );
 

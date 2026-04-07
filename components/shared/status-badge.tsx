@@ -18,7 +18,13 @@ const taskStatusLabels: Record<TaskStatus, string> = {
 
 export function TaskStatusBadge({ status }: { status: TaskStatus }) {
   return (
-    <Badge variant="outline" className={cn('text-[11px] px-1.5 py-0', taskStatusStyles[status])}>
+    <Badge
+      variant="outline"
+      className={cn(
+        'text-[11px] px-1.5 py-px rounded-none uppercase font-mono tracking-wider',
+        taskStatusStyles[status],
+      )}
+    >
       {taskStatusLabels[status]}
     </Badge>
   );

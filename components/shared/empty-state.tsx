@@ -6,12 +6,18 @@ interface EmptyStateProps {
   description?: string;
 }
 
-export function EmptyState({ icon: Icon, title, description }: EmptyStateProps) {
+export function EmptyState({ title, description }: EmptyStateProps) {
   return (
-    <div className="rounded-lg border border-border bg-surface p-north-xl text-center">
-      <Icon className="mx-auto h-10 w-10 text-foreground-muted mb-north-sm" />
-      <p className="text-body text-foreground-secondary">{title}</p>
-      {description && <p className="text-metadata text-foreground-muted mt-1">{description}</p>}
+    <div className="border-t border-border pt-north-md">
+      <p className="text-metadata font-mono text-foreground-muted uppercase tracking-widest">
+        <span className="text-primary">{'// '}</span>
+        {title}
+      </p>
+      {description && (
+        <p className="text-metadata font-mono text-foreground-muted mt-1 uppercase tracking-wider">
+          {description}
+        </p>
+      )}
     </div>
   );
 }

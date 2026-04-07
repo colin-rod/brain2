@@ -172,7 +172,8 @@ export function TasksList({ tasks, allPeople, allProjects }: TasksListProps) {
       />
 
       {/* Column headers */}
-      <div className="hidden sm:grid sm:grid-cols-[1fr_100px_60px_90px_100px_100px_32px] gap-north-sm px-north-base items-center">
+      <div className="hidden sm:grid sm:grid-cols-[24px_1fr_100px_60px_90px_100px_100px_32px] gap-north-sm px-north-sm items-center border-b-2 border-border pb-north-xs">
+        <span className="font-mono text-[10px] text-foreground-muted uppercase">#</span>
         <SortableHeader label="Title" field="title" currentSort={sort} onSort={toggleSort} />
         <SortableHeader label="Status" field="status" currentSort={sort} onSort={toggleSort} />
         <SortableHeader label="Pri" field="priority" currentSort={sort} onSort={toggleSort} />
@@ -182,9 +183,9 @@ export function TasksList({ tasks, allPeople, allProjects }: TasksListProps) {
         <span />
       </div>
 
-      <div className="space-y-north-xs">
+      <div className="divide-y divide-border border-t border-border">
         {isAdding && (
-          <div className="rounded-lg border border-primary/30 bg-surface px-north-base py-north-md">
+          <div className="border-l-2 border-primary px-north-sm py-north-xs">
             <InlineEditableText
               value=""
               onSave={async (v) => {
@@ -197,13 +198,17 @@ export function TasksList({ tasks, allPeople, allProjects }: TasksListProps) {
           </div>
         )}
 
-        {filtered.map((task) => (
+        {filtered.map((task, index) => (
           <div
             key={task.id}
-            className="rounded-lg border border-border bg-surface px-north-base py-north-md"
+            className="px-north-sm py-north-xs border-l-2 border-transparent hover:border-primary/40"
           >
             {/* Desktop: grid layout */}
-            <div className="hidden sm:grid sm:grid-cols-[1fr_100px_60px_90px_100px_100px_32px] gap-north-sm items-center">
+            <div className="hidden sm:grid sm:grid-cols-[24px_1fr_100px_60px_90px_100px_100px_32px] gap-north-sm items-center">
+              <span className="font-mono text-[10px] tabular-nums text-foreground-muted">
+                {String(index + 1).padStart(2, '0')}
+              </span>
+
               <div className="min-w-0">
                 <InlineEditableText
                   value={task.title}
@@ -228,7 +233,10 @@ export function TasksList({ tasks, allPeople, allProjects }: TasksListProps) {
                 value={task.status}
                 onValueChange={(v) => handleFieldUpdate(task.id, { status: v as TaskStatus })}
               >
-                <SelectTrigger size="sm" className="text-[11px]">
+                <SelectTrigger
+                  size="sm"
+                  className="text-[11px] font-mono uppercase tracking-wider rounded-none"
+                >
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -248,7 +256,10 @@ export function TasksList({ tasks, allPeople, allProjects }: TasksListProps) {
                   })
                 }
               >
-                <SelectTrigger size="sm" className="text-[11px]">
+                <SelectTrigger
+                  size="sm"
+                  className="text-[11px] font-mono uppercase tracking-wider rounded-none"
+                >
                   <SelectValue placeholder="--" />
                 </SelectTrigger>
                 <SelectContent>
@@ -265,7 +276,7 @@ export function TasksList({ tasks, allPeople, allProjects }: TasksListProps) {
                 type="date"
                 value={task.due_date || ''}
                 onChange={(e) => handleFieldUpdate(task.id, { due_date: e.target.value || null })}
-                className="h-7 text-[11px]"
+                className="h-7 text-[11px] font-mono rounded-none"
               />
 
               {/* Assignee cell */}
@@ -399,8 +410,8 @@ export function TasksList({ tasks, allPeople, allProjects }: TasksListProps) {
         ))}
 
         {filtered.length === 0 && search.length >= 2 && (
-          <p className="text-body text-foreground-muted text-center py-north-lg">
-            No tasks match &ldquo;{search}&rdquo;
+          <p className="font-mono text-metadata text-foreground-muted uppercase tracking-wider pt-north-md">
+            <span className="text-primary">{'// '}</span>NO RESULTS FOR &ldquo;{search}&rdquo;
           </p>
         )}
       </div>

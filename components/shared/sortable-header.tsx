@@ -1,7 +1,5 @@
 'use client';
 
-import { ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react';
-
 export interface SortState {
   field: string;
   direction: 'asc' | 'desc';
@@ -28,17 +26,17 @@ export function SortableHeader({
     <button
       type="button"
       onClick={() => onSort(field)}
-      className={`flex items-center gap-north-xs text-metadata font-medium text-foreground-muted hover:text-foreground transition-colors ${className}`}
+      className={`flex items-center gap-0.5 text-metadata font-semibold uppercase tracking-widest text-foreground-muted hover:text-foreground transition-colors ${className}`}
     >
       {label}
       {isActive ? (
         currentSort.direction === 'asc' ? (
-          <ArrowUp className="h-3 w-3" />
+          <span className="font-mono text-[10px] leading-none">▲</span>
         ) : (
-          <ArrowDown className="h-3 w-3" />
+          <span className="font-mono text-[10px] leading-none">▼</span>
         )
       ) : (
-        <ArrowUpDown className="h-3 w-3 opacity-40" />
+        <span className="font-mono text-[10px] leading-none opacity-40">⇅</span>
       )}
     </button>
   );

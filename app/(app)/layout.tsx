@@ -13,12 +13,12 @@ export default function AppLayout({
     <SearchProvider>
       <Sidebar />
       <main className="md:ml-60 flex-1 pb-16 md:pb-0">
-        <div className="border-b border-border bg-surface px-north-base py-north-sm md:px-north-lg">
+        <div className="border-b border-border border-t-2 border-t-primary bg-surface px-north-base py-north-xs md:px-north-lg">
           <div className="mx-auto max-w-5xl">
             <GlobalSearch />
           </div>
         </div>
-        <div className="mx-auto max-w-5xl px-north-base py-north-lg md:px-north-lg md:py-north-xl">
+        <div className="mx-auto max-w-5xl px-north-base py-north-md md:px-north-lg md:py-north-lg">
           {children}
         </div>
       </main>

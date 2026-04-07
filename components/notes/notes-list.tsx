@@ -21,27 +21,30 @@ export function NotesList({ notes }: { notes: Note[] }) {
     <div className="space-y-north-md">
       <SearchBar placeholder="Filter notes..." onSearch={setQuery} />
 
-      <div className="space-y-north-xs">
-        {filtered.map((note) => (
+      <div className="divide-y divide-border border-t border-border">
+        {filtered.map((note, index) => (
           <Link
             key={note.id}
             href={`/notes/${note.id}`}
-            className="block rounded-lg border border-border bg-surface px-north-base py-north-md hover:bg-surface-subtle transition-colors"
+            className="flex items-baseline gap-north-md px-north-sm py-north-xs hover:bg-surface-subtle transition-colors border-l-2 border-transparent hover:border-primary"
           >
-            <p className="text-issue-title text-foreground">{note.title}</p>
+            <span className="font-mono text-[10px] text-foreground-muted tabular-nums shrink-0 w-6 text-right">
+              {String(index + 1).padStart(2, '0')}
+            </span>
+            <span className="text-issue-title text-foreground truncate flex-1">{note.title}</span>
             {note.summary && (
-              <p className="text-body text-foreground-secondary mt-0.5 line-clamp-2">
+              <span className="hidden sm:block text-body text-foreground-secondary truncate flex-1">
                 {note.summary}
-              </p>
+              </span>
             )}
-            <p className="text-metadata text-foreground-muted mt-north-xs">
+            <span className="font-mono text-[11px] tabular-nums text-foreground-muted shrink-0 ml-auto">
               {formatDate(note.created_at)}
-            </p>
+            </span>
           </Link>
         ))}
         {filtered.length === 0 && query.length >= 2 && (
-          <p className="text-body text-foreground-muted text-center py-north-lg">
-            No notes match &ldquo;{query}&rdquo;
+          <p className="font-mono text-metadata text-foreground-muted uppercase tracking-wider pt-north-md border-t border-border">
+            <span className="text-primary">{'// '}</span>NO RESULTS FOR &ldquo;{query}&rdquo;
           </p>
         )}
       </div>

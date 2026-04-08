@@ -44,6 +44,8 @@ export default async function DecisionsPage() {
           description="Decisions appear here after you save notes that contain them."
           iconColor="var(--entity-decisions)"
           bgColor="var(--entity-decisions-tint)"
+          ctaLabel="Capture something"
+          ctaHref="/inbox"
         />
       ) : (
         <DecisionsList decisions={decisions} allProjects={allProjects} allPeople={allPeople} />

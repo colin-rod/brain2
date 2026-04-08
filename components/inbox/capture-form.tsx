@@ -54,7 +54,7 @@ export function CaptureForm() {
         onValueChange={(v) => setMode(v as InputMode)}
         className="space-y-north-base"
       >
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-3" aria-label="Capture input method">
           <TabsTrigger value="image" className="gap-1.5">
             <ImageIcon className="h-4 w-4" />
             <span>Image</span>

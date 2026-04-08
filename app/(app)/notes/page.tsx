@@ -30,6 +30,8 @@ export default async function NotesPage() {
           description="Notes appear here after you save a reviewed capture."
           iconColor="var(--entity-notes)"
           bgColor="var(--entity-notes-tint)"
+          ctaLabel="Capture something"
+          ctaHref="/inbox"
         />
       ) : (
         <NotesList notes={notes} />

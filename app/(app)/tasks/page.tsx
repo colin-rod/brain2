@@ -44,6 +44,8 @@ export default async function TasksPage() {
           description="Tasks appear here after you save notes with action items."
           iconColor="var(--entity-tasks)"
           bgColor="var(--entity-tasks-tint)"
+          ctaLabel="Capture something"
+          ctaHref="/inbox"
         />
       ) : (
         <TasksList tasks={tasks} allPeople={allPeople} allProjects={allProjects} />

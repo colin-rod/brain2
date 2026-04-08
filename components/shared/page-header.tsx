@@ -28,7 +28,7 @@ export function PageHeader({
               style={{ color: iconColor ?? 'var(--foreground-muted)' }}
             />
           )}
-          <h1 className="text-page-title font-sans">{title}</h1>
+          <h1 className="text-page-title">{title}</h1>
         </div>
         {description && (
           <p className="text-metadata text-foreground-muted font-mono uppercase tracking-wider mt-0.5">

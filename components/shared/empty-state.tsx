@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { LucideIcon } from 'lucide-react';
 
 interface EmptyStateProps {
@@ -6,6 +7,8 @@ interface EmptyStateProps {
   description?: string;
   iconColor?: string;
   bgColor?: string;
+  ctaLabel?: string;
+  ctaHref?: string;
 }
 
 export function EmptyState({
@@ -14,6 +17,8 @@ export function EmptyState({
   description,
   iconColor,
   bgColor,
+  ctaLabel,
+  ctaHref,
 }: EmptyStateProps) {
   return (
     <div
@@ -31,7 +36,7 @@ export function EmptyState({
     >
       <Icon
         className="mx-auto h-10 w-10 mb-north-sm animate-float"
-        style={{ color: iconColor ?? 'var(--foreground-muted)' }}
+        style={{ color: iconColor ?? 'var(--primary)' }}
       />
       <p className="text-metadata font-mono text-foreground-muted uppercase tracking-widest">
         <span className="text-primary">{'// '}</span>
@@ -41,6 +46,14 @@ export function EmptyState({
         <p className="text-metadata font-mono text-foreground-muted mt-1 uppercase tracking-wider">
           {description}
         </p>
+      )}
+      {ctaLabel && ctaHref && (
+        <Link
+          href={ctaHref}
+          className="inline-flex items-center gap-1.5 mt-north-base text-metadata font-mono uppercase tracking-wider text-primary hover:text-primary/80 transition-colors"
+        >
+          {ctaLabel} <span aria-hidden="true">&rarr;</span>
+        </Link>
       )}
     </div>
   );

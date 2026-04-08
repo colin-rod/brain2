@@ -35,6 +35,8 @@ export default async function PeoplePage() {
           description="People appear here after you save notes that mention them."
           iconColor="var(--entity-people)"
           bgColor="var(--entity-people-tint)"
+          ctaLabel="Capture something"
+          ctaHref="/inbox"
         />
       ) : (
         <PeopleList people={people} allProjects={allProjects} />

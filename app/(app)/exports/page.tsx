@@ -26,6 +26,8 @@ export default async function ExportsPage() {
           icon={Download}
           title="No exports yet"
           description="Exports are generated automatically when you save a note."
+          ctaLabel="Capture something"
+          ctaHref="/inbox"
         />
       ) : (
         <div className="space-y-north-xs">

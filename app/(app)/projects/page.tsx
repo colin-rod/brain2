@@ -35,6 +35,8 @@ export default async function ProjectsPage() {
           description="Projects appear here after you save notes that reference them."
           iconColor="var(--entity-projects)"
           bgColor="var(--entity-projects-tint)"
+          ctaLabel="Capture something"
+          ctaHref="/inbox"
         />
       ) : (
         <ProjectsList projects={projects} allPeople={allPeople} />

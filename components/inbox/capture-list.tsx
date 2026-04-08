@@ -38,6 +38,16 @@ const statusLabels: Record<CaptureStatus, string> = {
   failed: 'Failed',
 };
 
+const statusDotColor: Record<CaptureStatus, string> = {
+  new: 'var(--color-status-new)',
+  processing: 'var(--color-status-processing)',
+  ocr_complete: 'var(--color-status-parsed)',
+  parsed: 'var(--color-status-parsed)',
+  in_review: 'var(--color-status-in-review)',
+  saved: 'var(--color-status-saved)',
+  failed: 'var(--color-status-failed)',
+};
+
 function formatRelativeTime(dateStr: string): string {
   const date = new Date(dateStr);
   const now = new Date();
@@ -142,12 +152,17 @@ function CaptureCard({ capture, index }: { capture: Capture; index: number }) {
       className={cn(
         'flex items-center gap-north-md px-north-sm py-north-xs rounded-none border-l-2 border-transparent transition-colors',
         isClickable && 'hover:border-primary hover:bg-surface-subtle cursor-pointer',
+        isParsing && 'bg-surface-subtle/50',
       )}
     >
       <div className="flex flex-col items-center shrink-0 w-8 gap-0.5">
         <span className="font-mono text-[10px] tabular-nums text-foreground-muted">
           {String(index + 1).padStart(2, '0')}
         </span>
+        <span
+          className="h-1.5 w-1.5 rounded-full"
+          style={{ backgroundColor: statusDotColor[capture.status] }}
+        />
         <span className="font-mono text-[9px] uppercase text-foreground-muted opacity-60">
           {sourceShort[capture.source_type]}
         </span>
@@ -156,23 +171,24 @@ function CaptureCard({ capture, index }: { capture: Capture; index: number }) {
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-north-sm mb-0.5">
           <Badge
+            key={capture.status}
             variant="outline"
             className={cn(
-              'text-[11px] px-1.5 py-px rounded-none uppercase font-mono tracking-wider transition-all duration-200',
+              'text-[11px] px-1.5 py-px rounded-none uppercase font-mono tracking-wider animate-scale-in',
               statusStyles[capture.status],
             )}
           >
             {statusLabels[capture.status]}
           </Badge>
         </div>
-        <p className="text-body text-foreground truncate">{getPreviewText(capture)}</p>
+        <p className="text-body text-foreground font-medium truncate">{getPreviewText(capture)}</p>
         {capture.status === 'failed' && capture.error_message && (
           <p className="text-metadata text-status-failed mt-0.5 flex items-center gap-1">
             <AlertCircle className="h-3 w-3 shrink-0" aria-hidden="true" />
             {capture.error_message.slice(0, 80)}
           </p>
         )}
-        <p className="font-mono text-[11px] tabular-nums text-foreground-muted mt-0.5">
+        <p className="font-mono text-[11px] tabular-nums text-foreground-muted/70 mt-0.5">
           {formatRelativeTime(capture.created_at)}
         </p>
       </div>

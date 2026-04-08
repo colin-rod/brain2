@@ -31,11 +31,11 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="hidden md:flex md:w-52 lg:w-60 md:flex-col md:fixed md:inset-y-0 bg-sidebar border-r border-sidebar-border">
-      <div className="flex h-12 items-center gap-north-sm px-north-md border-b border-sidebar-border">
+    <aside className="hidden md:flex md:w-52 lg:w-60 md:flex-col md:fixed md:inset-y-0 bg-sidebar border-r border-sidebar-border shadow-[2px_0_8px_rgba(0,0,0,0.03)]">
+      <div className="flex h-14 items-center gap-1 px-north-md border-b border-sidebar-border">
         <span className="font-mono text-[11px] text-primary select-none">[</span>
-        <span className="font-mono text-sm font-semibold uppercase tracking-widest text-foreground">
-          BRAIN2
+        <span className="font-accent text-lg font-semibold tracking-tight text-foreground">
+          Brain2
         </span>
         <span className="font-mono text-[11px] text-primary select-none">]</span>
       </div>
@@ -48,10 +48,10 @@ export function Sidebar() {
               key={item.href}
               href={item.href}
               className={cn(
-                'flex items-center gap-north-md px-north-md py-north-xs rounded-none text-[13px] font-mono uppercase tracking-wider border-l-2 transition-all duration-150',
+                'flex items-center gap-north-md px-north-md py-north-xs rounded-none text-[13px] font-mono uppercase tracking-wider transition-all duration-150',
                 isActive
-                  ? 'border-primary bg-sidebar-accent/40 text-foreground'
-                  : 'border-transparent text-foreground-secondary hover:border-primary/40 hover:bg-sidebar-accent/20 hover:text-foreground',
+                  ? 'border-l-[3px] border-primary bg-sidebar-accent/50 text-foreground font-semibold'
+                  : 'border-l-2 border-transparent text-foreground-secondary hover:border-primary/40 hover:bg-sidebar-accent/20 hover:text-foreground',
               )}
             >
               <item.icon

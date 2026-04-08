@@ -101,7 +101,7 @@ export function NoteTasksSection({ noteId, tasks, onMutate }: NoteTasksSectionPr
                     value={task.status}
                     onValueChange={(v) => handleFieldUpdate(task.id, { status: v as TaskStatus })}
                   >
-                    <SelectTrigger className="w-28 h-7 text-[12px]">
+                    <SelectTrigger size="sm" className="text-label">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -113,10 +113,10 @@ export function NoteTasksSection({ noteId, tasks, onMutate }: NoteTasksSectionPr
                   </Select>
                   <Button
                     variant="ghost"
-                    size="sm"
+                    size="icon-sm"
                     onClick={() => handleDelete(task.id)}
                     disabled={isPending}
-                    className="shrink-0 text-foreground-muted hover:text-destructive h-7 w-7 p-0"
+                    className="shrink-0 text-foreground-muted hover:text-destructive"
                   >
                     <X className="h-3.5 w-3.5" />
                   </Button>
@@ -131,7 +131,7 @@ export function NoteTasksSection({ noteId, tasks, onMutate }: NoteTasksSectionPr
                     })
                   }
                 >
-                  <SelectTrigger className="w-20 h-7 text-[12px]">
+                  <SelectTrigger size="sm" className="text-label">
                     <SelectValue placeholder="Priority" />
                   </SelectTrigger>
                   <SelectContent>
@@ -142,7 +142,7 @@ export function NoteTasksSection({ noteId, tasks, onMutate }: NoteTasksSectionPr
                     <SelectItem value="P3">P3</SelectItem>
                   </SelectContent>
                 </Select>
-                <div className="w-40">
+                <div className="shrink-0">
                   <DateInputWithShortcuts
                     value={task.due_date || ''}
                     onChange={(v) => handleFieldUpdate(task.id, { due_date: v || null })}

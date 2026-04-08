@@ -21,7 +21,7 @@ export function TaskStatusBadge({ status }: { status: TaskStatus }) {
     <Badge
       variant="outline"
       className={cn(
-        'text-[11px] px-1.5 py-px rounded-none uppercase font-mono tracking-wider',
+        'text-label px-1.5 py-0.5 rounded-none uppercase font-mono tracking-wider',
         taskStatusStyles[status],
       )}
     >

@@ -92,7 +92,7 @@ export function NoteProjectsSection({
           ))}
         </div>
         {showCombobox && (
-          <div className="mt-north-sm w-64">
+          <div className="mt-north-sm w-full max-w-xs">
             <EntityCombobox
               items={allProjects.map((p) => ({ id: p.id, name: p.name }))}
               excludeIds={linkedIds}

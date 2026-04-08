@@ -90,10 +90,10 @@ export function NoteDecisionsSection({ noteId, decisions, onMutate }: NoteDecisi
                 </div>
                 <Button
                   variant="ghost"
-                  size="sm"
+                  size="icon-sm"
                   onClick={() => handleDelete(d.id)}
                   disabled={isPending}
-                  className="shrink-0 text-foreground-muted hover:text-destructive h-7 w-7 p-0"
+                  className="shrink-0 text-foreground-muted hover:text-destructive"
                 >
                   <X className="h-3.5 w-3.5" />
                 </Button>

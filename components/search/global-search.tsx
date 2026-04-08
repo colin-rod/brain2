@@ -109,13 +109,13 @@ export function GlobalSearch() {
           className="border-0 rounded-none pl-1.5 pr-16 focus-visible:border-0 focus-visible:ring-0 placeholder:uppercase placeholder:tracking-wider placeholder:font-mono placeholder:text-[12px] bg-transparent"
           disabled={isLoading}
         />
-        <kbd className="absolute right-3 top-1/2 -translate-y-1/2 hidden sm:inline-flex items-center gap-0.5 rounded-none border border-border bg-surface-subtle px-1.5 py-0.5 text-[11px] font-mono text-foreground-muted">
+        <kbd className="absolute right-3 top-1/2 -translate-y-1/2 hidden sm:inline-flex items-center gap-0.5 rounded-none border border-border bg-surface-subtle px-1.5 py-0.5 text-label font-mono text-foreground-muted">
           <span className="text-xs">⌘</span>K
         </kbd>
       </div>
 
       {isOpen && query.length >= 2 && (
-        <div className="absolute top-full left-0 right-0 z-50 mt-0.5 max-h-[400px] overflow-y-auto rounded-none border border-border bg-surface shadow-lg">
+        <div className="absolute top-full left-0 right-0 z-50 mt-0.5 max-h-96 overflow-y-auto rounded-none border border-border bg-surface shadow-lg">
           {flatResults.length === 0 ? (
             <div className="px-north-base py-north-lg text-center text-metadata text-foreground-muted">
               No results for &ldquo;{query}&rdquo;

@@ -235,7 +235,7 @@ export function TasksList({ tasks, allPeople, allProjects }: TasksListProps) {
               >
                 <SelectTrigger
                   size="sm"
-                  className="text-[11px] font-mono uppercase tracking-wider rounded-none"
+                  className="text-label font-mono uppercase tracking-wider rounded-none"
                 >
                   <SelectValue />
                 </SelectTrigger>
@@ -258,7 +258,7 @@ export function TasksList({ tasks, allPeople, allProjects }: TasksListProps) {
               >
                 <SelectTrigger
                   size="sm"
-                  className="text-[11px] font-mono uppercase tracking-wider rounded-none"
+                  className="text-label font-mono uppercase tracking-wider rounded-none"
                 >
                   <SelectValue placeholder="--" />
                 </SelectTrigger>
@@ -276,7 +276,7 @@ export function TasksList({ tasks, allPeople, allProjects }: TasksListProps) {
                 type="date"
                 value={task.due_date || ''}
                 onChange={(e) => handleFieldUpdate(task.id, { due_date: e.target.value || null })}
-                className="h-7 text-[11px] font-mono rounded-none"
+                className="h-7 text-label font-mono rounded-none"
               />
 
               {/* Assignee cell */}
@@ -339,10 +339,10 @@ export function TasksList({ tasks, allPeople, allProjects }: TasksListProps) {
 
               <Button
                 variant="ghost"
-                size="sm"
+                size="icon-sm"
                 onClick={() => handleDelete(task.id)}
                 disabled={isPending}
-                className="shrink-0 text-foreground-muted hover:text-destructive h-7 w-7 p-0"
+                className="shrink-0 text-foreground-muted hover:text-destructive"
               >
                 <X className="h-3.5 w-3.5" />
               </Button>
@@ -362,10 +362,10 @@ export function TasksList({ tasks, allPeople, allProjects }: TasksListProps) {
                 />
                 <Button
                   variant="ghost"
-                  size="sm"
+                  size="icon-sm"
                   onClick={() => handleDelete(task.id)}
                   disabled={isPending}
-                  className="shrink-0 text-foreground-muted hover:text-destructive h-9 w-9 p-0"
+                  className="shrink-0 text-foreground-muted hover:text-destructive"
                 >
                   <X className="h-3.5 w-3.5" />
                 </Button>

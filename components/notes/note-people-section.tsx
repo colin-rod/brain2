@@ -92,7 +92,7 @@ export function NotePeopleSection({ noteId, people, allPeople, onMutate }: NoteP
           ))}
         </div>
         {showCombobox && (
-          <div className="mt-north-sm w-64">
+          <div className="mt-north-sm w-full max-w-xs">
             <EntityCombobox
               items={allPeople.map((p) => ({ id: p.id, name: p.name }))}
               excludeIds={linkedIds}

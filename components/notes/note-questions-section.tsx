@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
@@ -101,19 +102,21 @@ export function NoteQuestionsSection({ noteId, questions, onMutate }: NoteQuesti
               >
                 <Badge
                   variant="outline"
-                  className={`text-[11px] px-1.5 py-0 cursor-pointer ${
-                    q.status === 'resolved' ? 'bg-status-saved text-white border-status-saved' : ''
-                  }`}
+                  className={cn(
+                    'text-label px-1.5 py-0.5 cursor-pointer',
+                    q.status === 'resolved' &&
+                      'bg-status-saved text-primary-foreground border-status-saved',
+                  )}
                 >
                   {q.status}
                 </Badge>
               </button>
               <Button
                 variant="ghost"
-                size="sm"
+                size="icon-sm"
                 onClick={() => handleDelete(q.id)}
                 disabled={isPending}
-                className="shrink-0 text-foreground-muted hover:text-destructive h-7 w-7 p-0"
+                className="shrink-0 text-foreground-muted hover:text-destructive"
               >
                 <X className="h-3.5 w-3.5" />
               </Button>

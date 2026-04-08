@@ -63,35 +63,31 @@ export function NoteDetailClient({
 
       <p className="text-metadata text-foreground-muted">{formatDate(note.created_at)}</p>
 
-      {(note.summary || true) && (
-        <div>
-          <h2 className="text-section-header mb-north-xs">Summary</h2>
-          <InlineEditableText
-            value={note.summary || ''}
-            onSave={async (v) => updateNote(note.id, { summary: v })}
-            className="text-body text-foreground-secondary"
-            inputClassName="text-body"
-            placeholder="Add a summary..."
-            multiline
-            rows={3}
-          />
-        </div>
-      )}
+      <div>
+        <h2 className="text-section-header mb-north-xs">Summary</h2>
+        <InlineEditableText
+          value={note.summary || ''}
+          onSave={async (v) => updateNote(note.id, { summary: v })}
+          className="text-body text-foreground-secondary"
+          inputClassName="text-body"
+          placeholder="Add a summary..."
+          multiline
+          rows={3}
+        />
+      </div>
 
-      {(note.cleaned_text || true) && (
-        <div>
-          <h2 className="text-section-header mb-north-xs">Content</h2>
-          <InlineEditableText
-            value={note.cleaned_text || ''}
-            onSave={async (v) => updateNote(note.id, { cleaned_text: v })}
-            className="text-body text-foreground-secondary whitespace-pre-wrap"
-            inputClassName="text-body"
-            placeholder="Add content..."
-            multiline
-            rows={8}
-          />
-        </div>
-      )}
+      <div>
+        <h2 className="text-section-header mb-north-xs">Content</h2>
+        <InlineEditableText
+          value={note.cleaned_text || ''}
+          onSave={async (v) => updateNote(note.id, { cleaned_text: v })}
+          className="text-body text-foreground-secondary whitespace-pre-wrap"
+          inputClassName="text-body"
+          placeholder="Add content..."
+          multiline
+          rows={8}
+        />
+      </div>
 
       <NoteTasksSection noteId={note.id} tasks={tasks} onMutate={refresh} />
 

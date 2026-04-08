@@ -35,6 +35,7 @@ export function TasksEditor() {
           <EditorItemCard key={task.id} variant="subtle">
             <div className="flex items-start gap-north-sm">
               <Input
+                aria-label="Task title"
                 value={task.title}
                 onChange={(e) => updateTask(task.id, { title: e.target.value })}
                 placeholder="Task title"
@@ -54,6 +55,7 @@ export function TasksEditor() {
               <div className="flex-1">
                 <label className="text-metadata text-foreground-muted block mb-1">Due date</label>
                 <DateInputWithShortcuts
+                  aria-label="Due date"
                   value={task.due_date || ''}
                   onChange={(v) => updateTask(task.id, { due_date: v || null })}
                 />
@@ -68,7 +70,7 @@ export function TasksEditor() {
                     })
                   }
                 >
-                  <SelectTrigger>
+                  <SelectTrigger aria-label="Priority">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -92,7 +94,7 @@ export function TasksEditor() {
                     })
                   }
                 >
-                  <SelectTrigger>
+                  <SelectTrigger aria-label="Assignee">
                     <SelectValue placeholder="Unassigned" />
                   </SelectTrigger>
                   <SelectContent>

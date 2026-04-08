@@ -1,21 +1,29 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import Fuse from 'fuse.js';
+import type FuseType from 'fuse.js';
 import { SearchBar } from '@/components/shared/search-bar';
 import { formatDate } from '@/lib/format-date';
 import type { Note } from '@/types/database';
 
 export function NotesList({ notes }: { notes: Note[] }) {
   const [query, setQuery] = useState('');
+  const fuseRef = useRef<FuseType<Note> | null>(null);
 
-  const fuse = useMemo(
-    () => new Fuse(notes, { keys: ['title', 'summary'], threshold: 0.4, ignoreLocation: true }),
-    [notes],
-  );
+  useEffect(() => {
+    if (query.length < 2) return;
+    import('fuse.js').then(({ default: Fuse }) => {
+      fuseRef.current = new Fuse(notes, {
+        keys: ['title', 'summary'],
+        threshold: 0.4,
+        ignoreLocation: true,
+      });
+    });
+  }, [query.length >= 2, notes]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const filtered = query.length >= 2 ? fuse.search(query).map((r) => r.item) : notes;
+  const filtered =
+    query.length >= 2 && fuseRef.current ? fuseRef.current.search(query).map((r) => r.item) : notes;
 
   return (
     <div className="space-y-north-md">

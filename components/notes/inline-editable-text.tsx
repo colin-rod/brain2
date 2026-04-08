@@ -105,7 +105,7 @@ export function InlineEditableText({
         setDraft(value);
         setIsEditing(true);
       }}
-      className={`text-left w-full rounded px-1 -mx-1 hover:bg-surface-subtle transition-colors cursor-text ${className}`}
+      className={`text-left w-full rounded px-1 -mx-1 hover:bg-surface-subtle transition-colors cursor-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${className}`}
     >
       {value || <span className="text-foreground-muted">{placeholder}</span>}
     </button>

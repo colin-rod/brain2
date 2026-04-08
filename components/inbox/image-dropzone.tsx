@@ -66,7 +66,8 @@ export function ImageDropzone({ file, onFileChange }: ImageDropzoneProps) {
         <button
           type="button"
           onClick={handleClear}
-          className="absolute top-2 right-2 z-10 rounded-full bg-background/80 p-1.5 hover:bg-background transition-colors"
+          aria-label="Clear image"
+          className="absolute top-2 right-2 z-10 rounded-full bg-background/80 p-1.5 hover:bg-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <X className="h-4 w-4" />
         </button>

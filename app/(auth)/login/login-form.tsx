@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 export default function LoginForm() {
   const [email, setEmail] = useState('');
@@ -48,13 +49,12 @@ export default function LoginForm() {
             <label htmlFor="email" className="text-metadata text-foreground-secondary block">
               Email
             </label>
-            <input
+            <Input
               id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full rounded-md border border-input bg-surface px-north-md py-north-sm text-body placeholder:text-foreground-muted focus:outline-none focus:ring-2 focus:ring-ring"
               placeholder="you@example.com"
             />
           </div>
@@ -63,14 +63,13 @@ export default function LoginForm() {
             <label htmlFor="password" className="text-metadata text-foreground-secondary block">
               Password
             </label>
-            <input
+            <Input
               id="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={6}
-              className="w-full rounded-md border border-input bg-surface px-north-md py-north-sm text-body placeholder:text-foreground-muted focus:outline-none focus:ring-2 focus:ring-ring"
               placeholder="••••••••"
             />
           </div>
@@ -84,13 +83,14 @@ export default function LoginForm() {
 
         <p className="text-center text-metadata text-foreground-muted">
           {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
-          <button
+          <Button
+            variant="link"
             type="button"
             onClick={() => setIsSignUp(!isSignUp)}
-            className="text-primary hover:text-primary-hover underline"
+            className="h-auto p-0 align-baseline"
           >
             {isSignUp ? 'Sign In' : 'Sign Up'}
-          </button>
+          </Button>
         </p>
       </div>
     </div>

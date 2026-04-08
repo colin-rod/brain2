@@ -25,6 +25,7 @@ export function QuestionsEditor() {
         {questions.map((q) => (
           <div key={q.id} className="flex items-center gap-north-sm">
             <Input
+              aria-label="Question"
               value={q.question_text}
               onChange={(e) => updateQuestion(q.id, { question_text: e.target.value })}
               placeholder="What needs to be resolved?"

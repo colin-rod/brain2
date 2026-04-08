@@ -168,7 +168,7 @@ function CaptureCard({ capture, index }: { capture: Capture; index: number }) {
         <p className="text-body text-foreground truncate">{getPreviewText(capture)}</p>
         {capture.status === 'failed' && capture.error_message && (
           <p className="text-metadata text-status-failed mt-0.5 flex items-center gap-1">
-            <AlertCircle className="h-3 w-3 shrink-0" />
+            <AlertCircle className="h-3 w-3 shrink-0" aria-hidden="true" />
             {capture.error_message.slice(0, 80)}
           </p>
         )}

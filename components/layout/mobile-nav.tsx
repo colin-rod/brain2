@@ -20,7 +20,10 @@ export function MobileNav() {
 
   return (
     <>
-      <nav className="md:hidden fixed bottom-0 inset-x-0 bg-surface border-t border-border z-50 pb-[env(safe-area-inset-bottom,0px)]">
+      <nav
+        aria-label="Mobile navigation"
+        className="md:hidden fixed bottom-0 inset-x-0 bg-surface border-t border-border z-50 pb-[env(safe-area-inset-bottom,0px)]"
+      >
         <div className="flex items-center justify-around h-14">
           {mobileNavItems.map((item) => {
             const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
@@ -33,8 +36,8 @@ export function MobileNav() {
                   isActive ? 'text-primary' : 'text-foreground-muted',
                 )}
               >
-                <item.icon className="h-5 w-5" />
-                <span className="text-[10px] font-medium">{item.label}</span>
+                <item.icon aria-hidden="true" className="h-5 w-5" />
+                <span className="text-xs font-medium">{item.label}</span>
               </Link>
             );
           })}
@@ -43,8 +46,8 @@ export function MobileNav() {
             onClick={() => setShowMore(true)}
             className="flex flex-col items-center gap-0.5 px-north-sm py-north-xs transition-colors text-foreground-muted"
           >
-            <MoreHorizontal className="h-5 w-5" />
-            <span className="text-[10px] font-medium">More</span>
+            <MoreHorizontal aria-hidden="true" className="h-5 w-5" />
+            <span className="text-xs font-medium">More</span>
           </button>
         </div>
       </nav>

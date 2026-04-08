@@ -23,6 +23,7 @@ export function ProjectsEditor() {
         {projects.map((project) => (
           <div key={project.id} className="flex items-center gap-north-sm">
             <Input
+              aria-label="Project name"
               value={project.name}
               onChange={(e) => updateProject(project.id, { name: e.target.value })}
               placeholder="Project name"

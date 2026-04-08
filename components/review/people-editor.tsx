@@ -23,12 +23,14 @@ export function PeopleEditor() {
         {people.map((person) => (
           <div key={person.id} className="flex items-center gap-north-sm">
             <Input
+              aria-label="Person name"
               value={person.name}
               onChange={(e) => updatePerson(person.id, { name: e.target.value })}
               placeholder="Name"
               className="flex-1"
             />
             <Input
+              aria-label="Person role"
               value={person.role || ''}
               onChange={(e) => updatePerson(person.id, { role: e.target.value || null })}
               placeholder="Role (optional)"

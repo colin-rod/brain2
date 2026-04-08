@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { FileQuestion } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export default function AppNotFound() {
   return (
@@ -9,12 +10,7 @@ export default function AppNotFound() {
       <p className="text-body text-foreground-secondary mb-north-lg">
         The page or record you&apos;re looking for doesn&apos;t exist.
       </p>
-      <Link
-        href="/inbox"
-        className="inline-flex items-center justify-center rounded-md bg-primary px-north-base py-north-sm text-sm font-medium text-primary-foreground hover:bg-primary-hover transition-colors"
-      >
-        Back to Inbox
-      </Link>
+      <Button render={<Link href="/inbox" />}>Back to Inbox</Button>
     </div>
   );
 }

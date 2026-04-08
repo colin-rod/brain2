@@ -9,18 +9,25 @@ interface DateInputWithShortcutsProps {
   value: string;
   onChange: (value: string) => void;
   className?: string;
+  'aria-label'?: string;
 }
 
 export function DateInputWithShortcuts({
   value,
   onChange,
   className,
+  'aria-label': ariaLabel,
 }: DateInputWithShortcutsProps) {
   const shortcuts = getDateShortcuts();
 
   return (
     <div className={cn('space-y-north-xs', className)}>
-      <Input type="date" value={value} onChange={(e) => onChange(e.target.value)} />
+      <Input
+        type="date"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        aria-label={ariaLabel}
+      />
       <div className="flex gap-north-xs flex-wrap">
         {shortcuts.map((s) => (
           <Button

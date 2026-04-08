@@ -1,5 +1,5 @@
-import { useState, useMemo, useCallback } from 'react';
-import Fuse from 'fuse.js';
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
+import type FuseType from 'fuse.js';
 import type { SortState } from '@/components/shared/sortable-header';
 
 interface UseListStateOptions<T> {
@@ -17,11 +17,18 @@ export function useListState<T extends Record<string, any>>({
   const [filters, setFilters] = useState<Record<string, string>>({});
   const [sort, setSort] = useState<SortState | null>(null);
   const [search, setSearch] = useState('');
+  const fuseRef = useRef<FuseType<T> | null>(null);
 
-  const fuse = useMemo(
-    () => new Fuse(items, { keys: searchKeys, threshold: searchThreshold, ignoreLocation: true }),
-    [items, searchKeys, searchThreshold],
-  );
+  useEffect(() => {
+    if (search.length < 2) return;
+    import('fuse.js').then(({ default: Fuse }) => {
+      fuseRef.current = new Fuse(items, {
+        keys: searchKeys,
+        threshold: searchThreshold,
+        ignoreLocation: true,
+      });
+    });
+  }, [search.length >= 2, items, searchKeys, searchThreshold]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const setFilter = useCallback((key: string, value: string) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
@@ -42,8 +49,9 @@ export function useListState<T extends Record<string, any>>({
 
   const searched = useMemo(() => {
     if (search.length < 2) return items;
-    return fuse.search(search).map((r) => r.item);
-  }, [search, items, fuse]);
+    if (!fuseRef.current) return items;
+    return fuseRef.current.search(search).map((r) => r.item);
+  }, [search, items]);
 
   return {
     filters,

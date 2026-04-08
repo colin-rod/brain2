@@ -158,7 +158,7 @@ function CaptureCard({ capture, index }: { capture: Capture; index: number }) {
           <Badge
             variant="outline"
             className={cn(
-              'text-[11px] px-1.5 py-px rounded-none uppercase font-mono tracking-wider',
+              'text-[11px] px-1.5 py-px rounded-none uppercase font-mono tracking-wider transition-all duration-200',
               statusStyles[capture.status],
             )}
           >
@@ -183,7 +183,7 @@ function CaptureCard({ capture, index }: { capture: Capture; index: number }) {
           variant={capture.status === 'failed' ? 'outline' : 'default'}
           onClick={handleParse}
           disabled={isParsing}
-          className="shrink-0"
+          className="shrink-0 active:scale-[0.97] transition-all duration-150"
         >
           {isParsing ? (
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -205,9 +205,11 @@ function CaptureCard({ capture, index }: { capture: Capture; index: number }) {
     </div>
   );
 
-  if (isClickable) {
-    return <Link href={`/review/${capture.id}`}>{content}</Link>;
-  }
+  const wrapped = isClickable ? <Link href={`/review/${capture.id}`}>{content}</Link> : content;
 
-  return content;
+  return (
+    <div className="animate-slide-in-up" style={{ animationDelay: `${index * 40}ms` }}>
+      {wrapped}
+    </div>
+  );
 }

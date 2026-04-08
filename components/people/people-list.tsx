@@ -114,7 +114,7 @@ export function PeopleList({ people, allProjects }: PeopleListProps) {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-north-sm">
         {isAdding && (
-          <div className="rounded-lg border border-primary/30 bg-surface px-north-base py-north-md">
+          <div className="rounded-lg border border-primary/30 bg-surface px-north-base py-north-md animate-scale-in">
             <InlineEditableText
               value=""
               onSave={async (v) => {
@@ -127,10 +127,11 @@ export function PeopleList({ people, allProjects }: PeopleListProps) {
           </div>
         )}
 
-        {filtered.map((person) => (
+        {filtered.map((person, index) => (
           <div
             key={person.id}
-            className="group relative rounded-lg border border-border bg-surface px-north-base py-north-md hover:bg-surface-subtle transition-colors border-l-[3px] border-l-(--entity-people)"
+            className="group relative rounded-lg border border-border bg-surface px-north-base py-north-md hover:bg-surface-subtle transition-colors border-l-[3px] border-l-(--entity-people) animate-fade-in"
+            style={{ animationDelay: `${index * 30}ms` }}
           >
             <Button
               variant="ghost"

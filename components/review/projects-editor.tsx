@@ -21,7 +21,7 @@ export function ProjectsEditor() {
 
       <div className="space-y-north-xs">
         {projects.map((project) => (
-          <div key={project.id} className="flex items-center gap-north-sm">
+          <div key={project.id} className="flex items-center gap-north-sm animate-scale-in">
             <Input
               aria-label="Project name"
               value={project.name}

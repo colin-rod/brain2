@@ -26,7 +26,7 @@ export function DecisionsEditor() {
 
       <div className="space-y-north-sm">
         {decisions.map((decision) => (
-          <EditorItemCard key={decision.id} variant="subtle">
+          <EditorItemCard key={decision.id} variant="subtle" className="animate-scale-in">
             <div className="flex items-start gap-north-sm">
               <Textarea
                 value={decision.decision_text}

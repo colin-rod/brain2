@@ -32,11 +32,17 @@ export function MobileNav() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  'flex flex-col items-center gap-0.5 px-north-sm py-north-xs transition-colors',
+                  'flex flex-col items-center gap-0.5 px-north-sm py-north-xs transition-all duration-150',
                   isActive ? 'text-primary' : 'text-foreground-muted',
                 )}
               >
-                <item.icon aria-hidden="true" className="h-5 w-5" />
+                <item.icon
+                  aria-hidden="true"
+                  className={cn(
+                    'h-5 w-5 transition-transform duration-150',
+                    isActive && 'scale-110',
+                  )}
+                />
                 <span className="text-xs font-medium">{item.label}</span>
               </Link>
             );

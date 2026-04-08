@@ -23,7 +23,7 @@ export function QuestionsEditor() {
 
       <div className="space-y-north-xs">
         {questions.map((q) => (
-          <div key={q.id} className="flex items-center gap-north-sm">
+          <div key={q.id} className="flex items-center gap-north-sm animate-scale-in">
             <Input
               aria-label="Question"
               value={q.question_text}

@@ -30,7 +30,7 @@ export function EmptyState({
       }
     >
       <Icon
-        className="mx-auto h-10 w-10 mb-north-sm"
+        className="mx-auto h-10 w-10 mb-north-sm animate-float"
         style={{ color: iconColor ?? 'var(--foreground-muted)' }}
       />
       <p className="text-metadata font-mono text-foreground-muted uppercase tracking-widest">

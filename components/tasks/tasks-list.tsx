@@ -185,7 +185,7 @@ export function TasksList({ tasks, allPeople, allProjects }: TasksListProps) {
 
       <div className="divide-y divide-border border-t border-border">
         {isAdding && (
-          <div className="border-l-2 border-primary px-north-sm py-north-xs">
+          <div className="border-l-2 border-primary px-north-sm py-north-xs animate-scale-in">
             <InlineEditableText
               value=""
               onSave={async (v) => {
@@ -201,7 +201,8 @@ export function TasksList({ tasks, allPeople, allProjects }: TasksListProps) {
         {filtered.map((task, index) => (
           <div
             key={task.id}
-            className="px-north-sm py-north-xs border-l-[3px] border-l-(--entity-tasks)"
+            className="px-north-sm py-north-xs border-l-[3px] border-l-(--entity-tasks) animate-fade-in"
+            style={{ animationDelay: `${index * 25}ms` }}
           >
             {/* Desktop: grid layout */}
             <div className="hidden sm:grid sm:grid-cols-[24px_1fr_100px_60px_90px_100px_100px_32px] gap-north-sm items-center">

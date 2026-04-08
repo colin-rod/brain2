@@ -32,7 +32,7 @@ export function TasksEditor() {
 
       <div className="space-y-north-sm">
         {tasks.map((task) => (
-          <EditorItemCard key={task.id} variant="subtle">
+          <EditorItemCard key={task.id} variant="subtle" className="animate-scale-in">
             <div className="flex items-start gap-north-sm">
               <Input
                 aria-label="Task title"

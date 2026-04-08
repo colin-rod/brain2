@@ -21,7 +21,7 @@ export function PeopleEditor() {
 
       <div className="space-y-north-xs">
         {people.map((person) => (
-          <div key={person.id} className="flex items-center gap-north-sm">
+          <div key={person.id} className="flex items-center gap-north-sm animate-scale-in">
             <Input
               aria-label="Person name"
               value={person.name}

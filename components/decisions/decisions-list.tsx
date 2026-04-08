@@ -175,7 +175,7 @@ export function DecisionsList({ decisions, allProjects, allPeople }: DecisionsLi
 
       <div className="space-y-north-sm">
         {isAdding && (
-          <div className="rounded-lg border border-primary/30 bg-surface px-north-base py-north-md">
+          <div className="rounded-lg border border-primary/30 bg-surface px-north-base py-north-md animate-scale-in">
             <InlineEditableText
               value=""
               onSave={async (v) => {
@@ -188,10 +188,11 @@ export function DecisionsList({ decisions, allProjects, allPeople }: DecisionsLi
           </div>
         )}
 
-        {filtered.map((d) => (
+        {filtered.map((d, index) => (
           <div
             key={d.id}
-            className="group rounded-lg border border-border bg-surface px-north-base py-north-md border-l-[3px] border-l-(--entity-decisions)"
+            className="group rounded-lg border border-border bg-surface px-north-base py-north-md border-l-[3px] border-l-(--entity-decisions) animate-fade-in"
+            style={{ animationDelay: `${index * 30}ms` }}
           >
             <div className="flex items-start justify-between gap-north-sm">
               <div className="flex-1 min-w-0">

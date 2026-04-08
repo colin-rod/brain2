@@ -14,6 +14,7 @@ import { DecisionsEditor } from './decisions-editor';
 import { QuestionsEditor } from './questions-editor';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import { Check, Loader2, Save } from 'lucide-react';
 import type { Capture, ParsedNoteJson } from '@/types/database';
 
@@ -26,6 +27,7 @@ export function ReviewClient({ capture, imageUrl }: ReviewClientProps) {
   const router = useRouter();
   const [isSaving, startTransition] = useTransition();
   const [isSaved, setIsSaved] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
   const store = useReviewStore();
   const captureId = store.captureId;
@@ -65,6 +67,8 @@ export function ReviewClient({ capture, imageUrl }: ReviewClientProps) {
 
       toast.success('Saved to Notes');
       setIsSaved(true);
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 600);
       const noteId = result.noteId;
       setTimeout(() => {
         reset();
@@ -85,21 +89,38 @@ export function ReviewClient({ capture, imageUrl }: ReviewClientProps) {
 
         {/* Right column: editable fields */}
         <div className="lg:col-span-3 space-y-north-lg">
-          <NoteFields />
+          <div className="animate-slide-in-up" style={{ animationDelay: '0ms' }}>
+            <NoteFields />
+          </div>
           <Separator />
-          <TasksEditor />
+          <div className="animate-slide-in-up" style={{ animationDelay: '50ms' }}>
+            <TasksEditor />
+          </div>
           <Separator />
-          <PeopleEditor />
+          <div className="animate-slide-in-up" style={{ animationDelay: '100ms' }}>
+            <PeopleEditor />
+          </div>
           <Separator />
-          <ProjectsEditor />
+          <div className="animate-slide-in-up" style={{ animationDelay: '150ms' }}>
+            <ProjectsEditor />
+          </div>
           <Separator />
-          <DecisionsEditor />
+          <div className="animate-slide-in-up" style={{ animationDelay: '200ms' }}>
+            <DecisionsEditor />
+          </div>
           <Separator />
-          <QuestionsEditor />
+          <div className="animate-slide-in-up" style={{ animationDelay: '250ms' }}>
+            <QuestionsEditor />
+          </div>
 
           {/* Desktop save button */}
           <div className="hidden lg:flex justify-end pt-north-base">
-            <Button onClick={handleSave} disabled={isSaving || isSaved} size="lg">
+            <Button
+              onClick={handleSave}
+              disabled={isSaving || isSaved}
+              size="lg"
+              className={cn('transition-transform duration-150', saveSuccess && 'scale-105')}
+            >
               {isSaving ? (
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
               ) : isSaved ? (

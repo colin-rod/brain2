@@ -48,7 +48,7 @@ export function Sidebar() {
               key={item.href}
               href={item.href}
               className={cn(
-                'flex items-center gap-north-md px-north-md py-north-xs rounded-none text-[13px] font-mono uppercase tracking-wider border-l-2 transition-colors',
+                'flex items-center gap-north-md px-north-md py-north-xs rounded-none text-[13px] font-mono uppercase tracking-wider border-l-2 transition-all duration-150',
                 isActive
                   ? 'border-primary bg-sidebar-accent/40 text-foreground'
                   : 'border-transparent text-foreground-secondary hover:border-primary/40 hover:bg-sidebar-accent/20 hover:text-foreground',

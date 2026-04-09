@@ -12,6 +12,7 @@ import { SearchBar } from '@/components/shared/search-bar';
 import { FilterBar, type FilterConfig } from '@/components/shared/filter-bar';
 import { SortableHeader } from '@/components/shared/sortable-header';
 import { useListState, applySorting } from '@/lib/hooks/use-list-state';
+import { useSearchRefresh } from '@/components/search/search-provider';
 import { updateDecision, deleteDecision } from '@/lib/actions/note-mutations';
 import {
   createStandaloneDecision,
@@ -35,6 +36,7 @@ interface DecisionsListProps {
 
 export function DecisionsList({ decisions, allProjects, allPeople }: DecisionsListProps) {
   const router = useRouter();
+  const refreshSearch = useSearchRefresh();
   const [isPending, startTransition] = useTransition();
   const [isAdding, setIsAdding] = useState(false);
   const [editingProject, setEditingProject] = useState<string | null>(null);
@@ -87,6 +89,7 @@ export function DecisionsList({ decisions, allProjects, allPeople }: DecisionsLi
         toast.error(result.error);
       } else {
         router.refresh();
+        refreshSearch();
       }
     });
   }
@@ -98,6 +101,7 @@ export function DecisionsList({ decisions, allProjects, allPeople }: DecisionsLi
         toast.error(result.error);
       } else {
         router.refresh();
+        refreshSearch();
       }
     });
   }
@@ -113,6 +117,7 @@ export function DecisionsList({ decisions, allProjects, allPeople }: DecisionsLi
         toast.error(result.error);
       } else {
         router.refresh();
+        refreshSearch();
       }
       setIsAdding(false);
     });
@@ -125,6 +130,7 @@ export function DecisionsList({ decisions, allProjects, allPeople }: DecisionsLi
         toast.error(result.error);
       } else {
         router.refresh();
+        refreshSearch();
       }
       setAddingPerson(null);
     });
@@ -137,6 +143,7 @@ export function DecisionsList({ decisions, allProjects, allPeople }: DecisionsLi
         toast.error(result.error);
       } else {
         router.refresh();
+        refreshSearch();
       }
     });
   }
@@ -200,7 +207,10 @@ export function DecisionsList({ decisions, allProjects, allPeople }: DecisionsLi
                   value={d.decision_text}
                   onSave={async (v) => {
                     const r = await updateDecision(d.id, { decision_text: v });
-                    if (!r.error) router.refresh();
+                    if (!r.error) {
+                      router.refresh();
+                      refreshSearch();
+                    }
                     return r;
                   }}
                   className="text-body"
@@ -209,7 +219,10 @@ export function DecisionsList({ decisions, allProjects, allPeople }: DecisionsLi
                   value={d.rationale || ''}
                   onSave={async (v) => {
                     const r = await updateDecision(d.id, { rationale: v || null });
-                    if (!r.error) router.refresh();
+                    if (!r.error) {
+                      router.refresh();
+                      refreshSearch();
+                    }
                     return r;
                   }}
                   placeholder="Add rationale..."

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Download, RefreshCw, Loader2 } from 'lucide-react';
+import { useSearchRefresh } from '@/components/search/search-provider';
 import { exportNoteMarkdown, downloadNoteMarkdown } from '@/lib/actions/export';
 
 interface NoteDetailExportProps {
@@ -14,6 +15,7 @@ interface NoteDetailExportProps {
 
 export function NoteDetailExport({ noteId, hasExport }: NoteDetailExportProps) {
   const router = useRouter();
+  const refreshSearch = useSearchRefresh();
   const [isExporting, startExport] = useTransition();
   const [isDownloading, startDownload] = useTransition();
 
@@ -25,6 +27,7 @@ export function NoteDetailExport({ noteId, hasExport }: NoteDetailExportProps) {
       } else {
         toast.success('Markdown exported');
         router.refresh();
+        refreshSearch();
       }
     });
   }

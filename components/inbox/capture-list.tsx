@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { formatDate } from '@/lib/format-date';
 import { Inbox as InboxIcon, Sparkles, RotateCcw, Loader2, AlertCircle } from 'lucide-react';
 import { EmptyState } from '@/components/shared/empty-state';
+import { useSearchRefresh } from '@/components/search/search-provider';
 import { parseCapture } from '@/lib/actions/parse';
 import type { Capture, CaptureSourceType, CaptureStatus } from '@/types/database';
 import { cn } from '@/lib/utils';
@@ -127,6 +128,7 @@ function ProcessingIndicator() {
 
 function CaptureCard({ capture, index }: { capture: Capture; index: number }) {
   const router = useRouter();
+  const refreshSearch = useSearchRefresh();
   const [isParsing, startTransition] = useTransition();
   const isClickable = capture.status === 'parsed' || capture.status === 'in_review';
   const canParse = capture.status === 'new' || capture.status === 'failed';
@@ -141,6 +143,7 @@ function CaptureCard({ capture, index }: { capture: Capture; index: number }) {
       } else {
         toast.success('Ready to review');
         router.refresh();
+        refreshSearch();
       }
     });
   }

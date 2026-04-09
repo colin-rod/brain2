@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import { useSearchData } from './search-provider';
@@ -17,11 +17,12 @@ export function GlobalSearch() {
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const results =
-    query.length >= 2 && fuse ? fuse.search(query, { limit: 30 }).map((r) => r.item) : [];
-
-  const groups = groupResultsByType(results);
-  const flatResults = groups.flatMap((g) => g.items);
+  const results = useMemo(
+    () => (query.length >= 2 && fuse ? fuse.search(query, { limit: 30 }).map((r) => r.item) : []),
+    [query, fuse],
+  );
+  const groups = useMemo(() => groupResultsByType(results), [results]);
+  const flatResults = useMemo(() => groups.flatMap((g) => g.items), [groups]);
 
   const navigate = useCallback(
     (item: SearchableItem) => {

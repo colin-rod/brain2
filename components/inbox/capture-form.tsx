@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { ImageDropzone } from './image-dropzone';
+import { useSearchRefresh } from '@/components/search/search-provider';
 import { createTextCapture, createImageCapture } from '@/lib/actions/capture';
 import type { CaptureSourceType } from '@/types/database';
 import { ImageIcon, FileText, MessageSquare, Loader2 } from 'lucide-react';
@@ -15,6 +16,7 @@ type InputMode = 'image' | 'text' | 'chat_transcript';
 
 export function CaptureForm() {
   const router = useRouter();
+  const refreshSearch = useSearchRefresh();
   const [isPending, startTransition] = useTransition();
   const [mode, setMode] = useState<InputMode>('image');
   const [text, setText] = useState('');
@@ -44,6 +46,7 @@ export function CaptureForm() {
       setText('');
       setFile(null);
       router.refresh();
+      refreshSearch();
     });
   }
 

@@ -10,6 +10,7 @@ import { SearchBar } from '@/components/shared/search-bar';
 import { FilterBar, type FilterConfig } from '@/components/shared/filter-bar';
 import { SortableHeader } from '@/components/shared/sortable-header';
 import { useListState, applySorting } from '@/lib/hooks/use-list-state';
+import { useSearchRefresh } from '@/components/search/search-provider';
 import { createPerson, updatePerson, deletePerson } from '@/lib/actions/entity-mutations';
 import { Plus, X } from 'lucide-react';
 import type { Person, Project } from '@/types/database';
@@ -25,6 +26,7 @@ interface PeopleListProps {
 
 export function PeopleList({ people, allProjects }: PeopleListProps) {
   const router = useRouter();
+  const refreshSearch = useSearchRefresh();
   const [isPending, startTransition] = useTransition();
   const [isAdding, setIsAdding] = useState(false);
 
@@ -69,6 +71,7 @@ export function PeopleList({ people, allProjects }: PeopleListProps) {
         toast.error(result.error);
       } else {
         router.refresh();
+        refreshSearch();
       }
       setIsAdding(false);
     });
@@ -81,6 +84,7 @@ export function PeopleList({ people, allProjects }: PeopleListProps) {
         toast.error(result.error);
       } else {
         router.refresh();
+        refreshSearch();
       }
     });
   }
@@ -148,7 +152,10 @@ export function PeopleList({ people, allProjects }: PeopleListProps) {
                 value={person.name}
                 onSave={async (v) => {
                   const r = await updatePerson(person.id, { name: v });
-                  if (!r.error) router.refresh();
+                  if (!r.error) {
+                    router.refresh();
+                    refreshSearch();
+                  }
                   return r;
                 }}
                 className="text-issue-title"
@@ -157,7 +164,10 @@ export function PeopleList({ people, allProjects }: PeopleListProps) {
                 value={person.role || ''}
                 onSave={async (v) => {
                   const r = await updatePerson(person.id, { role: v || null });
-                  if (!r.error) router.refresh();
+                  if (!r.error) {
+                    router.refresh();
+                    refreshSearch();
+                  }
                   return r;
                 }}
                 placeholder="Add role..."

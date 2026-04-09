@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ImageIcon, FileText, MessageSquare, ChevronDown } from 'lucide-react';
 import type { Capture, CaptureSourceType } from '@/types/database';
@@ -41,11 +42,12 @@ export function SourcePreview({ capture, imageUrl }: SourcePreviewProps) {
           <div className="border-t border-border px-north-base py-north-md">
             {capture.source_type === 'image' && imageUrl && (
               <div className="flex justify-center">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <Image
                   src={imageUrl}
                   alt="Source capture"
-                  className="max-h-96 rounded-md object-contain"
+                  width={800}
+                  height={384}
+                  className="max-h-96 w-auto rounded-md object-contain"
                 />
               </div>
             )}

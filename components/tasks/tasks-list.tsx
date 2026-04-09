@@ -20,6 +20,7 @@ import { FilterBar, type FilterConfig } from '@/components/shared/filter-bar';
 import { SortableHeader } from '@/components/shared/sortable-header';
 import { TaskStatusBadge } from '@/components/shared/status-badge';
 import { useListState, applySorting } from '@/lib/hooks/use-list-state';
+import { useSearchRefresh } from '@/components/search/search-provider';
 import { updateTask, deleteTask } from '@/lib/actions/note-mutations';
 import { createStandaloneTask } from '@/lib/actions/entity-mutations';
 import { formatDate } from '@/lib/format-date';
@@ -54,6 +55,7 @@ const PRIORITY_OPTIONS = [
 
 export function TasksList({ tasks, allPeople, allProjects }: TasksListProps) {
   const router = useRouter();
+  const refreshSearch = useSearchRefresh();
   const [isPending, startTransition] = useTransition();
   const [isAdding, setIsAdding] = useState(false);
   const [editingAssignee, setEditingAssignee] = useState<string | null>(null);
@@ -118,6 +120,7 @@ export function TasksList({ tasks, allPeople, allProjects }: TasksListProps) {
         toast.error(result.error);
       } else {
         router.refresh();
+        refreshSearch();
       }
     });
   }
@@ -129,6 +132,7 @@ export function TasksList({ tasks, allPeople, allProjects }: TasksListProps) {
         toast.error(result.error);
       } else {
         router.refresh();
+        refreshSearch();
       }
     });
   }
@@ -144,6 +148,7 @@ export function TasksList({ tasks, allPeople, allProjects }: TasksListProps) {
         toast.error(result.error);
       } else {
         router.refresh();
+        refreshSearch();
       }
       setIsAdding(false);
     });
@@ -215,7 +220,10 @@ export function TasksList({ tasks, allPeople, allProjects }: TasksListProps) {
                   value={task.title}
                   onSave={async (v) => {
                     const r = await updateTask(task.id, { title: v });
-                    if (!r.error) router.refresh();
+                    if (!r.error) {
+                      router.refresh();
+                      refreshSearch();
+                    }
                     return r;
                   }}
                   className="text-body"
@@ -356,7 +364,10 @@ export function TasksList({ tasks, allPeople, allProjects }: TasksListProps) {
                   value={task.title}
                   onSave={async (v) => {
                     const r = await updateTask(task.id, { title: v });
-                    if (!r.error) router.refresh();
+                    if (!r.error) {
+                      router.refresh();
+                      refreshSearch();
+                    }
                     return r;
                   }}
                   className="text-body flex-1"

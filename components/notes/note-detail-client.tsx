@@ -10,6 +10,7 @@ import { NotePeopleSection } from './note-people-section';
 import { NoteProjectsSection } from './note-projects-section';
 import { NoteDecisionsSection } from './note-decisions-section';
 import { NoteQuestionsSection } from './note-questions-section';
+import { useSearchRefresh } from '@/components/search/search-provider';
 import { updateNote } from '@/lib/actions/note-mutations';
 import { formatDate } from '@/lib/format-date';
 import type { Note, Task, Person, Project, Decision, OpenQuestion } from '@/types/database';
@@ -36,9 +37,11 @@ export function NoteDetailClient({
   allProjects,
 }: NoteDetailClientProps) {
   const router = useRouter();
+  const refreshSearch = useSearchRefresh();
 
   function refresh() {
     router.refresh();
+    refreshSearch();
   }
 
   return (

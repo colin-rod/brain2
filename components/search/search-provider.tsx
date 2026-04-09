@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import Fuse from 'fuse.js';
 import { fetchAllSearchableEntities } from '@/lib/actions/search';
 import {
@@ -27,6 +27,10 @@ export function useSearchData() {
   return useContext(SearchContext);
 }
 
+export function useSearchRefresh() {
+  return useContext(SearchContext).refresh;
+}
+
 export function SearchProvider({ children }: { children: React.ReactNode }) {
   const [data, setData] = useState<AllEntities | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -44,13 +48,13 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  const refresh = () => {
+  const refresh = useCallback(() => {
     setIsLoading(true);
     fetchAllSearchableEntities().then((result) => {
       setData(result);
       setIsLoading(false);
     });
-  };
+  }, []);
 
   const items = useMemo(() => (data ? normalizeToSearchableItems(data) : []), [data]);
 
@@ -68,7 +72,10 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
     });
   }, [items]);
 
-  const value = useMemo(() => ({ items, fuse, isLoading, refresh }), [items, fuse, isLoading]);
+  const value = useMemo(
+    () => ({ items, fuse, isLoading, refresh }),
+    [items, fuse, isLoading, refresh],
+  );
 
   return <SearchContext.Provider value={value}>{children}</SearchContext.Provider>;
 }

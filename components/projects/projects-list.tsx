@@ -10,6 +10,7 @@ import { SearchBar } from '@/components/shared/search-bar';
 import { FilterBar, type FilterConfig } from '@/components/shared/filter-bar';
 import { SortableHeader } from '@/components/shared/sortable-header';
 import { useListState, applySorting } from '@/lib/hooks/use-list-state';
+import { useSearchRefresh } from '@/components/search/search-provider';
 import { createProject, updateProject, deleteProject } from '@/lib/actions/entity-mutations';
 import { Plus, X } from 'lucide-react';
 import type { Project, Person } from '@/types/database';
@@ -25,6 +26,7 @@ interface ProjectsListProps {
 
 export function ProjectsList({ projects, allPeople }: ProjectsListProps) {
   const router = useRouter();
+  const refreshSearch = useSearchRefresh();
   const [isPending, startTransition] = useTransition();
   const [isAdding, setIsAdding] = useState(false);
 
@@ -78,6 +80,7 @@ export function ProjectsList({ projects, allPeople }: ProjectsListProps) {
         toast.error(result.error);
       } else {
         router.refresh();
+        refreshSearch();
       }
       setIsAdding(false);
     });
@@ -90,6 +93,7 @@ export function ProjectsList({ projects, allPeople }: ProjectsListProps) {
         toast.error(result.error);
       } else {
         router.refresh();
+        refreshSearch();
       }
     });
   }
@@ -157,7 +161,10 @@ export function ProjectsList({ projects, allPeople }: ProjectsListProps) {
                 value={project.name}
                 onSave={async (v) => {
                   const r = await updateProject(project.id, { name: v });
-                  if (!r.error) router.refresh();
+                  if (!r.error) {
+                    router.refresh();
+                    refreshSearch();
+                  }
                   return r;
                 }}
                 className="text-issue-title"
@@ -166,7 +173,10 @@ export function ProjectsList({ projects, allPeople }: ProjectsListProps) {
                 value={project.status || ''}
                 onSave={async (v) => {
                   const r = await updateProject(project.id, { status: v || null });
-                  if (!r.error) router.refresh();
+                  if (!r.error) {
+                    router.refresh();
+                    refreshSearch();
+                  }
                   return r;
                 }}
                 placeholder="Add status..."

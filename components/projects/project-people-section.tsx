@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { EntityCombobox } from '@/components/notes/entity-combobox';
+import { useSearchRefresh } from '@/components/search/search-provider';
 import { linkPersonToProject, unlinkPersonFromProject } from '@/lib/actions/entity-mutations';
 import { Plus, X } from 'lucide-react';
 
@@ -21,6 +22,7 @@ export function ProjectPeopleSection({
   allPeople,
 }: ProjectPeopleSectionProps) {
   const router = useRouter();
+  const refreshSearch = useSearchRefresh();
   const [isPending, startTransition] = useTransition();
   const [isAdding, setIsAdding] = useState(false);
 
@@ -31,6 +33,7 @@ export function ProjectPeopleSection({
         toast.error(result.error);
       } else {
         router.refresh();
+        refreshSearch();
       }
       setIsAdding(false);
     });
@@ -43,6 +46,7 @@ export function ProjectPeopleSection({
         toast.error(result.error);
       } else {
         router.refresh();
+        refreshSearch();
       }
     });
   }

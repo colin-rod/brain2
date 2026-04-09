@@ -27,6 +27,7 @@ export function PeopleEditor() {
               value={person.name}
               onChange={(e) => updatePerson(person.id, { name: e.target.value })}
               placeholder="Name"
+              maxLength={200}
               className="flex-1"
             />
             <Input
@@ -34,6 +35,7 @@ export function PeopleEditor() {
               value={person.role || ''}
               onChange={(e) => updatePerson(person.id, { role: e.target.value || null })}
               placeholder="Role (optional)"
+              maxLength={200}
               className="flex-1"
             />
             <Button

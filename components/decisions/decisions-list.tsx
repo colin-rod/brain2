@@ -282,7 +282,7 @@ export function DecisionsList({ decisions, allProjects, allPeople }: DecisionsLi
               {d.notes && (
                 <Link
                   href={`/notes/${d.notes.id}`}
-                  className="text-metadata text-primary hover:underline"
+                  className="text-metadata text-primary hover:underline truncate max-w-[200px] inline-block"
                 >
                   {d.notes.title}
                 </Link>
@@ -332,9 +332,13 @@ export function DecisionsList({ decisions, allProjects, allPeople }: DecisionsLi
           </div>
         ))}
 
-        {filtered.length === 0 && search.length >= 2 && (
+        {filtered.length === 0 && (search.length >= 2 || Object.values(filters).some(Boolean)) && (
           <p className="text-body text-foreground-muted text-center py-north-lg">
-            No decisions match &ldquo;{search}&rdquo;
+            {search.length >= 2 ? (
+              <>No decisions match &ldquo;{search}&rdquo;</>
+            ) : (
+              <>No decisions match your filters.</>
+            )}
           </p>
         )}
       </div>

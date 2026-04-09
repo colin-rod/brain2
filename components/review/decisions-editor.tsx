@@ -32,6 +32,7 @@ export function DecisionsEditor() {
                 value={decision.decision_text}
                 onChange={(e) => updateDecision(decision.id, { decision_text: e.target.value })}
                 placeholder="What was decided?"
+                maxLength={2000}
                 rows={2}
                 className="flex-1 resize-y"
               />
@@ -58,6 +59,7 @@ export function DecisionsEditor() {
                     })
                   }
                   placeholder="Why was this decided?"
+                  maxLength={1000}
                 />
               </div>
               <div className="w-48">

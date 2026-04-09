@@ -231,7 +231,7 @@ export function TasksList({ tasks, allPeople, allProjects }: TasksListProps) {
                 {task.notes && (
                   <Link
                     href={`/notes/${task.notes.id}`}
-                    className="text-metadata text-primary hover:underline block mt-0.5"
+                    className="text-metadata text-primary hover:underline block mt-0.5 truncate"
                   >
                     {task.notes.title}
                   </Link>
@@ -421,9 +421,14 @@ export function TasksList({ tasks, allPeople, allProjects }: TasksListProps) {
           </div>
         ))}
 
-        {filtered.length === 0 && search.length >= 2 && (
+        {filtered.length === 0 && (search.length >= 2 || Object.values(filters).some(Boolean)) && (
           <p className="font-mono text-metadata text-foreground-muted uppercase tracking-wider pt-north-md">
-            <span className="text-primary">{'// '}</span>NO RESULTS FOR &ldquo;{search}&rdquo;
+            <span className="text-primary">{'// '}</span>
+            {search.length >= 2 ? (
+              <>NO RESULTS FOR &ldquo;{search}&rdquo;</>
+            ) : (
+              <>NO TASKS MATCH YOUR FILTERS</>
+            )}
           </p>
         )}
       </div>

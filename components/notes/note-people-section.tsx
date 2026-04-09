@@ -74,10 +74,10 @@ export function NotePeopleSection({ noteId, people, allPeople, onMutate }: NoteP
               key={person.id}
               className="group rounded-md border border-border bg-surface px-north-md py-north-sm flex items-center gap-north-sm"
             >
-              <div>
-                <p className="text-body font-medium">{person.name}</p>
+              <div className="min-w-0">
+                <p className="text-body font-medium truncate">{person.name}</p>
                 {person.role && (
-                  <p className="text-metadata text-foreground-muted">{person.role}</p>
+                  <p className="text-metadata text-foreground-muted truncate">{person.role}</p>
                 )}
               </div>
               <button

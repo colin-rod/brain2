@@ -27,6 +27,7 @@ export function ProjectsEditor() {
               value={project.name}
               onChange={(e) => updateProject(project.id, { name: e.target.value })}
               placeholder="Project name"
+              maxLength={200}
               className="flex-1"
             />
             <Button

@@ -39,6 +39,7 @@ export function TasksEditor() {
                 value={task.title}
                 onChange={(e) => updateTask(task.id, { title: e.target.value })}
                 placeholder="Task title"
+                maxLength={500}
                 className="flex-1"
               />
               <Button

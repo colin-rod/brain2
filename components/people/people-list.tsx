@@ -192,9 +192,13 @@ export function PeopleList({ people, allProjects }: PeopleListProps) {
         ))}
       </div>
 
-      {filtered.length === 0 && search.length >= 2 && (
+      {filtered.length === 0 && (search.length >= 2 || Object.values(filters).some(Boolean)) && (
         <p className="text-body text-foreground-muted text-center py-north-lg">
-          No people match &ldquo;{search}&rdquo;
+          {search.length >= 2 ? (
+            <>No people match &ldquo;{search}&rdquo;</>
+          ) : (
+            <>No people match your filters.</>
+          )}
         </p>
       )}
     </div>

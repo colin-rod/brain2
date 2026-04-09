@@ -14,6 +14,7 @@ interface InlineEditableTextProps {
   placeholder?: string;
   multiline?: boolean;
   rows?: number;
+  maxLength?: number;
 }
 
 export function InlineEditableText({
@@ -24,6 +25,7 @@ export function InlineEditableText({
   placeholder = 'Click to edit...',
   multiline = false,
   rows = 3,
+  maxLength,
 }: InlineEditableTextProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [draft, setDraft] = useState(value);
@@ -32,6 +34,11 @@ export function InlineEditableText({
 
   const save = useCallback(() => {
     const trimmed = draft.trim();
+    if (!trimmed && value.trim()) {
+      setDraft(value);
+      setIsEditing(false);
+      return;
+    }
     if (trimmed === value.trim()) {
       setIsEditing(false);
       return;
@@ -73,6 +80,7 @@ export function InlineEditableText({
       disabled: isPending,
       placeholder,
       autoFocus: true,
+      maxLength,
     };
 
     return (
@@ -105,7 +113,7 @@ export function InlineEditableText({
         setDraft(value);
         setIsEditing(true);
       }}
-      className={`text-left w-full rounded px-1 -mx-1 hover:bg-surface-subtle transition-colors cursor-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${className}`}
+      className={`text-left w-full rounded px-1 -mx-1 hover:bg-surface-subtle transition-colors cursor-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring wrap-break-word overflow-wrap-anywhere ${className}`}
     >
       {value || <span className="text-foreground-muted">{placeholder}</span>}
     </button>

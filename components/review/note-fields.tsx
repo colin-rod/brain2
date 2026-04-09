@@ -26,6 +26,7 @@ export function NoteFields() {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Note title"
+          maxLength={200}
           className="text-issue-title"
         />
       </div>
@@ -42,6 +43,7 @@ export function NoteFields() {
           value={summary}
           onChange={(e) => setSummary(e.target.value)}
           placeholder="Brief summary of the note..."
+          maxLength={2000}
           rows={3}
           className="resize-y"
         />
@@ -59,6 +61,7 @@ export function NoteFields() {
           value={cleaned_text}
           onChange={(e) => setCleanedText(e.target.value)}
           placeholder="Full content of the note..."
+          maxLength={50000}
           rows={8}
           className="resize-y"
         />

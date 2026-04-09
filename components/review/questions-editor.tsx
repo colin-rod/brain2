@@ -29,6 +29,7 @@ export function QuestionsEditor() {
               value={q.question_text}
               onChange={(e) => updateQuestion(q.id, { question_text: e.target.value })}
               placeholder="What needs to be resolved?"
+              maxLength={1000}
               className="flex-1"
             />
             <Button

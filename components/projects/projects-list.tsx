@@ -201,9 +201,13 @@ export function ProjectsList({ projects, allPeople }: ProjectsListProps) {
         ))}
       </div>
 
-      {filtered.length === 0 && search.length >= 2 && (
+      {filtered.length === 0 && (search.length >= 2 || Object.values(filters).some(Boolean)) && (
         <p className="text-body text-foreground-muted text-center py-north-lg">
-          No projects match &ldquo;{search}&rdquo;
+          {search.length >= 2 ? (
+            <>No projects match &ldquo;{search}&rdquo;</>
+          ) : (
+            <>No projects match your filters.</>
+          )}
         </p>
       )}
     </div>

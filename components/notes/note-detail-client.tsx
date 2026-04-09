@@ -84,7 +84,7 @@ export function NoteDetailClient({
         <InlineEditableText
           value={note.cleaned_text || ''}
           onSave={async (v) => updateNote(note.id, { cleaned_text: v })}
-          className="text-body text-foreground-secondary whitespace-pre-wrap"
+          className="text-body text-foreground-secondary whitespace-pre-wrap wrap-break-word"
           inputClassName="text-body"
           placeholder="Add content..."
           multiline

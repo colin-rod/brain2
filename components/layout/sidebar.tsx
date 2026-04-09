@@ -35,7 +35,7 @@ export function Sidebar() {
       <div className="flex h-14 items-center gap-1 px-north-md border-b border-sidebar-border">
         <span className="font-mono text-[11px] text-primary select-none">[</span>
         <span className="font-accent text-lg font-semibold tracking-tight text-foreground">
-          Brain2
+          Brain<span className="text-primary italic">2</span>
         </span>
         <span className="font-mono text-[11px] text-primary select-none">]</span>
       </div>

@@ -15,42 +15,26 @@ export function EmptyState({
   icon: Icon,
   title,
   description,
-  iconColor,
-  bgColor,
+  iconColor: _iconColor,
+  bgColor: _bgColor,
   ctaLabel,
   ctaHref,
 }: EmptyStateProps) {
   return (
-    <div
-      className="border-t border-border pt-north-md"
-      style={
-        bgColor
-          ? {
-              backgroundColor: bgColor,
-              borderColor: 'transparent',
-              padding: 'var(--north-xl)',
-              borderRadius: '0.5rem',
-            }
-          : undefined
-      }
-    >
-      <Icon
-        className="mx-auto h-10 w-10 mb-north-sm animate-float"
-        style={{ color: iconColor ?? 'var(--primary)' }}
-      />
-      <p className="text-metadata font-mono text-foreground-muted uppercase tracking-widest">
-        <span className="text-primary">{'// '}</span>
-        {title}
-      </p>
+    <div className="rounded-xl border border-border-divider bg-primary-tint-subtle p-north-2xl text-center">
+      <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary-tint mb-north-sm">
+        <Icon className="h-6 w-6 text-primary" />
+      </div>
+      <p className="font-accent text-[17px] font-semibold text-foreground">{title}</p>
       {description && (
-        <p className="text-metadata font-mono text-foreground-muted mt-1 uppercase tracking-wider">
+        <p className="text-[13px] text-foreground-secondary mt-north-xs leading-relaxed tracking-[0.01em]">
           {description}
         </p>
       )}
       {ctaLabel && ctaHref && (
         <Link
           href={ctaHref}
-          className="inline-flex items-center gap-1.5 mt-north-base text-metadata font-mono uppercase tracking-wider text-primary hover:text-primary/80 transition-colors"
+          className="inline-flex items-center gap-1.5 mt-north-base text-[13px] font-medium text-primary hover:text-primary/80 transition-colors"
         >
           {ctaLabel} <span aria-hidden="true">&rarr;</span>
         </Link>

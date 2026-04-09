@@ -31,7 +31,7 @@ export function PageHeader({
           <h1 className="text-page-title">{title}</h1>
         </div>
         {description && (
-          <p className="text-metadata text-foreground-muted font-mono uppercase tracking-wider mt-0.5">
+          <p className="text-metadata text-[14px] leading-snug text-foreground-muted font-mono uppercase tracking-wider mt-0.5">
             {description}
           </p>
         )}

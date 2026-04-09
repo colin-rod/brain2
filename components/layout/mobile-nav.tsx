@@ -32,7 +32,7 @@ export function MobileNav() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  'flex flex-col items-center gap-0.5 px-north-sm py-north-xs transition-all duration-150',
+                  'relative flex flex-col items-center gap-0.5 px-north-sm py-north-xs transition-all duration-150',
                   isActive ? 'text-primary' : 'text-foreground-muted',
                 )}
               >
@@ -44,6 +44,9 @@ export function MobileNav() {
                   )}
                 />
                 <span className="text-xs font-medium">{item.label}</span>
+                {isActive && (
+                  <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 h-0.5 w-4 rounded-full bg-primary" />
+                )}
               </Link>
             );
           })}

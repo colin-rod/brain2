@@ -19,7 +19,7 @@ export default function AppLayout({
       </a>
       <Sidebar />
       <main id="main-content" className="md:ml-52 lg:ml-60 flex-1 pb-16 md:pb-0">
-        <div className="border-b border-border border-t-2 border-t-primary bg-surface px-north-base py-north-xs md:px-north-lg">
+        <div className="border-b border-border border-t-2 border-t-primary bg-surface px-north-base py-north-md md:px-north-lg shadow-header">
           <div className="mx-auto max-w-5xl">
             <GlobalSearch />
           </div>

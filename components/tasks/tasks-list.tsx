@@ -201,7 +201,7 @@ export function TasksList({ tasks, allPeople, allProjects }: TasksListProps) {
         {filtered.map((task, index) => (
           <div
             key={task.id}
-            className="px-north-sm py-north-xs border-l-[3px] border-l-(--entity-tasks) animate-fade-in"
+            className="px-north-sm py-north-xs border-l-[3px] border-l-(--entity-tasks) animate-fade-in hover:bg-surface-subtle transition-colors"
             style={{ animationDelay: `${index * 25}ms` }}
           >
             {/* Desktop: grid layout */}

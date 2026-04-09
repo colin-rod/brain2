@@ -7,7 +7,8 @@ import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { formatDate } from '@/lib/format-date';
-import { Sparkles, RotateCcw, Loader2, AlertCircle } from 'lucide-react';
+import { Inbox as InboxIcon, Sparkles, RotateCcw, Loader2, AlertCircle } from 'lucide-react';
+import { EmptyState } from '@/components/shared/empty-state';
 import { parseCapture } from '@/lib/actions/parse';
 import type { Capture, CaptureSourceType, CaptureStatus } from '@/types/database';
 import { cn } from '@/lib/utils';
@@ -80,14 +81,11 @@ interface CaptureListProps {
 export function CaptureList({ captures }: CaptureListProps) {
   if (captures.length === 0) {
     return (
-      <div className="border-t border-border pt-north-md animate-in fade-in slide-in-from-bottom-2 duration-700">
-        <p className="text-metadata font-mono text-foreground-muted uppercase tracking-widest">
-          <span className="text-primary">{'// '}</span>INBOX CLEAR
-        </p>
-        <p className="text-metadata font-mono text-foreground-muted mt-1 uppercase tracking-wider">
-          Drop an image or paste text above — Brain2 will find what matters.
-        </p>
-      </div>
+      <EmptyState
+        icon={InboxIcon}
+        title="Inbox clear"
+        description="Drop an image or paste text above — Brain2 will find what matters."
+      />
     );
   }
 
@@ -150,8 +148,9 @@ function CaptureCard({ capture, index }: { capture: Capture; index: number }) {
   const content = (
     <div
       className={cn(
-        'flex items-center gap-north-md px-north-sm py-north-xs rounded-none border-l-2 border-transparent transition-colors',
-        isClickable && 'hover:border-primary hover:bg-surface-subtle cursor-pointer',
+        'flex items-center gap-north-md px-north-sm py-north-xs rounded-none border-l-2 border-transparent transition-all duration-150',
+        isClickable &&
+          'hover:border-primary hover:bg-surface-subtle hover:shadow-level-1 cursor-pointer',
         isParsing && 'bg-surface-subtle/50',
       )}
     >

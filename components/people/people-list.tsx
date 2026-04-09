@@ -130,7 +130,7 @@ export function PeopleList({ people, allProjects }: PeopleListProps) {
         {filtered.map((person, index) => (
           <div
             key={person.id}
-            className="group relative rounded-lg border border-border bg-surface px-north-base py-north-md hover:bg-surface-subtle transition-colors border-l-[3px] border-l-(--entity-people) animate-fade-in"
+            className="group relative rounded-lg border border-border bg-surface px-north-base py-north-md hover:bg-surface-subtle hover:border-border-warm hover:shadow-level-1 transition-all duration-150 border-l-[3px] border-l-(--entity-people) animate-fade-in"
             style={{ animationDelay: `${index * 30}ms` }}
           >
             <Button

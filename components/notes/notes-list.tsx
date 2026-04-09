@@ -34,7 +34,7 @@ export function NotesList({ notes }: { notes: Note[] }) {
           <Link
             key={note.id}
             href={`/notes/${note.id}`}
-            className="flex items-baseline gap-north-md px-north-sm py-north-xs hover:bg-surface-subtle transition-colors border-l-[3px] border-l-(--entity-notes) animate-fade-in"
+            className="flex items-baseline gap-north-md px-north-sm py-north-xs hover:bg-surface-subtle hover:border-border-warm hover:shadow-level-1 transition-all duration-150 border-l-[3px] border-l-(--entity-notes) animate-fade-in"
             style={{ animationDelay: `${index * 30}ms` }}
           >
             <span className="font-mono text-[10px] text-foreground-muted tabular-nums shrink-0 w-6 text-right">

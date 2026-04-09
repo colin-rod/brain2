@@ -56,6 +56,8 @@
   --color-primary-hover: var(--primary-hover);
   --color-primary-tint: var(--primary-tint);
   --color-border-divider: var(--border-divider);
+  --color-border-warm: var(--border-warm);
+  --color-primary-tint-subtle: var(--primary-tint-subtle);
 
   /* --- Status colors --- */
   --color-status-new: var(--status-new);
@@ -162,6 +164,8 @@
   --entity-projects-tint:  hsl(32 90% 94%);
 
   --border-divider: hsl(35 18% 88%);
+  --border-warm: hsl(33 28% 80%);
+  --primary-tint-subtle: hsl(17 60% 94%);
 
   /* Capture status colors */
   --status-new: hsl(216 21% 73%);
@@ -210,10 +214,10 @@
    ============================================================ */
 @layer utilities {
   .text-page-title {
-    font-size: 22px;
+    font-size: 26px;
     font-weight: 600;
-    line-height: 1.2;
-    letter-spacing: -0.3px;
+    line-height: 1.15;
+    letter-spacing: -0.5px;
     font-family: var(--font-accent);
   }
 
@@ -221,6 +225,7 @@
     font-size: 16px;
     font-weight: 600;
     line-height: 1.3;
+    letter-spacing: -0.1px;
     font-family: var(--font-accent);
   }
 
@@ -240,6 +245,7 @@
     font-size: 13px;
     font-weight: 500;
     line-height: 1.5;
+    letter-spacing: 0.012em;
   }
 
   .text-label {

@@ -11,6 +11,7 @@ Given the content of meeting notes (which may be handwritten, transcribed, or ty
 - Action items / tasks with due dates, priorities, and the person responsible (actionee) when mentioned
 - People mentioned with their roles if apparent
 - Projects or initiatives referenced
+- Work domains or areas (e.g. Engineering, Marketing, Legal, Finance, Design, Operations)
 - Decisions that were made, with rationale if available
 - Open questions that remain unresolved
 
@@ -24,6 +25,7 @@ Given plain text content (notes, emails, documents), extract:
 - Tasks or action items with due dates, priorities, and the person responsible (actionee) when mentioned
 - People mentioned with their roles if apparent
 - Projects or initiatives referenced
+- Work domains or areas (e.g. Engineering, Marketing, Legal, Finance, Design, Operations)
 - Decisions mentioned, with rationale if available
 - Open questions or unresolved items
 
@@ -37,6 +39,7 @@ Given a chat transcript (Google Chat, Slack, etc.), extract:
 - Action items / tasks assigned to people (include the person's name as actionee), with due dates and priorities when mentioned
 - All people who participated or were mentioned, with their roles if apparent
 - Projects or initiatives discussed
+- Work domains or areas (e.g. Engineering, Marketing, Legal, Finance, Design, Operations)
 - Decisions that were reached, with rationale if available
 - Open questions that remain unresolved
 
@@ -102,6 +105,24 @@ const jsonSchema = {
           additionalProperties: false,
         },
       },
+      domains: {
+        type: 'array' as const,
+        items: {
+          type: 'object' as const,
+          properties: {
+            name: {
+              type: 'string' as const,
+              description: 'Work area or category (e.g. Engineering, Marketing, Legal)',
+            },
+            description: {
+              type: ['string', 'null'] as unknown as 'string',
+              description: 'Brief description of the domain, or null',
+            },
+          },
+          required: ['name', 'description'],
+          additionalProperties: false,
+        },
+      },
       decisions: {
         type: 'array' as const,
         items: {
@@ -139,6 +160,7 @@ const jsonSchema = {
       'tasks',
       'people',
       'projects',
+      'domains',
       'decisions',
       'open_questions',
     ],

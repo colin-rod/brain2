@@ -20,7 +20,7 @@ import {
   unlinkPersonFromDecision,
 } from '@/lib/actions/entity-mutations';
 import { Plus, X } from 'lucide-react';
-import type { Decision, Person, Project } from '@/types/database';
+import type { Decision, Person, Project, NoteDomain } from '@/types/database';
 
 type DecisionWithRelations = Decision & {
   notes: { id: string; title: string } | null;
@@ -32,9 +32,17 @@ interface DecisionsListProps {
   decisions: DecisionWithRelations[];
   allProjects: Pick<Project, 'id' | 'name'>[];
   allPeople: Pick<Person, 'id' | 'name'>[];
+  allDomains: { id: string; name: string }[];
+  noteDomains: NoteDomain[];
 }
 
-export function DecisionsList({ decisions, allProjects, allPeople }: DecisionsListProps) {
+export function DecisionsList({
+  decisions,
+  allProjects,
+  allPeople,
+  allDomains,
+  noteDomains,
+}: DecisionsListProps) {
   const router = useRouter();
   const refreshSearch = useSearchRefresh();
   const [isPending, startTransition] = useTransition();
@@ -51,8 +59,14 @@ export function DecisionsList({ decisions, allProjects, allPeople }: DecisionsLi
         options: allProjects.map((p) => ({ value: p.id, label: p.name })),
       },
       { key: 'decision_date', label: 'Date', type: 'date-range' },
+      {
+        key: 'domain',
+        label: 'Domain',
+        type: 'select',
+        options: allDomains.map((d) => ({ value: d.id, label: d.name })),
+      },
     ],
-    [allProjects],
+    [allProjects, allDomains],
   );
 
   const { filters, sort, search, setFilter, clearFilters, toggleSort, setSearch, searched } =
@@ -75,9 +89,15 @@ export function DecisionsList({ decisions, allProjects, allPeople }: DecisionsLi
     if (filters.decision_date_to) {
       result = result.filter((d) => d.decision_date && d.decision_date <= filters.decision_date_to);
     }
+    if (filters.domain) {
+      const noteIdsForDomain = new Set(
+        noteDomains.filter((nd) => nd.domain_id === filters.domain).map((nd) => nd.note_id),
+      );
+      result = result.filter((d) => d.note_id && noteIdsForDomain.has(d.note_id));
+    }
 
     return applySorting(result, sort);
-  }, [searched, filters, sort]);
+  }, [searched, filters, sort, noteDomains]);
 
   function handleFieldUpdate(decisionId: string, updates: Record<string, unknown>) {
     startTransition(async () => {

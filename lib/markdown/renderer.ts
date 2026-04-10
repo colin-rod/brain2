@@ -4,6 +4,7 @@ import type {
   Task,
   Person,
   Project,
+  Domain,
   Decision,
   OpenQuestion,
   Capture,
@@ -15,12 +16,13 @@ interface RenderInput {
   tasks: (Task & { actionee?: { name: string } | null })[];
   people: Person[];
   projects: Project[];
+  domains: Domain[];
   decisions: Decision[];
   openQuestions: OpenQuestion[];
 }
 
 export function renderNoteMarkdown(input: RenderInput): string {
-  const { note, capture, tasks, people, projects, decisions, openQuestions } = input;
+  const { note, capture, tasks, people, projects, domains, decisions, openQuestions } = input;
   const lines: string[] = [];
 
   // Title
@@ -80,6 +82,17 @@ export function renderNoteMarkdown(input: RenderInput): string {
     lines.push('');
     for (const project of projects) {
       lines.push(`- ${project.name}`);
+    }
+    lines.push('');
+  }
+
+  // Domains
+  if (domains.length > 0) {
+    lines.push('## Domains');
+    lines.push('');
+    for (const domain of domains) {
+      const desc = domain.description ? ` — ${domain.description}` : '';
+      lines.push(`- ${domain.name}${desc}`);
     }
     lines.push('');
   }

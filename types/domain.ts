@@ -14,6 +14,7 @@ export interface ParsedNote {
   tasks: TaskDraft[];
   people: PersonDraft[];
   projects: ProjectDraft[];
+  domains: DomainDraft[];
   decisions: DecisionDraft[];
   open_questions: QuestionDraft[];
 }
@@ -43,6 +44,14 @@ export interface ProjectDraft {
   matchedProjectId: string | null;
 }
 
+export interface DomainDraft {
+  id: string;
+  name: string;
+  description: string | null;
+  /** If set, link to this existing domain instead of creating new */
+  matchedDomainId: string | null;
+}
+
 export interface DecisionDraft {
   id: string;
   decision_text: string;
@@ -64,6 +73,7 @@ export interface ReviewPayload {
   tasks: TaskDraft[];
   people: PersonDraft[];
   projects: ProjectDraft[];
+  domains: DomainDraft[];
   decisions: DecisionDraft[];
   open_questions: QuestionDraft[];
 }

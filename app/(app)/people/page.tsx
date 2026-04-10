@@ -8,9 +8,12 @@ import type { Person } from '@/types/database';
 export default async function PeoplePage() {
   const supabase = await createClient();
 
-  const [peopleRes, projectsRes] = await Promise.all([
+  const [peopleRes, projectsRes, domainsRes, noteDomainsRes, notePeopleRes] = await Promise.all([
     supabase.from('people').select('*, project_people(projects(id, name))').order('name'),
     supabase.from('projects').select('id, name').order('name'),
+    supabase.from('domains').select('id, name').order('name'),
+    supabase.from('note_domains').select('note_id, domain_id'),
+    supabase.from('note_people').select('note_id, person_id'),
   ]);
 
   const people = (peopleRes.data ?? []) as (Person & {
@@ -18,6 +21,9 @@ export default async function PeoplePage() {
   })[];
 
   const allProjects = (projectsRes.data ?? []) as { id: string; name: string }[];
+  const allDomains = (domainsRes.data ?? []) as { id: string; name: string }[];
+  const noteDomains = (noteDomainsRes.data ?? []) as { note_id: string; domain_id: string }[];
+  const notePeople = (notePeopleRes.data ?? []) as { note_id: string; person_id: string }[];
 
   return (
     <div className="space-y-north-lg">
@@ -39,7 +45,13 @@ export default async function PeoplePage() {
           ctaHref="/inbox"
         />
       ) : (
-        <PeopleList people={people} allProjects={allProjects} />
+        <PeopleList
+          people={people}
+          allProjects={allProjects}
+          allDomains={allDomains}
+          noteDomains={noteDomains}
+          notePeople={notePeople}
+        />
       )}
     </div>
   );

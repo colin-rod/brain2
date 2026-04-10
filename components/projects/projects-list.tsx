@@ -13,7 +13,7 @@ import { useListState, applySorting } from '@/lib/hooks/use-list-state';
 import { useSearchRefresh } from '@/components/search/search-provider';
 import { createProject, updateProject, deleteProject } from '@/lib/actions/entity-mutations';
 import { Plus, X } from 'lucide-react';
-import type { Project, Person } from '@/types/database';
+import type { Project, Person, NoteDomain, NoteProject } from '@/types/database';
 
 type ProjectWithPeople = Project & {
   project_people: { people: { id: string; name: string } }[];
@@ -22,9 +22,18 @@ type ProjectWithPeople = Project & {
 interface ProjectsListProps {
   projects: ProjectWithPeople[];
   allPeople: Pick<Person, 'id' | 'name'>[];
+  allDomains: { id: string; name: string }[];
+  noteDomains: NoteDomain[];
+  noteProjects: NoteProject[];
 }
 
-export function ProjectsList({ projects, allPeople }: ProjectsListProps) {
+export function ProjectsList({
+  projects,
+  allPeople,
+  allDomains,
+  noteDomains,
+  noteProjects,
+}: ProjectsListProps) {
   const router = useRouter();
   const refreshSearch = useSearchRefresh();
   const [isPending, startTransition] = useTransition();
@@ -46,8 +55,14 @@ export function ProjectsList({ projects, allPeople }: ProjectsListProps) {
         type: 'select',
         options: allPeople.map((p) => ({ value: p.id, label: p.name })),
       },
+      {
+        key: 'domain',
+        label: 'Domain',
+        type: 'select',
+        options: allDomains.map((d) => ({ value: d.id, label: d.name })),
+      },
     ],
-    [uniqueStatuses, allPeople],
+    [uniqueStatuses, allPeople, allDomains],
   );
 
   const { filters, sort, search, setFilter, clearFilters, toggleSort, setSearch, searched } =
@@ -65,9 +80,18 @@ export function ProjectsList({ projects, allPeople }: ProjectsListProps) {
     if (filters.person) {
       result = result.filter((p) => p.project_people.some((pp) => pp.people.id === filters.person));
     }
+    if (filters.domain) {
+      const noteIdsForDomain = new Set(
+        noteDomains.filter((nd) => nd.domain_id === filters.domain).map((nd) => nd.note_id),
+      );
+      const projectIdsForDomain = new Set(
+        noteProjects.filter((np) => noteIdsForDomain.has(np.note_id)).map((np) => np.project_id),
+      );
+      result = result.filter((p) => projectIdsForDomain.has(p.id));
+    }
 
     return applySorting(result, sort);
-  }, [searched, filters, sort]);
+  }, [searched, filters, sort, noteDomains, noteProjects]);
 
   function handleCreate(name: string) {
     if (!name.trim()) {

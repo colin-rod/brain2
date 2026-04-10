@@ -162,6 +162,8 @@
   --entity-decisions-tint: hsl(258 80% 95%);
   --entity-projects:       hsl(32 95% 54%);
   --entity-projects-tint:  hsl(32 90% 94%);
+  --entity-domains:        hsl(190 80% 42%);
+  --entity-domains-tint:   hsl(190 70% 94%);
 
   --border-divider: hsl(35 18% 88%);
   --border-warm: hsl(33 28% 80%);

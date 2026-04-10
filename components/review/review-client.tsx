@@ -10,6 +10,7 @@ import { NoteFields } from './note-fields';
 import { TasksEditor } from './tasks-editor';
 import { PeopleEditor } from './people-editor';
 import { ProjectsEditor } from './projects-editor';
+import { DomainsEditor } from './domains-editor';
 import { DecisionsEditor } from './decisions-editor';
 import { QuestionsEditor } from './questions-editor';
 import { Separator } from '@/components/ui/separator';
@@ -51,6 +52,7 @@ export function ReviewClient({ capture, imageUrl }: ReviewClientProps) {
         tasks: store.tasks,
         people: store.people,
         projects: store.projects,
+        domains: store.domains,
         decisions: store.decisions,
         open_questions: store.open_questions,
       });
@@ -105,11 +107,15 @@ export function ReviewClient({ capture, imageUrl }: ReviewClientProps) {
             <ProjectsEditor />
           </div>
           <Separator />
-          <div className="animate-slide-in-up" style={{ animationDelay: '200ms' }}>
+          <div className="animate-slide-in-up" style={{ animationDelay: '175ms' }}>
+            <DomainsEditor />
+          </div>
+          <Separator />
+          <div className="animate-slide-in-up" style={{ animationDelay: '225ms' }}>
             <DecisionsEditor />
           </div>
           <Separator />
-          <div className="animate-slide-in-up" style={{ animationDelay: '250ms' }}>
+          <div className="animate-slide-in-up" style={{ animationDelay: '275ms' }}>
             <QuestionsEditor />
           </div>
 

@@ -44,6 +44,12 @@ export function validateReviewPayload(payload: ReviewPayload): ValidationError[]
     }
   }
 
+  for (let i = 0; i < payload.domains.length; i++) {
+    if (!payload.domains[i].name.trim()) {
+      errors.push({ field: `domains[${i}].name`, message: `Domain ${i + 1} needs a name` });
+    }
+  }
+
   for (let i = 0; i < payload.decisions.length; i++) {
     if (!payload.decisions[i].decision_text.trim()) {
       errors.push({

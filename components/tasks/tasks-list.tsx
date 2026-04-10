@@ -25,7 +25,7 @@ import { updateTask, deleteTask } from '@/lib/actions/note-mutations';
 import { createStandaloneTask } from '@/lib/actions/entity-mutations';
 import { formatDate } from '@/lib/format-date';
 import { Plus, X } from 'lucide-react';
-import type { Task, TaskPriority, TaskStatus, Person, Project } from '@/types/database';
+import type { Task, TaskPriority, TaskStatus, Person, Project, NoteDomain } from '@/types/database';
 
 type TaskWithRelations = Task & {
   notes: { id: string; title: string } | null;
@@ -37,6 +37,8 @@ interface TasksListProps {
   tasks: TaskWithRelations[];
   allPeople: Pick<Person, 'id' | 'name'>[];
   allProjects: Pick<Project, 'id' | 'name'>[];
+  allDomains: { id: string; name: string }[];
+  noteDomains: NoteDomain[];
 }
 
 const STATUS_OPTIONS = [
@@ -53,7 +55,13 @@ const PRIORITY_OPTIONS = [
   { value: 'P3', label: 'P3' },
 ];
 
-export function TasksList({ tasks, allPeople, allProjects }: TasksListProps) {
+export function TasksList({
+  tasks,
+  allPeople,
+  allProjects,
+  allDomains,
+  noteDomains,
+}: TasksListProps) {
   const router = useRouter();
   const refreshSearch = useSearchRefresh();
   const [isPending, startTransition] = useTransition();
@@ -78,8 +86,14 @@ export function TasksList({ tasks, allPeople, allProjects }: TasksListProps) {
         options: allProjects.map((p) => ({ value: p.id, label: p.name })),
       },
       { key: 'due_date', label: 'Due Date', type: 'date-range' },
+      {
+        key: 'domain',
+        label: 'Domain',
+        type: 'select',
+        options: allDomains.map((d) => ({ value: d.id, label: d.name })),
+      },
     ],
-    [allPeople, allProjects],
+    [allPeople, allProjects, allDomains],
   );
 
   const { filters, sort, search, setFilter, clearFilters, toggleSort, setSearch, searched } =
@@ -109,9 +123,15 @@ export function TasksList({ tasks, allPeople, allProjects }: TasksListProps) {
     if (filters.due_date_to) {
       result = result.filter((t) => t.due_date && t.due_date <= filters.due_date_to);
     }
+    if (filters.domain) {
+      const noteIdsForDomain = new Set(
+        noteDomains.filter((nd) => nd.domain_id === filters.domain).map((nd) => nd.note_id),
+      );
+      result = result.filter((t) => t.note_id && noteIdsForDomain.has(t.note_id));
+    }
 
     return applySorting(result, sort);
-  }, [searched, filters, sort]);
+  }, [searched, filters, sort, noteDomains]);
 
   function handleFieldUpdate(taskId: string, updates: Record<string, unknown>) {
     startTransition(async () => {

@@ -152,6 +152,43 @@ export async function saveReviewedNote(payload: ReviewPayload): Promise<SaveResu
     }
   }
 
+  // Insert domains (new ones) and collect IDs for junction table
+  const domainIds: string[] = [];
+
+  for (const d of payload.domains) {
+    if (d.matchedDomainId) {
+      domainIds.push(d.matchedDomainId);
+    } else {
+      const { data: newDomain, error: domainError } = await supabase
+        .from('domains')
+        .insert({
+          user_id: user.id,
+          name: d.name.trim(),
+          description: d.description?.trim() || null,
+        })
+        .select('id')
+        .single();
+
+      if (domainError || !newDomain) {
+        return { error: `Failed to save domain "${d.name}": ${domainError?.message}` };
+      }
+      domainIds.push(newDomain.id);
+    }
+  }
+
+  // Insert note_domains junction rows
+  if (domainIds.length > 0) {
+    const { error: ndError } = await supabase.from('note_domains').insert(
+      domainIds.map((domainId) => ({
+        note_id: noteId,
+        domain_id: domainId,
+      })),
+    );
+    if (ndError) {
+      return { error: `Failed to link domains: ${ndError.message}` };
+    }
+  }
+
   // Insert decisions
   if (payload.decisions.length > 0) {
     const { error: decisionsError } = await supabase.from('decisions').insert(
@@ -185,6 +222,15 @@ export async function saveReviewedNote(payload: ReviewPayload): Promise<SaveResu
 
   // Update capture status to saved
   await supabase.from('captures').update({ status: 'saved' }).eq('id', payload.captureId);
+
+  // Invalidate wiki summaries for linked people and projects
+  const linkedPersonIds = Array.from(personIdMap.values());
+  if (linkedPersonIds.length > 0) {
+    await supabase.from('people').update({ summary_generated_at: null }).in('id', linkedPersonIds);
+  }
+  if (projectIds.length > 0) {
+    await supabase.from('projects').update({ summary_generated_at: null }).in('id', projectIds);
+  }
 
   // Auto-export markdown (best-effort, don't fail the save)
   await exportNoteMarkdown(noteId).catch(() => {});

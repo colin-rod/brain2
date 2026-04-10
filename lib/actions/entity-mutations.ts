@@ -195,6 +195,64 @@ export async function deleteProject(projectId: string): Promise<MutationResult> 
   return {};
 }
 
+// ── Domains CRUD ────────────────────────────────────────────
+
+export async function createDomain(data: {
+  name: string;
+  description?: string | null;
+}): Promise<CreateResult> {
+  const { supabase, user } = await getUser();
+  if (!user) return { error: 'Not authenticated' };
+
+  const { data: domain, error } = await supabase
+    .from('domains')
+    .insert({
+      user_id: user.id,
+      name: data.name.trim(),
+      description: data.description?.trim() || null,
+    })
+    .select('id')
+    .single();
+
+  if (error) return { error: error.message };
+  return { id: domain.id };
+}
+
+export async function updateDomain(
+  domainId: string,
+  updates: { name?: string; description?: string | null },
+): Promise<MutationResult> {
+  const { supabase, user } = await getUser();
+  if (!user) return { error: 'Not authenticated' };
+
+  const clean: Record<string, string | null> = {};
+  if (updates.name !== undefined) clean.name = updates.name.trim();
+  if (updates.description !== undefined) clean.description = updates.description?.trim() || null;
+
+  const { error } = await supabase
+    .from('domains')
+    .update(clean)
+    .eq('id', domainId)
+    .eq('user_id', user.id);
+
+  if (error) return { error: error.message };
+  return {};
+}
+
+export async function deleteDomain(domainId: string): Promise<MutationResult> {
+  const { supabase, user } = await getUser();
+  if (!user) return { error: 'Not authenticated' };
+
+  const { error } = await supabase
+    .from('domains')
+    .delete()
+    .eq('id', domainId)
+    .eq('user_id', user.id);
+
+  if (error) return { error: error.message };
+  return {};
+}
+
 // ── Cross-entity linking: project_people ─────────────────────
 
 export async function linkPersonToProject(

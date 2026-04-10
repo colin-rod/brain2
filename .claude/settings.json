@@ -73,7 +73,10 @@
       "Bash(ls /Users/colinrodrigues/Brain2/app/\\\\\\(app\\\\\\)/tasks)",
       "Bash(ls /Users/colinrodrigues/Brain2/app/\\\\\\(app\\\\\\)/projects)",
       "Bash(ls /Users/colinrodrigues/Brain2/app/*.css)",
-      "mcp__claude_ai_Vercel__list_teams"
+      "mcp__claude_ai_Vercel__list_teams",
+      "Bash(grep -n \"domain\" /Users/colinrodrigues/Brain2/supabase/migrations/*.sql)",
+      "Bash(grep -A 20 \"create table.*tasks\" /Users/colinrodrigues/Brain2/supabase/migrations/*.sql)",
+      "Bash(npx supabase:*)"
     ],
     "additionalDirectories": ["/Users/colinrodrigues/Brain2/app/(app)/review"]
   }

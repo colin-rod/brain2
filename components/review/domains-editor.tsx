@@ -1,0 +1,54 @@
+'use client';
+
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { X } from 'lucide-react';
+import { useReviewStore } from '@/lib/stores/review-store';
+import { EditorSectionHeader } from '@/components/shared/editor-section-header';
+import { EditorEmptyMessage } from '@/components/shared/editor-empty-message';
+
+export function DomainsEditor() {
+  const domains = useReviewStore((s) => s.domains);
+  const updateDomain = useReviewStore((s) => s.updateDomain);
+  const addDomain = useReviewStore((s) => s.addDomain);
+  const removeDomain = useReviewStore((s) => s.removeDomain);
+
+  return (
+    <div className="space-y-north-sm">
+      <EditorSectionHeader title="Domains" onAdd={addDomain} />
+
+      {domains.length === 0 && <EditorEmptyMessage message="No domains extracted." />}
+
+      <div className="space-y-north-xs">
+        {domains.map((domain) => (
+          <div key={domain.id} className="flex items-center gap-north-sm animate-scale-in">
+            <Input
+              aria-label="Domain name"
+              value={domain.name}
+              onChange={(e) => updateDomain(domain.id, { name: e.target.value })}
+              placeholder="Domain name"
+              maxLength={200}
+              className="flex-1"
+            />
+            <Input
+              aria-label="Domain description"
+              value={domain.description ?? ''}
+              onChange={(e) => updateDomain(domain.id, { description: e.target.value || null })}
+              placeholder="Description (optional)"
+              maxLength={500}
+              className="flex-1"
+            />
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => removeDomain(domain.id)}
+              className="shrink-0 text-foreground-muted hover:text-destructive"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}

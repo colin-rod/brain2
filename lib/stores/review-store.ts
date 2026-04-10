@@ -4,6 +4,7 @@ import type {
   TaskDraft,
   PersonDraft,
   ProjectDraft,
+  DomainDraft,
   DecisionDraft,
   QuestionDraft,
 } from '@/types/domain';
@@ -17,6 +18,7 @@ interface ReviewState {
   tasks: TaskDraft[];
   people: PersonDraft[];
   projects: ProjectDraft[];
+  domains: DomainDraft[];
   decisions: DecisionDraft[];
   open_questions: QuestionDraft[];
 
@@ -43,6 +45,11 @@ interface ReviewState {
   addProject: () => void;
   removeProject: (id: string) => void;
 
+  // Domains
+  updateDomain: (id: string, updates: Partial<DomainDraft>) => void;
+  addDomain: () => void;
+  removeDomain: (id: string) => void;
+
   // Decisions
   updateDecision: (id: string, updates: Partial<DecisionDraft>) => void;
   addDecision: () => void;
@@ -66,6 +73,7 @@ const emptyState = {
   tasks: [] as TaskDraft[],
   people: [] as PersonDraft[],
   projects: [] as ProjectDraft[],
+  domains: [] as DomainDraft[],
   decisions: [] as DecisionDraft[],
   open_questions: [] as QuestionDraft[],
 };
@@ -107,6 +115,11 @@ export const useReviewStore = create<ReviewState>()(
             ...p,
             id: uid(),
             matchedProjectId: null,
+          })),
+          domains: (parsed.domains ?? []).map((d) => ({
+            ...d,
+            id: uid(),
+            matchedDomainId: null,
           })),
           decisions: parsed.decisions.map((d) => ({ ...d, id: uid() })),
           open_questions: parsed.open_questions.map((q) => ({ ...q, id: uid() })),
@@ -170,6 +183,20 @@ export const useReviewStore = create<ReviewState>()(
           projects: [...s.projects, { id: uid(), name: '', matchedProjectId: null }],
         })),
       removeProject: (id) => set((s) => ({ projects: s.projects.filter((p) => p.id !== id) })),
+
+      // Domains
+      updateDomain: (id, updates) =>
+        set((s) => ({
+          domains: s.domains.map((d) => (d.id === id ? { ...d, ...updates } : d)),
+        })),
+      addDomain: () =>
+        set((s) => ({
+          domains: [
+            ...s.domains,
+            { id: uid(), name: '', description: null, matchedDomainId: null },
+          ],
+        })),
+      removeDomain: (id) => set((s) => ({ domains: s.domains.filter((d) => d.id !== id) })),
 
       // Decisions
       updateDecision: (id, updates) =>

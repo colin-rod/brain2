@@ -73,6 +73,8 @@ export interface Person {
   name: string;
   role: string | null;
   notes: string | null;
+  compiled_summary: string | null;
+  summary_generated_at: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -83,6 +85,8 @@ export interface Project {
   name: string;
   status: string | null;
   notes: string | null;
+  compiled_summary: string | null;
+  summary_generated_at: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -129,6 +133,20 @@ export interface DecisionPerson {
   person_id: string;
 }
 
+export interface Domain {
+  id: string;
+  user_id: string;
+  name: string;
+  description: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface NoteDomain {
+  note_id: string;
+  domain_id: string;
+}
+
 /* JSON shape stored in captures.parsed_json */
 export interface ParsedNoteJson {
   title: string;
@@ -146,6 +164,10 @@ export interface ParsedNoteJson {
   }[];
   projects: {
     name: string;
+  }[];
+  domains: {
+    name: string;
+    description: string | null;
   }[];
   decisions: {
     decision_text: string;

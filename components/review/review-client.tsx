@@ -13,6 +13,7 @@ import { ProjectsEditor } from './projects-editor';
 import { DomainsEditor } from './domains-editor';
 import { DecisionsEditor } from './decisions-editor';
 import { QuestionsEditor } from './questions-editor';
+import { IdeasEditor } from './ideas-editor';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
@@ -86,6 +87,7 @@ export function ReviewClient({ capture, imageUrl }: ReviewClientProps) {
   const domains = useReviewStore((s) => s.domains);
   const decisions = useReviewStore((s) => s.decisions);
   const open_questions = useReviewStore((s) => s.open_questions);
+  const ideas = useReviewStore((s) => s.ideas);
 
   const addTask = useReviewStore((s) => s.addTask);
   const addPerson = useReviewStore((s) => s.addPerson);
@@ -93,6 +95,7 @@ export function ReviewClient({ capture, imageUrl }: ReviewClientProps) {
   const addDomain = useReviewStore((s) => s.addDomain);
   const addDecision = useReviewStore((s) => s.addDecision);
   const addQuestion = useReviewStore((s) => s.addQuestion);
+  const addIdea = useReviewStore((s) => s.addIdea);
 
   // Initialize store from parsed JSON when loading a new capture
   useEffect(() => {
@@ -114,6 +117,7 @@ export function ReviewClient({ capture, imageUrl }: ReviewClientProps) {
         domains: store.domains,
         decisions: store.decisions,
         open_questions: store.open_questions,
+        ideas: store.ideas,
       });
 
       if (result.validationErrors) {
@@ -215,6 +219,12 @@ export function ReviewClient({ capture, imageUrl }: ReviewClientProps) {
                 onAdd={addQuestion}
               >
                 <QuestionsEditor />
+              </CollapsibleSection>
+            </div>
+
+            <div className="pt-north-sm">
+              <CollapsibleSection title="Ideas" count={ideas.length} delay="325ms" onAdd={addIdea}>
+                <IdeasEditor />
               </CollapsibleSection>
             </div>
           </div>

@@ -7,6 +7,7 @@ import type {
   DomainDraft,
   DecisionDraft,
   QuestionDraft,
+  IdeaDraft,
 } from '@/types/domain';
 import type { ParsedNoteJson } from '@/types/database';
 
@@ -21,6 +22,7 @@ interface ReviewState {
   domains: DomainDraft[];
   decisions: DecisionDraft[];
   open_questions: QuestionDraft[];
+  ideas: IdeaDraft[];
 
   // Actions
   initFromParsed: (captureId: string, parsed: ParsedNoteJson) => void;
@@ -59,6 +61,11 @@ interface ReviewState {
   updateQuestion: (id: string, updates: Partial<QuestionDraft>) => void;
   addQuestion: () => void;
   removeQuestion: (id: string) => void;
+
+  // Ideas
+  updateIdea: (id: string, updates: Partial<IdeaDraft>) => void;
+  addIdea: () => void;
+  removeIdea: (id: string) => void;
 }
 
 function uid(): string {
@@ -76,6 +83,7 @@ const emptyState = {
   domains: [] as DomainDraft[],
   decisions: [] as DecisionDraft[],
   open_questions: [] as QuestionDraft[],
+  ideas: [] as IdeaDraft[],
 };
 
 export const useReviewStore = create<ReviewState>()(
@@ -123,6 +131,7 @@ export const useReviewStore = create<ReviewState>()(
           })),
           decisions: parsed.decisions.map((d) => ({ ...d, id: uid() })),
           open_questions: parsed.open_questions.map((q) => ({ ...q, id: uid() })),
+          ideas: (parsed.ideas ?? []).map((i) => ({ ...i, id: uid(), status: 'raw' as const })),
         });
       },
 
@@ -225,6 +234,17 @@ export const useReviewStore = create<ReviewState>()(
         set((s) => ({
           open_questions: s.open_questions.filter((q) => q.id !== id),
         })),
+
+      // Ideas
+      updateIdea: (id, updates) =>
+        set((s) => ({
+          ideas: s.ideas.map((i) => (i.id === id ? { ...i, ...updates } : i)),
+        })),
+      addIdea: () =>
+        set((s) => ({
+          ideas: [...s.ideas, { id: uid(), idea_text: '', status: 'raw' as const }],
+        })),
+      removeIdea: (id) => set((s) => ({ ideas: s.ideas.filter((i) => i.id !== id) })),
     }),
     {
       name: 'brain2-review-draft',

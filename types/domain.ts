@@ -1,4 +1,4 @@
-import type { TaskPriority } from './database';
+import type { IdeaStatus, TaskPriority } from './database';
 
 /* ============================================================
    Domain types — used in the review flow and parser
@@ -17,6 +17,7 @@ export interface ParsedNote {
   domains: DomainDraft[];
   decisions: DecisionDraft[];
   open_questions: QuestionDraft[];
+  ideas: IdeaDraft[];
 }
 
 export interface TaskDraft {
@@ -64,6 +65,12 @@ export interface QuestionDraft {
   question_text: string;
 }
 
+export interface IdeaDraft {
+  id: string;
+  idea_text: string;
+  status: IdeaStatus;
+}
+
 /** Payload sent from review page to the save action */
 export interface ReviewPayload {
   captureId: string;
@@ -76,4 +83,5 @@ export interface ReviewPayload {
   domains: DomainDraft[];
   decisions: DecisionDraft[];
   open_questions: QuestionDraft[];
+  ideas: IdeaDraft[];
 }

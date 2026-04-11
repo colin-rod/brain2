@@ -20,6 +20,7 @@ import {
 import { formatDate } from '@/lib/format-date';
 import { useListState } from '@/lib/hooks/use-list-state';
 import { archiveNote, deleteNote } from '@/lib/actions/note-mutations';
+import { TaskStatusBadge } from '@/components/shared/status-badge';
 import type { NoteWithMeta } from '@/types/database';
 import { cn } from '@/lib/utils';
 
@@ -174,52 +175,100 @@ export function NotesList({
             style={{ animationDelay: `${index * 30}ms` }}
           >
             {/* Left: clickable content */}
-            <Link href={`/notes/${note.id}`} className="flex-1 min-w-0">
-              <p className="text-issue-title text-foreground">{note.title}</p>
-              {note.summary && (
-                <p className="text-body text-foreground-secondary mt-0.5 line-clamp-3">
-                  {note.summary}
-                </p>
-              )}
+            <div className="flex-1 min-w-0">
+              <Link href={`/notes/${note.id}`} className="block">
+                <p className="text-issue-title text-foreground">{note.title}</p>
+                {note.summary && (
+                  <p className="text-body text-foreground-secondary mt-0.5 line-clamp-3">
+                    {note.summary}
+                  </p>
+                )}
+              </Link>
               {/* Chips */}
               {(note.projects.length > 0 ||
                 note.people.length > 0 ||
                 note.domains.length > 0 ||
-                note.task_count > 0 ||
-                note.decision_count > 0) && (
+                note.tasks.length > 0 ||
+                note.decisions.length > 0 ||
+                note.question_count > 0) && (
                 <div className="flex flex-wrap gap-north-xs mt-north-xs">
                   {note.projects.map((p) => (
-                    <Badge key={p.id} variant="outline" className="text-[11px]">
-                      {p.name}
-                    </Badge>
+                    <Link
+                      key={p.id}
+                      href={`/projects/${p.id}`}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <Badge
+                        variant="outline"
+                        className="text-[11px] cursor-pointer hover:bg-accent"
+                      >
+                        {p.name}
+                      </Badge>
+                    </Link>
                   ))}
                   {note.people.map((p) => (
-                    <Badge key={p.id} variant="outline" className="text-[11px]">
-                      {p.name}
-                    </Badge>
+                    <Link key={p.id} href={`/people/${p.id}`} onClick={(e) => e.stopPropagation()}>
+                      <Badge
+                        variant="outline"
+                        className="text-[11px] cursor-pointer hover:bg-accent"
+                      >
+                        {p.name}
+                      </Badge>
+                    </Link>
                   ))}
                   {note.domains.map((d) => (
-                    <Badge
-                      key={d.id}
-                      variant="outline"
-                      className="text-[11px] bg-primary/10 border-primary/20"
-                    >
-                      {d.name}
-                    </Badge>
+                    <Link key={d.id} href="/domains" onClick={(e) => e.stopPropagation()}>
+                      <Badge
+                        variant="outline"
+                        className="text-[11px] cursor-pointer bg-primary/10 border-primary/20 hover:bg-primary/20"
+                      >
+                        {d.name}
+                      </Badge>
+                    </Link>
                   ))}
-                  {note.task_count > 0 && (
-                    <Badge variant="secondary" className="text-[11px]">
-                      {note.task_count} task{note.task_count !== 1 ? 's' : ''}
-                    </Badge>
+                  {note.tasks.length > 0 && (
+                    <div className="relative group/tasks">
+                      <Badge variant="secondary" className="text-[11px] cursor-default">
+                        {note.tasks.length} task{note.tasks.length !== 1 ? 's' : ''}
+                      </Badge>
+                      <div className="absolute bottom-full left-0 mb-1.5 z-50 hidden group-hover/tasks:block min-w-48 max-w-72 rounded-lg border border-border bg-popover shadow-md p-north-xs">
+                        <ul className="space-y-1">
+                          {note.tasks.map((t) => (
+                            <li key={t.id} className="flex items-center gap-north-xs">
+                              <TaskStatusBadge status={t.status} />
+                              <span className="text-[11px] text-foreground truncate">
+                                {t.title}
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
                   )}
-                  {note.decision_count > 0 && (
+                  {note.decisions.length > 0 && (
+                    <div className="relative group/decisions">
+                      <Badge variant="secondary" className="text-[11px] cursor-default">
+                        {note.decisions.length} decision{note.decisions.length !== 1 ? 's' : ''}
+                      </Badge>
+                      <div className="absolute bottom-full left-0 mb-1.5 z-50 hidden group-hover/decisions:block min-w-48 max-w-72 rounded-lg border border-border bg-popover shadow-md p-north-xs">
+                        <ul className="space-y-1">
+                          {note.decisions.map((d) => (
+                            <li key={d.id} className="text-[11px] text-foreground line-clamp-2">
+                              {d.decision_text}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  )}
+                  {note.question_count > 0 && (
                     <Badge variant="secondary" className="text-[11px]">
-                      {note.decision_count} decision{note.decision_count !== 1 ? 's' : ''}
+                      {note.question_count} question{note.question_count !== 1 ? 's' : ''}
                     </Badge>
                   )}
                 </div>
               )}
-            </Link>
+            </div>
 
             {/* Right: date + menu */}
             <div className="flex items-center gap-north-xs shrink-0 pt-0.5">

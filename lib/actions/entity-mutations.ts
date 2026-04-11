@@ -1,7 +1,7 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
-import type { TaskPriority } from '@/types/database';
+import type { IdeaStatus, TaskPriority } from '@/types/database';
 
 interface MutationResult {
   error?: string;
@@ -248,6 +248,68 @@ export async function deleteDomain(domainId: string): Promise<MutationResult> {
     .delete()
     .eq('id', domainId)
     .eq('user_id', user.id);
+
+  if (error) return { error: error.message };
+  return {};
+}
+
+// ── Ideas CRUD ──────────────────────────────────────────────
+
+export async function createIdea(data: { idea_text: string }): Promise<CreateResult> {
+  const { supabase, user } = await getUser();
+  if (!user) return { error: 'Not authenticated' };
+
+  const { data: idea, error } = await supabase
+    .from('ideas')
+    .insert({
+      user_id: user.id,
+      note_id: null,
+      idea_text: data.idea_text.trim(),
+      status: 'raw',
+    })
+    .select('id')
+    .single();
+
+  if (error) return { error: error.message };
+  return { id: idea.id };
+}
+
+export async function updateIdeaStatus(
+  ideaId: string,
+  status: IdeaStatus,
+): Promise<MutationResult> {
+  const { supabase, user } = await getUser();
+  if (!user) return { error: 'Not authenticated' };
+
+  const { error } = await supabase
+    .from('ideas')
+    .update({ status })
+    .eq('id', ideaId)
+    .eq('user_id', user.id);
+
+  if (error) return { error: error.message };
+  return {};
+}
+
+export async function updateIdeaText(ideaId: string, idea_text: string): Promise<MutationResult> {
+  const { supabase, user } = await getUser();
+  if (!user) return { error: 'Not authenticated' };
+
+  const { error } = await supabase
+    .from('ideas')
+    .update({ idea_text: idea_text.trim() })
+    .eq('id', ideaId)
+    .eq('user_id', user.id);
+
+  if (error) return { error: error.message };
+  return {};
+}
+
+export async function deleteIdea(ideaId: string): Promise<MutationResult> {
+  const { supabase, user } = await getUser();
+  if (!user) return { error: 'Not authenticated' };
+
+  const { error } = await supabase.from('ideas').delete().eq('id', ideaId).eq('user_id', user.id);
 
   if (error) return { error: error.message };
   return {};

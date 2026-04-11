@@ -3,7 +3,7 @@ import { PageHeader } from '@/components/shared/page-header';
 import { EmptyState } from '@/components/shared/empty-state';
 import { NotesList } from '@/components/notes/notes-list';
 import { FileText } from 'lucide-react';
-import type { NoteWithMeta } from '@/types/database';
+import type { NoteWithMeta, TaskStatus } from '@/types/database';
 
 function groupByNoteId<T extends { note_id: string }>(arr: T[]): Record<string, T[]> {
   const map: Record<string, T[]> = {};
@@ -38,6 +38,7 @@ export default async function NotesPage({
     noteDomainsRes,
     tasksRes,
     decisionsRes,
+    openQuestionsRes,
     allProjectsRes,
     allPeopleRes,
     allDomainsRes,
@@ -56,8 +57,9 @@ export default async function NotesPage({
     supabase.from('note_projects').select('note_id, project_id, projects(id, name)'),
     supabase.from('note_people').select('note_id, person_id, people(id, name)'),
     supabase.from('note_domains').select('note_id, domain_id, domains(id, name)'),
-    supabase.from('tasks').select('note_id').not('note_id', 'is', null),
-    supabase.from('decisions').select('note_id').not('note_id', 'is', null),
+    supabase.from('tasks').select('note_id, id, title, status').not('note_id', 'is', null),
+    supabase.from('decisions').select('note_id, id, decision_text').not('note_id', 'is', null),
+    supabase.from('open_questions').select('note_id').not('note_id', 'is', null),
     supabase.from('projects').select('id, name').order('name'),
     supabase.from('people').select('id, name').order('name'),
     supabase.from('domains').select('id, name').order('name'),
@@ -80,8 +82,14 @@ export default async function NotesPage({
       .map((r) => ({ note_id: r.note_id, domain: r.domains as unknown as JoinedEntity | null }))
       .filter((r): r is { note_id: string; domain: JoinedEntity } => r.domain !== null),
   );
-  const taskCountMap = countByNoteId((tasksRes.data ?? []) as { note_id: string | null }[]);
-  const decisionCountMap = countByNoteId((decisionsRes.data ?? []) as { note_id: string | null }[]);
+  type TaskRow = { note_id: string; id: string; title: string; status: string };
+  type DecisionRow = { note_id: string; id: string; decision_text: string };
+
+  const tasksByNoteId = groupByNoteId((tasksRes.data ?? []) as TaskRow[]);
+  const decisionsByNoteId = groupByNoteId((decisionsRes.data ?? []) as DecisionRow[]);
+  const questionCountMap = countByNoteId(
+    (openQuestionsRes.data ?? []) as { note_id: string | null }[],
+  );
 
   const notes: NoteWithMeta[] = (notesRes.data ?? []).map((note) => ({
     ...note,
@@ -89,8 +97,16 @@ export default async function NotesPage({
     projects: (noteProjectMap[note.id] ?? []).map((r) => r.project),
     people: (notePeopleMap[note.id] ?? []).map((r) => r.person),
     domains: (noteDomainMap[note.id] ?? []).map((r) => r.domain),
-    task_count: taskCountMap[note.id] ?? 0,
-    decision_count: decisionCountMap[note.id] ?? 0,
+    tasks: (tasksByNoteId[note.id] ?? []).map((t) => ({
+      id: t.id,
+      title: t.title,
+      status: t.status as TaskStatus,
+    })),
+    decisions: (decisionsByNoteId[note.id] ?? []).map((d) => ({
+      id: d.id,
+      decision_text: d.decision_text,
+    })),
+    question_count: questionCountMap[note.id] ?? 0,
   }));
 
   const allProjects = (allProjectsRes.data ?? []) as { id: string; name: string }[];

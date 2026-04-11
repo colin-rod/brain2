@@ -220,6 +220,21 @@ export async function saveReviewedNote(payload: ReviewPayload): Promise<SaveResu
     }
   }
 
+  // Insert ideas
+  if (payload.ideas.length > 0) {
+    const { error: ideasError } = await supabase.from('ideas').insert(
+      payload.ideas.map((i) => ({
+        user_id: user.id,
+        note_id: noteId,
+        idea_text: i.idea_text.trim(),
+        status: 'raw',
+      })),
+    );
+    if (ideasError) {
+      return { error: `Failed to save ideas: ${ideasError.message}` };
+    }
+  }
+
   // Update capture status to saved
   await supabase.from('captures').update({ status: 'saved' }).eq('id', payload.captureId);
 

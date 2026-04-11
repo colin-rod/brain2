@@ -10,6 +10,7 @@ import {
   FolderOpen,
   Layers,
   Scale,
+  Lightbulb,
   Download,
   Settings,
   LogOut,
@@ -25,6 +26,7 @@ const navItems = [
   { href: '/projects', label: 'Projects', icon: FolderOpen, iconColor: 'var(--entity-projects)' },
   { href: '/domains', label: 'Domains', icon: Layers, iconColor: 'var(--entity-domains)' },
   { href: '/decisions', label: 'Decisions', icon: Scale, iconColor: 'var(--entity-decisions)' },
+  { href: '/ideas', label: 'Ideas', icon: Lightbulb, iconColor: 'var(--entity-ideas)' },
   { href: '/exports', label: 'Exports', icon: Download, iconColor: undefined },
   { href: '/settings', label: 'Settings', icon: Settings, iconColor: undefined },
 ];

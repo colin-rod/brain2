@@ -14,6 +14,7 @@ Given the content of meeting notes (which may be handwritten, transcribed, or ty
 - Work domains or areas (e.g. Engineering, Marketing, Legal, Finance, Design, Operations)
 - Decisions that were made, with rationale if available
 - Open questions that remain unresolved
+- Ideas or possibilities worth capturing (e.g. "we could try X", "what if we did Y", potential improvements or opportunities)
 
 Be conservative: only extract information that is clearly present. Do not invent due dates, priorities, or decisions that aren't explicitly stated or strongly implied.`,
 
@@ -28,6 +29,7 @@ Given plain text content (notes, emails, documents), extract:
 - Work domains or areas (e.g. Engineering, Marketing, Legal, Finance, Design, Operations)
 - Decisions mentioned, with rationale if available
 - Open questions or unresolved items
+- Ideas or possibilities worth capturing (e.g. "we could try X", "what if we did Y", potential improvements or opportunities)
 
 Be conservative: only extract information that is clearly present. Do not invent due dates, priorities, or decisions that aren't explicitly stated or strongly implied.`,
 
@@ -42,6 +44,7 @@ Given a chat transcript (Google Chat, Slack, etc.), extract:
 - Work domains or areas (e.g. Engineering, Marketing, Legal, Finance, Design, Operations)
 - Decisions that were reached, with rationale if available
 - Open questions that remain unresolved
+- Ideas or possibilities worth capturing (e.g. "we could try X", "what if we did Y", potential improvements or opportunities)
 
 Be conservative: only extract information that is clearly present. Do not invent due dates, priorities, or decisions that aren't explicitly stated or strongly implied.`,
 };
@@ -152,6 +155,20 @@ const jsonSchema = {
           additionalProperties: false,
         },
       },
+      ideas: {
+        type: 'array' as const,
+        items: {
+          type: 'object' as const,
+          properties: {
+            idea_text: {
+              type: 'string' as const,
+              description: 'A possibility, opportunity, or speculative suggestion worth capturing',
+            },
+          },
+          required: ['idea_text'],
+          additionalProperties: false,
+        },
+      },
     },
     required: [
       'title',
@@ -163,6 +180,7 @@ const jsonSchema = {
       'domains',
       'decisions',
       'open_questions',
+      'ideas',
     ],
     additionalProperties: false,
   },

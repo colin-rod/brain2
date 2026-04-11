@@ -19,6 +19,8 @@ export type TaskPriority = 'P0' | 'P1' | 'P2' | 'P3';
 
 export type QuestionStatus = 'open' | 'resolved';
 
+export type IdeaStatus = 'raw' | 'developing' | 'accepted' | 'rejected' | 'archived';
+
 export interface Profile {
   id: string;
   created_at: string;
@@ -58,8 +60,9 @@ export interface NoteWithMeta extends Note {
   projects: { id: string; name: string }[];
   people: { id: string; name: string }[];
   domains: { id: string; name: string }[];
-  task_count: number;
-  decision_count: number;
+  tasks: { id: string; title: string; status: TaskStatus }[];
+  decisions: { id: string; decision_text: string }[];
+  question_count: number;
 }
 
 export interface Task {
@@ -156,6 +159,16 @@ export interface NoteDomain {
   domain_id: string;
 }
 
+export interface Idea {
+  id: string;
+  user_id: string;
+  note_id: string | null;
+  idea_text: string;
+  status: IdeaStatus;
+  created_at: string;
+  updated_at: string;
+}
+
 /* JSON shape stored in captures.parsed_json */
 export interface ParsedNoteJson {
   title: string;
@@ -185,5 +198,8 @@ export interface ParsedNoteJson {
   }[];
   open_questions: {
     question_text: string;
+  }[];
+  ideas: {
+    idea_text: string;
   }[];
 }

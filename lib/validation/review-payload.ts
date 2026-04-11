@@ -68,5 +68,14 @@ export function validateReviewPayload(payload: ReviewPayload): ValidationError[]
     }
   }
 
+  for (let i = 0; i < payload.ideas.length; i++) {
+    if (!payload.ideas[i].idea_text.trim()) {
+      errors.push({
+        field: `ideas[${i}].idea_text`,
+        message: `Idea ${i + 1} needs text`,
+      });
+    }
+  }
+
   return errors;
 }

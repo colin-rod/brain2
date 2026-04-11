@@ -1,12 +1,6 @@
 'use client';
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
@@ -46,7 +40,12 @@ export function FilterBar({ filters, values, onChange, onClear }: FilterBarProps
               }
             >
               <SelectTrigger size="sm" className="text-metadata">
-                <SelectValue placeholder={filter.label} />
+                <span>
+                  {values[filter.key]
+                    ? (filter.options.find((o) => o.value === values[filter.key])?.label ??
+                      filter.label)
+                    : filter.label}
+                </span>
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="__all__">All {filter.label}</SelectItem>
@@ -63,6 +62,9 @@ export function FilterBar({ filters, values, onChange, onClear }: FilterBarProps
         if (filter.type === 'date-range') {
           return (
             <div key={filter.key} className="flex items-center gap-north-xs">
+              <span className="font-mono text-[10px] uppercase tracking-wider text-foreground-muted shrink-0">
+                {filter.label}:
+              </span>
               <Input
                 type="date"
                 value={values[`${filter.key}_from`] || ''}

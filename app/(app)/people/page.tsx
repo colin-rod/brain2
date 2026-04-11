@@ -27,12 +27,7 @@ export default async function PeoplePage() {
 
   return (
     <div className="space-y-north-lg">
-      <PageHeader
-        title="People"
-        description="People mentioned across your notes."
-        icon={Users}
-        iconColor="var(--entity-people)"
-      />
+      <PageHeader title="People" icon={Users} iconColor="var(--entity-people)" />
 
       {people.length === 0 ? (
         <EmptyState

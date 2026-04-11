@@ -19,7 +19,7 @@ export default async function ExportsPage() {
 
   return (
     <div className="space-y-north-lg">
-      <PageHeader title="Exports" description="Download or regenerate markdown exports." />
+      <PageHeader title="Exports" />
 
       {notes.length === 0 ? (
         <EmptyState

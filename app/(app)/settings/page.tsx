@@ -4,7 +4,7 @@ import { Separator } from '@/components/ui/separator';
 export default function SettingsPage() {
   return (
     <div className="space-y-north-lg">
-      <PageHeader title="Settings" description="Brain2 is powered by these services." />
+      <PageHeader title="Settings" />
 
       <div className="rounded-lg border border-border bg-surface p-north-lg space-y-north-base">
         <div>

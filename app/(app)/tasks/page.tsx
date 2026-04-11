@@ -34,12 +34,7 @@ export default async function TasksPage() {
 
   return (
     <div className="space-y-north-lg">
-      <PageHeader
-        title="Tasks"
-        description="All tasks extracted from your notes."
-        icon={CheckSquare}
-        iconColor="var(--entity-tasks)"
-      />
+      <PageHeader title="Tasks" icon={CheckSquare} iconColor="var(--entity-tasks)" />
 
       {tasks.length === 0 ? (
         <EmptyState

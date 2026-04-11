@@ -19,12 +19,7 @@ export default async function DomainsPage() {
 
   return (
     <div className="space-y-north-lg">
-      <PageHeader
-        title="Domains"
-        description="Work areas and categories across your notes."
-        icon={Layers}
-        iconColor="var(--entity-domains)"
-      />
+      <PageHeader title="Domains" icon={Layers} iconColor="var(--entity-domains)" />
 
       {domains.length === 0 ? (
         <EmptyState

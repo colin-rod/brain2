@@ -55,6 +55,20 @@ const PRIORITY_OPTIONS = [
   { value: 'P3', label: 'P3' },
 ];
 
+const STATUS_BORDER: Record<TaskStatus, string> = {
+  todo: 'border-l-border',
+  in_progress: 'border-l-primary',
+  done: 'border-l-status-saved',
+  canceled: 'border-l-foreground-muted',
+};
+
+const STATUS_ROW_MUTED: Record<TaskStatus, string> = {
+  todo: '',
+  in_progress: '',
+  done: 'opacity-60',
+  canceled: 'opacity-40',
+};
+
 export function TasksList({
   tasks,
   allPeople,
@@ -68,6 +82,7 @@ export function TasksList({
   const [isAdding, setIsAdding] = useState(false);
   const [editingAssignee, setEditingAssignee] = useState<string | null>(null);
   const [editingProject, setEditingProject] = useState<string | null>(null);
+  const [groupBy, setGroupBy] = useState<string>('none');
 
   const filterConfigs: FilterConfig[] = useMemo(
     () => [
@@ -85,13 +100,13 @@ export function TasksList({
         type: 'select',
         options: allProjects.map((p) => ({ value: p.id, label: p.name })),
       },
-      { key: 'due_date', label: 'Due Date', type: 'date-range' },
       {
         key: 'domain',
         label: 'Domain',
         type: 'select',
         options: allDomains.map((d) => ({ value: d.id, label: d.name })),
       },
+      { key: 'due_date', label: 'Due Date', type: 'date-range' },
     ],
     [allPeople, allProjects, allDomains],
   );
@@ -132,6 +147,27 @@ export function TasksList({
 
     return applySorting(result, sort);
   }, [searched, filters, sort, noteDomains]);
+
+  const groupedTasks = useMemo(() => {
+    if (groupBy === 'none') return [{ label: null, tasks: filtered }];
+
+    const groups = new Map<string, TaskWithRelations[]>();
+    for (const task of filtered) {
+      let key = 'None';
+      if (groupBy === 'status') {
+        key = STATUS_OPTIONS.find((o) => o.value === task.status)?.label ?? task.status;
+      } else if (groupBy === 'priority') {
+        key = task.priority ?? 'No Priority';
+      } else if (groupBy === 'project') {
+        key = task.project?.name ?? 'No Project';
+      } else if (groupBy === 'assignee') {
+        key = task.actionee?.name ?? 'Unassigned';
+      }
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key)!.push(task);
+    }
+    return Array.from(groups.entries()).map(([label, tasks]) => ({ label, tasks }));
+  }, [filtered, groupBy]);
 
   function handleFieldUpdate(taskId: string, updates: Record<string, unknown>) {
     startTransition(async () => {
@@ -177,32 +213,70 @@ export function TasksList({
   return (
     <div className="space-y-north-md">
       <div className="flex items-center justify-between">
-        <SearchBar placeholder="Search tasks..." onSearch={setSearch} />
+        <div className="flex-1 min-w-0 mr-north-md">
+          <SearchBar placeholder="Search tasks..." onSearch={setSearch} />
+        </div>
         <Button
           variant="ghost"
           size="sm"
           onClick={() => setIsAdding(true)}
-          className="gap-1 ml-north-md shrink-0"
+          className="gap-1 shrink-0"
         >
           <Plus className="h-3.5 w-3.5" />
           New Task
         </Button>
       </div>
 
-      <FilterBar
-        filters={filterConfigs}
-        values={filters}
-        onChange={setFilter}
-        onClear={clearFilters}
-      />
+      <div className="flex items-center gap-north-sm flex-wrap">
+        <FilterBar
+          filters={filterConfigs}
+          values={filters}
+          onChange={setFilter}
+          onClear={clearFilters}
+        />
+        <Select value={groupBy} onValueChange={(v) => setGroupBy(v ?? 'none')}>
+          <SelectTrigger size="sm" className="text-metadata w-auto">
+            <SelectValue>
+              {groupBy === 'none'
+                ? 'Group by'
+                : `Group: ${groupBy.charAt(0).toUpperCase() + groupBy.slice(1)}`}
+            </SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="none">No grouping</SelectItem>
+            <SelectItem value="status">Status</SelectItem>
+            <SelectItem value="priority">Priority</SelectItem>
+            <SelectItem value="project">Project</SelectItem>
+            <SelectItem value="assignee">Assignee</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
 
       {/* Column headers */}
       <div className="hidden sm:grid sm:grid-cols-[24px_1fr_100px_60px_90px_100px_100px_32px] gap-north-sm px-north-sm items-center border-b-2 border-border pb-north-xs">
         <span className="font-mono text-[10px] text-foreground-muted uppercase">#</span>
         <SortableHeader label="Title" field="title" currentSort={sort} onSort={toggleSort} />
-        <SortableHeader label="Status" field="status" currentSort={sort} onSort={toggleSort} />
-        <SortableHeader label="Pri" field="priority" currentSort={sort} onSort={toggleSort} />
-        <SortableHeader label="Due" field="due_date" currentSort={sort} onSort={toggleSort} />
+        <SortableHeader
+          label="Status"
+          field="status"
+          currentSort={sort}
+          onSort={toggleSort}
+          className="pl-2"
+        />
+        <SortableHeader
+          label="Pri"
+          field="priority"
+          currentSort={sort}
+          onSort={toggleSort}
+          className="pl-2"
+        />
+        <SortableHeader
+          label="Due"
+          field="due_date"
+          currentSort={sort}
+          onSort={toggleSort}
+          className="pl-2"
+        />
         <SortableHeader label="Assignee" field="actionee" currentSort={sort} onSort={toggleSort} />
         <SortableHeader label="Project" field="project" currentSort={sort} onSort={toggleSort} />
         <span />
@@ -223,221 +297,232 @@ export function TasksList({
           </div>
         )}
 
-        {filtered.map((task, index) => (
-          <div
-            key={task.id}
-            className="px-north-sm py-north-xs border-l-[3px] border-l-(--entity-tasks) animate-fade-in hover:bg-surface-subtle transition-colors"
-            style={{ animationDelay: `${index * 25}ms` }}
-          >
-            {/* Desktop: grid layout */}
-            <div className="hidden sm:grid sm:grid-cols-[24px_1fr_100px_60px_90px_100px_100px_32px] gap-north-sm items-center">
-              <span className="font-mono text-[10px] tabular-nums text-foreground-muted">
-                {String(index + 1).padStart(2, '0')}
-              </span>
-
-              <div className="min-w-0">
-                <InlineEditableText
-                  value={task.title}
-                  onSave={async (v) => {
-                    const r = await updateTask(task.id, { title: v });
-                    if (!r.error) {
-                      router.refresh();
-                      refreshSearch();
-                    }
-                    return r;
-                  }}
-                  className="text-body"
-                />
-                {task.notes && (
-                  <Link
-                    href={`/notes/${task.notes.id}`}
-                    className="text-metadata text-primary hover:underline block mt-0.5 truncate"
-                  >
-                    {task.notes.title}
-                  </Link>
-                )}
+        {groupedTasks.map(({ label, tasks: groupTasks }) => (
+          <div key={label ?? '__all__'}>
+            {label !== null && (
+              <div className="font-mono text-[10px] uppercase tracking-wider text-foreground-muted px-north-sm py-1 bg-surface-subtle border-b border-border">
+                {label}
               </div>
-
-              <Select
-                value={task.status}
-                onValueChange={(v) => handleFieldUpdate(task.id, { status: v as TaskStatus })}
+            )}
+            {groupTasks.map((task, index) => (
+              <div
+                key={task.id}
+                className={`px-north-sm py-north-xs border-l-[3px] animate-fade-in hover:bg-surface-subtle transition-colors ${STATUS_BORDER[task.status]} ${STATUS_ROW_MUTED[task.status]} ${editingAssignee === task.id || editingProject === task.id ? 'relative z-10' : ''}`}
+                style={{ animationDelay: `${index * 25}ms` }}
               >
-                <SelectTrigger
-                  size="sm"
-                  className="text-label font-mono uppercase tracking-wider rounded-none"
-                >
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {STATUS_OPTIONS.map((o) => (
-                    <SelectItem key={o.value} value={o.value}>
-                      {o.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Select
-                value={task.priority || 'none'}
-                onValueChange={(v) =>
-                  handleFieldUpdate(task.id, {
-                    priority: v === 'none' ? null : (v as TaskPriority),
-                  })
-                }
-              >
-                <SelectTrigger
-                  size="sm"
-                  className="text-label font-mono uppercase tracking-wider rounded-none"
-                >
-                  <SelectValue placeholder="--" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">--</SelectItem>
-                  {PRIORITY_OPTIONS.map((o) => (
-                    <SelectItem key={o.value} value={o.value}>
-                      {o.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Input
-                type="date"
-                value={task.due_date || ''}
-                onChange={(e) => handleFieldUpdate(task.id, { due_date: e.target.value || null })}
-                className="h-7 text-label font-mono rounded-none"
-              />
-
-              {/* Assignee cell */}
-              <div className="relative">
-                {editingAssignee === task.id ? (
-                  <EntityCombobox
-                    items={allPeople}
-                    excludeIds={[]}
-                    onSelect={(item) => {
-                      handleFieldUpdate(task.id, { actionee_id: item.id });
-                      setEditingAssignee(null);
-                    }}
-                    onCreate={() => {}}
-                    onClose={() => setEditingAssignee(null)}
-                    placeholder="Search people..."
-                  />
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => setEditingAssignee(task.id)}
-                    className="text-left w-full text-metadata text-foreground-muted hover:text-foreground truncate"
-                  >
-                    {task.actionee ? (
-                      <span className="text-primary">@{task.actionee.name}</span>
-                    ) : (
-                      <span className="opacity-40">Assign</span>
-                    )}
-                  </button>
-                )}
-              </div>
-
-              {/* Project cell */}
-              <div className="relative">
-                {editingProject === task.id ? (
-                  <EntityCombobox
-                    items={allProjects}
-                    excludeIds={[]}
-                    onSelect={(item) => {
-                      handleFieldUpdate(task.id, { project_id: item.id });
-                      setEditingProject(null);
-                    }}
-                    onCreate={() => {}}
-                    onClose={() => setEditingProject(null)}
-                    placeholder="Search projects..."
-                  />
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => setEditingProject(task.id)}
-                    className="text-left w-full text-metadata text-foreground-muted hover:text-foreground truncate"
-                  >
-                    {task.project ? (
-                      <span className="text-primary">{task.project.name}</span>
-                    ) : (
-                      <span className="opacity-40">Project</span>
-                    )}
-                  </button>
-                )}
-              </div>
-
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                onClick={() => handleDelete(task.id)}
-                disabled={isPending}
-                className="shrink-0 text-foreground-muted hover:text-destructive"
-              >
-                <X className="h-3.5 w-3.5" />
-              </Button>
-            </div>
-
-            {/* Mobile: stacked layout */}
-            <div className="sm:hidden space-y-north-xs">
-              <div className="flex items-center justify-between gap-north-sm">
-                <InlineEditableText
-                  value={task.title}
-                  onSave={async (v) => {
-                    const r = await updateTask(task.id, { title: v });
-                    if (!r.error) {
-                      router.refresh();
-                      refreshSearch();
-                    }
-                    return r;
-                  }}
-                  className="text-body flex-1"
-                />
-                <Button
-                  variant="ghost"
-                  size="icon-sm"
-                  onClick={() => handleDelete(task.id)}
-                  disabled={isPending}
-                  className="shrink-0 text-foreground-muted hover:text-destructive"
-                >
-                  <X className="h-3.5 w-3.5" />
-                </Button>
-              </div>
-              <div className="flex flex-wrap items-center gap-north-sm">
-                <TaskStatusBadge status={task.status} />
-                {task.priority && (
-                  <span className="text-metadata text-foreground-muted">{task.priority}</span>
-                )}
-                {task.due_date && (
-                  <span className="text-metadata text-foreground-muted">
-                    Due: {formatDate(task.due_date)}
+                {/* Desktop: grid layout */}
+                <div className="hidden sm:grid sm:grid-cols-[24px_1fr_100px_60px_90px_100px_100px_32px] gap-north-sm items-center">
+                  <span className="font-mono text-[10px] tabular-nums text-foreground-muted">
+                    {String(index + 1).padStart(2, '0')}
                   </span>
-                )}
-                {task.actionee && (
-                  <Link
-                    href={`/people/${task.actionee.id}`}
-                    className="text-metadata text-primary hover:underline"
+
+                  <div className="min-w-0">
+                    <InlineEditableText
+                      value={task.title}
+                      onSave={async (v) => {
+                        const r = await updateTask(task.id, { title: v });
+                        if (!r.error) {
+                          router.refresh();
+                          refreshSearch();
+                        }
+                        return r;
+                      }}
+                      className="text-body"
+                    />
+                    {task.notes && (
+                      <Link
+                        href={`/notes/${task.notes.id}`}
+                        className="text-metadata text-primary hover:underline block mt-0.5 truncate"
+                      >
+                        {task.notes.title}
+                      </Link>
+                    )}
+                  </div>
+
+                  <Select
+                    value={task.status}
+                    onValueChange={(v) => handleFieldUpdate(task.id, { status: v as TaskStatus })}
                   >
-                    @{task.actionee.name}
-                  </Link>
-                )}
-                {task.project && (
-                  <Link
-                    href={`/projects/${task.project.id}`}
-                    className="text-metadata text-primary hover:underline"
+                    <SelectTrigger
+                      size="sm"
+                      className="text-label font-mono uppercase tracking-wider rounded-none"
+                    >
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {STATUS_OPTIONS.map((o) => (
+                        <SelectItem key={o.value} value={o.value}>
+                          {o.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  <Select
+                    value={task.priority || 'none'}
+                    onValueChange={(v) =>
+                      handleFieldUpdate(task.id, {
+                        priority: v === 'none' ? null : (v as TaskPriority),
+                      })
+                    }
                   >
-                    {task.project.name}
-                  </Link>
-                )}
-                {task.notes && (
-                  <Link
-                    href={`/notes/${task.notes.id}`}
-                    className="text-metadata text-primary hover:underline"
+                    <SelectTrigger
+                      size="sm"
+                      className="text-label font-mono uppercase tracking-wider rounded-none"
+                    >
+                      <SelectValue placeholder="--" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">--</SelectItem>
+                      {PRIORITY_OPTIONS.map((o) => (
+                        <SelectItem key={o.value} value={o.value}>
+                          {o.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  <Input
+                    type="date"
+                    value={task.due_date || ''}
+                    onChange={(e) =>
+                      handleFieldUpdate(task.id, { due_date: e.target.value || null })
+                    }
+                    className="h-7 text-label font-mono rounded-none"
+                  />
+
+                  {/* Assignee cell */}
+                  <div className="relative">
+                    {editingAssignee === task.id ? (
+                      <EntityCombobox
+                        items={allPeople}
+                        excludeIds={[]}
+                        onSelect={(item) => {
+                          handleFieldUpdate(task.id, { actionee_id: item.id });
+                          setEditingAssignee(null);
+                        }}
+                        onCreate={() => {}}
+                        onClose={() => setEditingAssignee(null)}
+                        placeholder="Search people..."
+                      />
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => setEditingAssignee(task.id)}
+                        className="text-left w-full text-metadata text-foreground-muted hover:text-foreground truncate"
+                      >
+                        {task.actionee ? (
+                          <span className="text-primary">@{task.actionee.name}</span>
+                        ) : (
+                          <span className="opacity-40">Assign</span>
+                        )}
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Project cell */}
+                  <div className="relative">
+                    {editingProject === task.id ? (
+                      <EntityCombobox
+                        items={allProjects}
+                        excludeIds={[]}
+                        onSelect={(item) => {
+                          handleFieldUpdate(task.id, { project_id: item.id });
+                          setEditingProject(null);
+                        }}
+                        onCreate={() => {}}
+                        onClose={() => setEditingProject(null)}
+                        placeholder="Search projects..."
+                      />
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => setEditingProject(task.id)}
+                        className="text-left w-full text-metadata text-foreground-muted hover:text-foreground truncate"
+                      >
+                        {task.project ? (
+                          <span className="text-primary">{task.project.name}</span>
+                        ) : (
+                          <span className="opacity-40">Project</span>
+                        )}
+                      </button>
+                    )}
+                  </div>
+
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    onClick={() => handleDelete(task.id)}
+                    disabled={isPending}
+                    className="shrink-0 text-foreground-muted hover:text-destructive"
                   >
-                    {task.notes.title}
-                  </Link>
-                )}
+                    <X className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
+
+                {/* Mobile: stacked layout */}
+                <div className="sm:hidden space-y-north-xs">
+                  <div className="flex items-center justify-between gap-north-sm">
+                    <InlineEditableText
+                      value={task.title}
+                      onSave={async (v) => {
+                        const r = await updateTask(task.id, { title: v });
+                        if (!r.error) {
+                          router.refresh();
+                          refreshSearch();
+                        }
+                        return r;
+                      }}
+                      className="text-body flex-1"
+                    />
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      onClick={() => handleDelete(task.id)}
+                      disabled={isPending}
+                      className="shrink-0 text-foreground-muted hover:text-destructive"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-north-sm">
+                    <TaskStatusBadge status={task.status} />
+                    {task.priority && (
+                      <span className="text-metadata text-foreground-muted">{task.priority}</span>
+                    )}
+                    {task.due_date && (
+                      <span className="text-metadata text-foreground-muted">
+                        Due: {formatDate(task.due_date)}
+                      </span>
+                    )}
+                    {task.actionee && (
+                      <Link
+                        href={`/people/${task.actionee.id}`}
+                        className="text-metadata text-primary hover:underline"
+                      >
+                        @{task.actionee.name}
+                      </Link>
+                    )}
+                    {task.project && (
+                      <Link
+                        href={`/projects/${task.project.id}`}
+                        className="text-metadata text-primary hover:underline"
+                      >
+                        {task.project.name}
+                      </Link>
+                    )}
+                    {task.notes && (
+                      <Link
+                        href={`/notes/${task.notes.id}`}
+                        className="text-metadata text-primary hover:underline"
+                      >
+                        {task.notes.title}
+                      </Link>
+                    )}
+                  </div>
+                </div>
               </div>
-            </div>
+            ))}
           </div>
         ))}
 

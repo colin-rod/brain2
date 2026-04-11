@@ -2,19 +2,12 @@ import type { LucideIcon } from 'lucide-react';
 
 interface PageHeaderProps {
   title: string;
-  description?: string;
   children?: React.ReactNode;
   icon?: LucideIcon;
   iconColor?: string;
 }
 
-export function PageHeader({
-  title,
-  description,
-  children,
-  icon: Icon,
-  iconColor,
-}: PageHeaderProps) {
+export function PageHeader({ title, children, icon: Icon, iconColor }: PageHeaderProps) {
   return (
     <div className="flex flex-col gap-north-xs sm:flex-row sm:items-center sm:justify-between border-b border-border pb-north-md mb-north-md">
       <div className="border-l-2 border-primary pl-north-sm">
@@ -30,11 +23,6 @@ export function PageHeader({
           )}
           <h1 className="text-page-title">{title}</h1>
         </div>
-        {description && (
-          <p className="text-metadata text-[14px] leading-snug text-foreground-muted font-mono uppercase tracking-wider mt-0.5">
-            {description}
-          </p>
-        )}
       </div>
       {children && <div className="flex items-center gap-north-sm">{children}</div>}
     </div>

@@ -27,12 +27,7 @@ export default async function ProjectsPage() {
 
   return (
     <div className="space-y-north-lg">
-      <PageHeader
-        title="Projects"
-        description="Projects referenced across your notes."
-        icon={FolderOpen}
-        iconColor="var(--entity-projects)"
-      />
+      <PageHeader title="Projects" icon={FolderOpen} iconColor="var(--entity-projects)" />
 
       {projects.length === 0 ? (
         <EmptyState

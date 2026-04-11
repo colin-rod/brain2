@@ -34,12 +34,7 @@ export default async function DecisionsPage() {
 
   return (
     <div className="space-y-north-lg">
-      <PageHeader
-        title="Decisions"
-        description="All decisions extracted from your notes."
-        icon={Scale}
-        iconColor="var(--entity-decisions)"
-      />
+      <PageHeader title="Decisions" icon={Scale} iconColor="var(--entity-decisions)" />
 
       {decisions.length === 0 ? (
         <EmptyState

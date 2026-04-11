@@ -99,12 +99,7 @@ export default async function NotesPage({
 
   return (
     <div className="space-y-north-lg">
-      <PageHeader
-        title="Notes"
-        description="Browse all saved notes."
-        icon={FileText}
-        iconColor="var(--entity-notes)"
-      />
+      <PageHeader title="Notes" icon={FileText} iconColor="var(--entity-notes)" />
 
       {notes.length === 0 && !showArchived ? (
         <EmptyState

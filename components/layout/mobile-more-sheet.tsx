@@ -2,7 +2,16 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Users, Layers, Scale, Lightbulb, Download, Settings, LogOut } from 'lucide-react';
+import {
+  Users,
+  Layers,
+  Scale,
+  HelpCircle,
+  Lightbulb,
+  Download,
+  Settings,
+  LogOut,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { signOut } from '@/lib/actions/auth';
 
@@ -10,6 +19,12 @@ const sheetItems = [
   { href: '/people', label: 'People', icon: Users, iconColor: 'var(--entity-people)' },
   { href: '/domains', label: 'Domains', icon: Layers, iconColor: 'var(--entity-domains)' },
   { href: '/decisions', label: 'Decisions', icon: Scale, iconColor: 'var(--entity-decisions)' },
+  {
+    href: '/questions',
+    label: 'Questions',
+    icon: HelpCircle,
+    iconColor: 'var(--entity-questions)',
+  },
   { href: '/ideas', label: 'Ideas', icon: Lightbulb, iconColor: 'var(--entity-ideas)' },
   { href: '/exports', label: 'Exports', icon: Download, iconColor: undefined },
   { href: '/settings', label: 'Settings', icon: Settings, iconColor: undefined },

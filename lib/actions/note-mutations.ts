@@ -18,6 +18,30 @@ async function getUser() {
 
 // ── Note ──────────────────────────────────────────────────────────
 
+export async function archiveNote(noteId: string, archive = true): Promise<MutationResult> {
+  const { supabase, user } = await getUser();
+  if (!user) return { error: 'Not authenticated' };
+
+  const { error } = await supabase
+    .from('notes')
+    .update({ archived_at: archive ? new Date().toISOString() : null })
+    .eq('id', noteId)
+    .eq('user_id', user.id);
+
+  if (error) return { error: error.message };
+  return {};
+}
+
+export async function deleteNote(noteId: string): Promise<MutationResult> {
+  const { supabase, user } = await getUser();
+  if (!user) return { error: 'Not authenticated' };
+
+  const { error } = await supabase.from('notes').delete().eq('id', noteId).eq('user_id', user.id);
+
+  if (error) return { error: error.message };
+  return {};
+}
+
 export async function updateNote(
   noteId: string,
   updates: { title?: string; summary?: string; cleaned_text?: string },

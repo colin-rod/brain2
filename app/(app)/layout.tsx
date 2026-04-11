@@ -17,13 +17,18 @@ export default function AppLayout({
       >
         Skip to content
       </a>
+      <header className="sticky top-0 z-30 w-full h-14 flex items-center gap-north-md border-b border-border border-t-2 border-t-primary bg-surface px-north-md shadow-header">
+        <span className="font-mono text-[11px] text-primary select-none">[</span>
+        <span className="font-accent text-lg font-semibold tracking-tight text-foreground">
+          Brain<span className="text-primary italic">2</span>
+        </span>
+        <span className="font-mono text-[11px] text-primary select-none">]</span>
+        <div className="flex-1 ml-north-md">
+          <GlobalSearch />
+        </div>
+      </header>
       <Sidebar />
       <main id="main-content" className="md:ml-52 lg:ml-60 flex-1 pb-16 md:pb-0">
-        <div className="border-b border-border border-t-2 border-t-primary bg-surface px-north-base py-north-md md:px-north-lg shadow-header">
-          <div className="mx-auto max-w-5xl">
-            <GlobalSearch />
-          </div>
-        </div>
         <div className="mx-auto max-w-5xl px-north-base py-north-md md:px-north-lg md:py-north-lg">
           {children}
         </div>

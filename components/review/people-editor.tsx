@@ -4,19 +4,15 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 import { useReviewStore } from '@/lib/stores/review-store';
-import { EditorSectionHeader } from '@/components/shared/editor-section-header';
 import { EditorEmptyMessage } from '@/components/shared/editor-empty-message';
 
 export function PeopleEditor() {
   const people = useReviewStore((s) => s.people);
   const updatePerson = useReviewStore((s) => s.updatePerson);
-  const addPerson = useReviewStore((s) => s.addPerson);
   const removePerson = useReviewStore((s) => s.removePerson);
 
   return (
     <div className="space-y-north-sm">
-      <EditorSectionHeader title="People" onAdd={addPerson} />
-
       {people.length === 0 && <EditorEmptyMessage message="No one mentioned." />}
 
       <div className="space-y-north-xs">

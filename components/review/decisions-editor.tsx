@@ -6,20 +6,16 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 import { useReviewStore } from '@/lib/stores/review-store';
-import { EditorSectionHeader } from '@/components/shared/editor-section-header';
 import { EditorEmptyMessage } from '@/components/shared/editor-empty-message';
 import { EditorItemCard } from '@/components/shared/editor-item-card';
 
 export function DecisionsEditor() {
   const decisions = useReviewStore((s) => s.decisions);
   const updateDecision = useReviewStore((s) => s.updateDecision);
-  const addDecision = useReviewStore((s) => s.addDecision);
   const removeDecision = useReviewStore((s) => s.removeDecision);
 
   return (
     <div className="space-y-north-sm">
-      <EditorSectionHeader title="Decisions" onAdd={addDecision} />
-
       {decisions.length === 0 && (
         <EditorEmptyMessage message="No decisions found — add one if needed." />
       )}

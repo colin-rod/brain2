@@ -146,6 +146,7 @@ export function NoteTasksSection({ noteId, tasks, onMutate }: NoteTasksSectionPr
                   <DateInputWithShortcuts
                     value={task.due_date || ''}
                     onChange={(v) => handleFieldUpdate(task.id, { due_date: v || null })}
+                    inline
                   />
                 </div>
               </div>

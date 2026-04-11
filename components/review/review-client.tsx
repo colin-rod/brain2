@@ -13,15 +13,60 @@ import { ProjectsEditor } from './projects-editor';
 import { DomainsEditor } from './domains-editor';
 import { DecisionsEditor } from './decisions-editor';
 import { QuestionsEditor } from './questions-editor';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { Check, Loader2, Save } from 'lucide-react';
+import { Check, ChevronDown, Loader2, Plus, Save } from 'lucide-react';
 import type { Capture, ParsedNoteJson } from '@/types/database';
 
 interface ReviewClientProps {
   capture: Capture;
   imageUrl: string | null;
+}
+
+interface CollapsibleSectionProps {
+  title: string;
+  count: number;
+  children: React.ReactNode;
+  delay: string;
+  onAdd: () => void;
+}
+
+function CollapsibleSection({ title, count, children, delay, onAdd }: CollapsibleSectionProps) {
+  const [open, setOpen] = useState(count > 0);
+
+  return (
+    <div className="animate-slide-in-up" style={{ animationDelay: delay }}>
+      <Collapsible open={open} onOpenChange={setOpen}>
+        <div className="flex items-center justify-between">
+          <CollapsibleTrigger className="flex items-center gap-north-xs py-north-xs hover:opacity-70 transition-opacity">
+            <span className="text-section-header">
+              {title}
+              {count > 0 && (
+                <span className="ml-2 text-metadata text-foreground-muted font-normal">
+                  ({count})
+                </span>
+              )}
+            </span>
+            <ChevronDown
+              className={cn(
+                'h-4 w-4 text-foreground-muted transition-transform',
+                open && 'rotate-180',
+              )}
+            />
+          </CollapsibleTrigger>
+          <Button variant="ghost" size="sm" onClick={onAdd} className="gap-1">
+            <Plus className="h-3.5 w-3.5" />
+            Add
+          </Button>
+        </div>
+        <CollapsibleContent>
+          <div className="pt-north-sm">{children}</div>
+        </CollapsibleContent>
+      </Collapsible>
+    </div>
+  );
 }
 
 export function ReviewClient({ capture, imageUrl }: ReviewClientProps) {
@@ -34,6 +79,20 @@ export function ReviewClient({ capture, imageUrl }: ReviewClientProps) {
   const captureId = store.captureId;
   const initFromParsed = store.initFromParsed;
   const reset = store.reset;
+
+  const tasks = useReviewStore((s) => s.tasks);
+  const people = useReviewStore((s) => s.people);
+  const projects = useReviewStore((s) => s.projects);
+  const domains = useReviewStore((s) => s.domains);
+  const decisions = useReviewStore((s) => s.decisions);
+  const open_questions = useReviewStore((s) => s.open_questions);
+
+  const addTask = useReviewStore((s) => s.addTask);
+  const addPerson = useReviewStore((s) => s.addPerson);
+  const addProject = useReviewStore((s) => s.addProject);
+  const addDomain = useReviewStore((s) => s.addDomain);
+  const addDecision = useReviewStore((s) => s.addDecision);
+  const addQuestion = useReviewStore((s) => s.addQuestion);
 
   // Initialize store from parsed JSON when loading a new capture
   useEffect(() => {
@@ -81,62 +140,103 @@ export function ReviewClient({ capture, imageUrl }: ReviewClientProps) {
 
   return (
     <>
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-north-lg pb-20 lg:pb-0">
-        {/* Left column: source preview */}
-        <div className="lg:col-span-2">
-          <div className="lg:sticky lg:top-north-lg">
-            <SourcePreview capture={capture} imageUrl={imageUrl} />
+      <div className="space-y-north-lg pb-20 lg:pb-0">
+        {/* Title, Summary, Full Text — full width above the grid */}
+        <div className="animate-slide-in-up" style={{ animationDelay: '0ms' }}>
+          <NoteFields />
+        </div>
+
+        <Separator />
+
+        {/* Two-panel grid: source left, structured editors right */}
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-north-lg">
+          {/* Left column: source preview */}
+          <div className="lg:col-span-2">
+            <div className="lg:sticky lg:top-north-lg">
+              <SourcePreview capture={capture} imageUrl={imageUrl} />
+            </div>
+          </div>
+
+          {/* Right column: structured editors */}
+          <div className="lg:col-span-3 space-y-north-sm divide-y divide-border">
+            <CollapsibleSection title="Tasks" count={tasks.length} delay="50ms" onAdd={addTask}>
+              <TasksEditor />
+            </CollapsibleSection>
+
+            <div className="pt-north-sm">
+              <CollapsibleSection
+                title="People"
+                count={people.length}
+                delay="100ms"
+                onAdd={addPerson}
+              >
+                <PeopleEditor />
+              </CollapsibleSection>
+            </div>
+
+            <div className="pt-north-sm">
+              <CollapsibleSection
+                title="Projects"
+                count={projects.length}
+                delay="150ms"
+                onAdd={addProject}
+              >
+                <ProjectsEditor />
+              </CollapsibleSection>
+            </div>
+
+            <div className="pt-north-sm">
+              <CollapsibleSection
+                title="Domains"
+                count={domains.length}
+                delay="175ms"
+                onAdd={addDomain}
+              >
+                <DomainsEditor />
+              </CollapsibleSection>
+            </div>
+
+            <div className="pt-north-sm">
+              <CollapsibleSection
+                title="Decisions"
+                count={decisions.length}
+                delay="225ms"
+                onAdd={addDecision}
+              >
+                <DecisionsEditor />
+              </CollapsibleSection>
+            </div>
+
+            <div className="pt-north-sm">
+              <CollapsibleSection
+                title="Questions"
+                count={open_questions.length}
+                delay="275ms"
+                onAdd={addQuestion}
+              >
+                <QuestionsEditor />
+              </CollapsibleSection>
+            </div>
           </div>
         </div>
 
-        {/* Right column: editable fields */}
-        <div className="lg:col-span-3 space-y-north-lg">
-          <div className="animate-slide-in-up" style={{ animationDelay: '0ms' }}>
-            <NoteFields />
-          </div>
-          <Separator />
-          <div className="animate-slide-in-up" style={{ animationDelay: '50ms' }}>
-            <TasksEditor />
-          </div>
-          <Separator />
-          <div className="animate-slide-in-up" style={{ animationDelay: '100ms' }}>
-            <PeopleEditor />
-          </div>
-          <Separator />
-          <div className="animate-slide-in-up" style={{ animationDelay: '150ms' }}>
-            <ProjectsEditor />
-          </div>
-          <Separator />
-          <div className="animate-slide-in-up" style={{ animationDelay: '175ms' }}>
-            <DomainsEditor />
-          </div>
-          <Separator />
-          <div className="animate-slide-in-up" style={{ animationDelay: '225ms' }}>
-            <DecisionsEditor />
-          </div>
-          <Separator />
-          <div className="animate-slide-in-up" style={{ animationDelay: '275ms' }}>
-            <QuestionsEditor />
-          </div>
-
-          {/* Desktop save button */}
-          <div className="hidden lg:flex justify-end pt-north-base">
-            <Button
-              onClick={handleSave}
-              disabled={isSaving || isSaved}
-              size="lg"
-              className={cn('transition-transform duration-150', saveSuccess && 'scale-105')}
-            >
-              {isSaving ? (
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              ) : isSaved ? (
-                <Check className="h-4 w-4 mr-2" />
-              ) : (
-                <Save className="h-4 w-4 mr-2" />
-              )}
-              {isSaving ? 'Saving…' : isSaved ? 'Saved' : 'Save to Notes'}
-            </Button>
-          </div>
+        {/* Desktop save button */}
+        <div className="hidden lg:flex justify-end">
+          <Button
+            onClick={handleSave}
+            disabled={isSaving || isSaved}
+            size="lg"
+            className={cn('transition-transform duration-150', saveSuccess && 'scale-105')}
+          >
+            {isSaving ? (
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            ) : isSaved ? (
+              <Check className="h-4 w-4 mr-2" />
+            ) : (
+              <Save className="h-4 w-4 mr-2" />
+            )}
+            {isSaving ? 'Saving…' : isSaved ? 'Saved' : 'Save to Notes'}
+          </Button>
         </div>
       </div>
 

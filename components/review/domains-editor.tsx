@@ -4,19 +4,15 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 import { useReviewStore } from '@/lib/stores/review-store';
-import { EditorSectionHeader } from '@/components/shared/editor-section-header';
 import { EditorEmptyMessage } from '@/components/shared/editor-empty-message';
 
 export function DomainsEditor() {
   const domains = useReviewStore((s) => s.domains);
   const updateDomain = useReviewStore((s) => s.updateDomain);
-  const addDomain = useReviewStore((s) => s.addDomain);
   const removeDomain = useReviewStore((s) => s.removeDomain);
 
   return (
     <div className="space-y-north-sm">
-      <EditorSectionHeader title="Domains" onAdd={addDomain} />
-
       {domains.length === 0 && <EditorEmptyMessage message="No domains extracted." />}
 
       <div className="space-y-north-xs">

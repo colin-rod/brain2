@@ -54,8 +54,11 @@ export function NoteFields() {
           htmlFor="cleaned-text"
           className="text-metadata text-foreground-secondary block mb-north-xs"
         >
-          Full Notes
+          Full Text
         </label>
+        <p className="text-metadata text-foreground-muted mb-north-xs">
+          Cleaned-up version of the original — edit if anything was missed.
+        </p>
         <Textarea
           id="cleaned-text"
           value={cleaned_text}

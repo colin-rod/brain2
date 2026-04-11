@@ -4,19 +4,15 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 import { useReviewStore } from '@/lib/stores/review-store';
-import { EditorSectionHeader } from '@/components/shared/editor-section-header';
 import { EditorEmptyMessage } from '@/components/shared/editor-empty-message';
 
 export function ProjectsEditor() {
   const projects = useReviewStore((s) => s.projects);
   const updateProject = useReviewStore((s) => s.updateProject);
-  const addProject = useReviewStore((s) => s.addProject);
   const removeProject = useReviewStore((s) => s.removeProject);
 
   return (
     <div className="space-y-north-sm">
-      <EditorSectionHeader title="Projects" onAdd={addProject} />
-
       {projects.length === 0 && <EditorEmptyMessage message="No projects in view." />}
 
       <div className="space-y-north-xs">

@@ -49,8 +49,17 @@ export interface Note {
   summary: string | null;
   cleaned_text: string | null;
   markdown_path: string | null;
+  archived_at: string | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface NoteWithMeta extends Note {
+  projects: { id: string; name: string }[];
+  people: { id: string; name: string }[];
+  domains: { id: string; name: string }[];
+  task_count: number;
+  decision_count: number;
 }
 
 export interface Task {

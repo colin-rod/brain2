@@ -98,27 +98,26 @@ export function NoteDecisionsSection({ noteId, decisions, onMutate }: NoteDecisi
                   <X className="h-3.5 w-3.5" />
                 </Button>
               </div>
-              <div className="flex items-center gap-north-sm mt-north-xs">
-                <div className="flex-1">
-                  <InlineEditableText
-                    value={d.rationale || ''}
-                    onSave={async (v) => {
-                      const result = await updateDecision(d.id, {
-                        rationale: v || null,
-                      });
-                      if (!result.error) onMutate();
-                      return result;
-                    }}
-                    placeholder="Rationale..."
-                    className="text-metadata text-foreground-secondary"
-                  />
-                </div>
-                <div className="w-40 shrink-0">
-                  <DateInputWithShortcuts
-                    value={d.decision_date || ''}
-                    onChange={(v) => handleDateChange(d.id, v)}
-                  />
-                </div>
+              <div className="mt-north-xs">
+                <InlineEditableText
+                  value={d.rationale || ''}
+                  onSave={async (v) => {
+                    const result = await updateDecision(d.id, {
+                      rationale: v || null,
+                    });
+                    if (!result.error) onMutate();
+                    return result;
+                  }}
+                  placeholder="Rationale..."
+                  className="text-metadata text-foreground-secondary"
+                />
+              </div>
+              <div className="mt-north-xs">
+                <DateInputWithShortcuts
+                  value={d.decision_date || ''}
+                  onChange={(v) => handleDateChange(d.id, v)}
+                  inline
+                />
               </div>
             </EditorItemCard>
           ))}

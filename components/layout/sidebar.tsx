@@ -33,15 +33,7 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="hidden md:flex md:w-52 lg:w-60 md:flex-col md:fixed md:inset-y-0 bg-sidebar border-r border-sidebar-border shadow-[2px_0_8px_rgba(0,0,0,0.03)]">
-      <div className="flex h-14 items-center gap-1 px-north-md border-b border-sidebar-border">
-        <span className="font-mono text-[11px] text-primary select-none">[</span>
-        <span className="font-accent text-lg font-semibold tracking-tight text-foreground">
-          Brain<span className="text-primary italic">2</span>
-        </span>
-        <span className="font-mono text-[11px] text-primary select-none">]</span>
-      </div>
-
+    <aside className="hidden md:flex md:w-52 lg:w-60 md:flex-col md:fixed md:top-14 md:bottom-0 bg-sidebar border-r border-sidebar-border shadow-[2px_0_8px_rgba(0,0,0,0.03)]">
       <nav aria-label="Main navigation" className="flex-1 px-0 py-north-sm space-y-0">
         {navItems.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(item.href + '/');

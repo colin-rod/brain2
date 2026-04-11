@@ -46,6 +46,7 @@ export function NoteDetailClient({
 
   return (
     <div className="space-y-north-lg">
+      {/* Full-width header */}
       <div className="flex items-center gap-north-sm">
         <Link
           href="/notes"
@@ -66,6 +67,7 @@ export function NoteDetailClient({
 
       <p className="text-metadata text-foreground-muted">{formatDate(note.created_at)}</p>
 
+      {/* Full-width summary */}
       <div>
         <h2 className="text-section-header mb-north-xs">Summary</h2>
         <InlineEditableText
@@ -79,38 +81,45 @@ export function NoteDetailClient({
         />
       </div>
 
-      <div>
-        <h2 className="text-section-header mb-north-xs">Content</h2>
-        <InlineEditableText
-          value={note.cleaned_text || ''}
-          onSave={async (v) => updateNote(note.id, { cleaned_text: v })}
-          className="text-body text-foreground-secondary whitespace-pre-wrap wrap-break-word"
-          inputClassName="text-body"
-          placeholder="Add content..."
-          multiline
-          rows={8}
-        />
+      {/* Two-panel grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-[2fr_3fr] gap-x-north-xl gap-y-north-lg items-start">
+        {/* Left: Content */}
+        <div>
+          <h2 className="text-section-header mb-north-xs">Content</h2>
+          <InlineEditableText
+            value={note.cleaned_text || ''}
+            onSave={async (v) => updateNote(note.id, { cleaned_text: v })}
+            className="text-body text-foreground-secondary whitespace-pre-wrap wrap-break-word"
+            inputClassName="text-body"
+            placeholder="Add content..."
+            multiline
+            rows={8}
+          />
+        </div>
+
+        {/* Right: Structured data */}
+        <div className="space-y-north-lg">
+          <NoteTasksSection noteId={note.id} tasks={tasks} onMutate={refresh} />
+
+          <NotePeopleSection
+            noteId={note.id}
+            people={people}
+            allPeople={allPeople}
+            onMutate={refresh}
+          />
+
+          <NoteProjectsSection
+            noteId={note.id}
+            projects={projects}
+            allProjects={allProjects}
+            onMutate={refresh}
+          />
+
+          <NoteDecisionsSection noteId={note.id} decisions={decisions} onMutate={refresh} />
+
+          <NoteQuestionsSection noteId={note.id} questions={questions} onMutate={refresh} />
+        </div>
       </div>
-
-      <NoteTasksSection noteId={note.id} tasks={tasks} onMutate={refresh} />
-
-      <NotePeopleSection
-        noteId={note.id}
-        people={people}
-        allPeople={allPeople}
-        onMutate={refresh}
-      />
-
-      <NoteProjectsSection
-        noteId={note.id}
-        projects={projects}
-        allProjects={allProjects}
-        onMutate={refresh}
-      />
-
-      <NoteDecisionsSection noteId={note.id} decisions={decisions} onMutate={refresh} />
-
-      <NoteQuestionsSection noteId={note.id} questions={questions} onMutate={refresh} />
     </div>
   );
 }

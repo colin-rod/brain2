@@ -12,35 +12,45 @@ import {
 } from '@/components/ui/select';
 import { X } from 'lucide-react';
 import { useReviewStore } from '@/lib/stores/review-store';
-import { EditorSectionHeader } from '@/components/shared/editor-section-header';
 import { EditorEmptyMessage } from '@/components/shared/editor-empty-message';
 import { EditorItemCard } from '@/components/shared/editor-item-card';
 import type { TaskPriority } from '@/types/database';
+import type { TaskDraft, PersonDraft } from '@/types/domain';
+
+function getActioneeDisplayName(task: TaskDraft, people: PersonDraft[]): string | undefined {
+  if (!task.actionee_person_id) return undefined;
+  const person = people.find((p) => p.id === task.actionee_person_id);
+  return person?.name || task.actionee_name || undefined;
+}
 
 export function TasksEditor() {
   const tasks = useReviewStore((s) => s.tasks);
   const people = useReviewStore((s) => s.people);
   const updateTask = useReviewStore((s) => s.updateTask);
-  const addTask = useReviewStore((s) => s.addTask);
   const removeTask = useReviewStore((s) => s.removeTask);
 
   return (
     <div className="space-y-north-sm">
-      <EditorSectionHeader title="Tasks" onAdd={addTask} />
-
       {tasks.length === 0 && <EditorEmptyMessage message="No tasks found — add one if needed." />}
 
       <div className="space-y-north-sm">
         {tasks.map((task) => (
           <EditorItemCard key={task.id} variant="subtle" className="animate-scale-in">
-            <div className="flex items-start gap-north-sm">
+            {/* Row 1: title + date + shortcuts + remove */}
+            <div className="flex items-center gap-north-sm flex-wrap">
               <Input
                 aria-label="Task title"
                 value={task.title}
                 onChange={(e) => updateTask(task.id, { title: e.target.value })}
                 placeholder="Task title"
                 maxLength={500}
-                className="flex-1"
+                className="flex-1 min-w-40"
+              />
+              <DateInputWithShortcuts
+                aria-label="Due date"
+                value={task.due_date || ''}
+                onChange={(v) => updateTask(task.id, { due_date: v || null })}
+                inline
               />
               <Button
                 variant="ghost"
@@ -52,14 +62,36 @@ export function TasksEditor() {
               </Button>
             </div>
 
+            {/* Row 2: actionee + priority */}
             <div className="flex gap-north-sm">
               <div className="flex-1">
-                <label className="text-metadata text-foreground-muted block mb-1">Due date</label>
-                <DateInputWithShortcuts
-                  aria-label="Due date"
-                  value={task.due_date || ''}
-                  onChange={(v) => updateTask(task.id, { due_date: v || null })}
-                />
+                <label className="text-metadata text-foreground-muted block mb-1">Actionee</label>
+                <Select
+                  value={task.actionee_person_id || 'none'}
+                  onValueChange={(v) =>
+                    updateTask(task.id, {
+                      actionee_person_id: v === 'none' ? null : v,
+                      actionee_name:
+                        v === 'none' ? null : (people.find((p) => p.id === v)?.name ?? null),
+                    })
+                  }
+                >
+                  <SelectTrigger aria-label="Assignee">
+                    {task.actionee_person_id ? (
+                      <span>{getActioneeDisplayName(task, people) ?? 'Unassigned'}</span>
+                    ) : (
+                      <SelectValue placeholder="Unassigned" />
+                    )}
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Unassigned</SelectItem>
+                    {people.map((p) => (
+                      <SelectItem key={p.id} value={p.id}>
+                        {p.name || '(unnamed)'}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="w-32">
                 <label className="text-metadata text-foreground-muted block mb-1">Priority</label>
@@ -80,31 +112,6 @@ export function TasksEditor() {
                     <SelectItem value="P1">P1</SelectItem>
                     <SelectItem value="P2">P2</SelectItem>
                     <SelectItem value="P3">P3</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="w-40">
-                <label className="text-metadata text-foreground-muted block mb-1">Actionee</label>
-                <Select
-                  value={task.actionee_person_id || 'none'}
-                  onValueChange={(v) =>
-                    updateTask(task.id, {
-                      actionee_person_id: v === 'none' ? null : v,
-                      actionee_name:
-                        v === 'none' ? null : (people.find((p) => p.id === v)?.name ?? null),
-                    })
-                  }
-                >
-                  <SelectTrigger aria-label="Assignee">
-                    <SelectValue placeholder="Unassigned" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">Unassigned</SelectItem>
-                    {people.map((p) => (
-                      <SelectItem key={p.id} value={p.id}>
-                        {p.name || '(unnamed)'}
-                      </SelectItem>
-                    ))}
                   </SelectContent>
                 </Select>
               </div>

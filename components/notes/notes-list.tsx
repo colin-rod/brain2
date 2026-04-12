@@ -274,7 +274,7 @@ export function NotesList({
                     note.domains.length > 0 ||
                     note.tasks.length > 0 ||
                     note.decisions.length > 0 ||
-                    note.question_count > 0) && (
+                    note.questions.length > 0) && (
                     <div className="flex flex-wrap gap-north-xs mt-north-xs">
                       {note.projects.map((p) => (
                         <Link
@@ -349,10 +349,21 @@ export function NotesList({
                           </div>
                         </div>
                       )}
-                      {note.question_count > 0 && (
-                        <Badge variant="secondary" className="text-[11px]">
-                          {note.question_count} question{note.question_count !== 1 ? 's' : ''}
-                        </Badge>
+                      {note.questions.length > 0 && (
+                        <div className="relative group/questions">
+                          <Badge variant="secondary" className="text-[11px] cursor-default">
+                            {note.questions.length} question{note.questions.length !== 1 ? 's' : ''}
+                          </Badge>
+                          <div className="absolute bottom-full left-0 mb-1.5 z-50 hidden group-hover/questions:block min-w-48 max-w-72 rounded-lg border border-border bg-popover shadow-md p-north-xs">
+                            <ul className="space-y-1">
+                              {note.questions.map((q) => (
+                                <li key={q.id} className="text-[11px] text-foreground line-clamp-2">
+                                  {q.question_text}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
                       )}
                     </div>
                   )}

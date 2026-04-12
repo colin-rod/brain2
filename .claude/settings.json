@@ -77,7 +77,11 @@
       "Bash(grep -n \"domain\" /Users/colinrodrigues/Brain2/supabase/migrations/*.sql)",
       "Bash(grep -A 20 \"create table.*tasks\" /Users/colinrodrigues/Brain2/supabase/migrations/*.sql)",
       "Bash(npx supabase:*)",
-      "Bash(grep -E \"\\\\.\\(tsx|ts\\)$\")"
+      "Bash(grep -E \"\\\\.\\(tsx|ts\\)$\")",
+      "Bash(grep -rn \"tailwind\\\\|table\\\\b\" /Users/colinrodrigues/Brain2/tailwind.config.*)",
+      "Bash(ls /Users/colinrodrigues/Brain2/tailwind.config*)",
+      "Bash(ls /Users/colinrodrigues/Brain2/*.config*)",
+      "Bash(ls /Users/colinrodrigues/Brain2/*.css)"
     ],
     "additionalDirectories": [
       "/Users/colinrodrigues/Brain2/app/(app)/review",

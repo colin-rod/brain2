@@ -13,14 +13,6 @@ function groupByNoteId<T extends { note_id: string }>(arr: T[]): Record<string, 
   return map;
 }
 
-function countByNoteId(arr: { note_id: string | null }[]): Record<string, number> {
-  const map: Record<string, number> = {};
-  for (const item of arr) {
-    if (item.note_id) map[item.note_id] = (map[item.note_id] ?? 0) + 1;
-  }
-  return map;
-}
-
 export default async function NotesPage({
   searchParams,
 }: {
@@ -59,7 +51,7 @@ export default async function NotesPage({
     supabase.from('note_domains').select('note_id, domain_id, domains(id, name)'),
     supabase.from('tasks').select('note_id, id, title, status').not('note_id', 'is', null),
     supabase.from('decisions').select('note_id, id, decision_text').not('note_id', 'is', null),
-    supabase.from('open_questions').select('note_id').not('note_id', 'is', null),
+    supabase.from('open_questions').select('note_id, id, question_text').not('note_id', 'is', null),
     supabase.from('projects').select('id, name').order('name'),
     supabase.from('people').select('id, name').order('name'),
     supabase.from('domains').select('id, name').order('name'),
@@ -84,12 +76,11 @@ export default async function NotesPage({
   );
   type TaskRow = { note_id: string; id: string; title: string; status: string };
   type DecisionRow = { note_id: string; id: string; decision_text: string };
+  type QuestionRow = { note_id: string; id: string; question_text: string };
 
   const tasksByNoteId = groupByNoteId((tasksRes.data ?? []) as TaskRow[]);
   const decisionsByNoteId = groupByNoteId((decisionsRes.data ?? []) as DecisionRow[]);
-  const questionCountMap = countByNoteId(
-    (openQuestionsRes.data ?? []) as { note_id: string | null }[],
-  );
+  const questionsByNoteId = groupByNoteId((openQuestionsRes.data ?? []) as QuestionRow[]);
 
   const notes: NoteWithMeta[] = (notesRes.data ?? []).map((note) => ({
     ...note,
@@ -106,7 +97,11 @@ export default async function NotesPage({
       id: d.id,
       decision_text: d.decision_text,
     })),
-    question_count: questionCountMap[note.id] ?? 0,
+    questions: (questionsByNoteId[note.id] ?? []).map((q) => ({
+      id: q.id,
+      question_text: q.question_text,
+    })),
+    question_count: (questionsByNoteId[note.id] ?? []).length,
   }));
 
   const allProjects = (allProjectsRes.data ?? []) as { id: string; name: string }[];

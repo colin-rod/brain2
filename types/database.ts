@@ -62,6 +62,7 @@ export interface NoteWithMeta extends Note {
   domains: { id: string; name: string }[];
   tasks: { id: string; title: string; status: TaskStatus }[];
   decisions: { id: string; decision_text: string }[];
+  questions: { id: string; question_text: string }[];
   question_count: number;
 }
 
@@ -160,6 +161,28 @@ export interface NoteDomain {
   note_id: string;
   domain_id: string;
 }
+
+export type PersonListRow = Person & {
+  project_people: { projects: { id: string; name: string } }[];
+  note_count: number;
+  open_task_count: number;
+  open_question_count: number;
+  last_activity: string | null;
+};
+
+export type ProjectListRow = Project & {
+  project_people: { people: { id: string; name: string } }[];
+  note_count: number;
+  open_task_count: number;
+  open_question_count: number;
+  last_activity: string | null;
+};
+
+export type DomainListRow = Domain & {
+  note_count: number;
+  open_question_count: number;
+  last_activity: string | null;
+};
 
 export interface Idea {
   id: string;

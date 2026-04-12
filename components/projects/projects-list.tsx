@@ -1,7 +1,6 @@
 'use client';
 
 import { useMemo, useState, useTransition } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -12,19 +11,16 @@ import { SortableHeader } from '@/components/shared/sortable-header';
 import { useListState, applySorting } from '@/lib/hooks/use-list-state';
 import { useSearchRefresh } from '@/components/search/search-provider';
 import { createProject, updateProject, deleteProject } from '@/lib/actions/entity-mutations';
+import { summarizeSnippet, formatRelativeDate } from '@/lib/utils';
 import { Plus, X } from 'lucide-react';
-import type { Project, Person, NoteDomain, NoteProject } from '@/types/database';
-
-type ProjectWithPeople = Project & {
-  project_people: { people: { id: string; name: string } }[];
-};
+import type { Person, NoteDomain, ProjectListRow } from '@/types/database';
 
 interface ProjectsListProps {
-  projects: ProjectWithPeople[];
+  projects: ProjectListRow[];
   allPeople: Pick<Person, 'id' | 'name'>[];
   allDomains: { id: string; name: string }[];
   noteDomains: NoteDomain[];
-  noteProjects: NoteProject[];
+  noteProjects: { note_id: string; project_id: string }[];
 }
 
 export function ProjectsList({
@@ -66,7 +62,7 @@ export function ProjectsList({
   );
 
   const { filters, sort, search, setFilter, clearFilters, toggleSort, setSearch, searched } =
-    useListState<ProjectWithPeople>({
+    useListState<ProjectListRow>({
       items: projects,
       searchKeys: ['name'],
     });
@@ -122,6 +118,9 @@ export function ProjectsList({
     });
   }
 
+  const thClass =
+    'text-left px-north-sm py-north-sm text-metadata font-semibold uppercase tracking-widest text-foreground-muted whitespace-nowrap';
+
   return (
     <div className="space-y-north-md">
       <div className="flex items-center justify-between">
@@ -144,85 +143,165 @@ export function ProjectsList({
         onClear={clearFilters}
       />
 
-      <div className="flex items-center gap-north-md px-north-xs">
-        <SortableHeader label="Name" field="name" currentSort={sort} onSort={toggleSort} />
-        <SortableHeader label="Status" field="status" currentSort={sort} onSort={toggleSort} />
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-north-sm">
-        {isAdding && (
-          <div className="rounded-lg border border-primary/30 bg-surface px-north-base py-north-md animate-scale-in">
-            <InlineEditableText
-              value=""
-              onSave={async (v) => {
-                handleCreate(v);
-                return {};
-              }}
-              placeholder="Project name... (Enter to save)"
-              className="text-issue-title"
-            />
-          </div>
-        )}
-
-        {filtered.map((project, index) => (
-          <div
-            key={project.id}
-            className="group relative rounded-lg border border-border bg-surface px-north-base py-north-md hover:bg-surface-subtle transition-colors border-l-[3px] border-l-(--entity-projects) animate-fade-in"
-            style={{ animationDelay: `${index * 30}ms` }}
-          >
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handleDelete(project.id)}
-              disabled={isPending}
-              className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-foreground-muted hover:text-destructive h-6 w-6 p-0"
-            >
-              <X className="h-3 w-3" />
-            </Button>
-
-            <Link href={`/projects/${project.id}`} className="block">
-              <InlineEditableText
-                value={project.name}
-                onSave={async (v) => {
-                  const r = await updateProject(project.id, { name: v });
-                  if (!r.error) {
-                    router.refresh();
-                    refreshSearch();
-                  }
-                  return r;
-                }}
-                className="text-issue-title"
-              />
-              <InlineEditableText
-                value={project.status || ''}
-                onSave={async (v) => {
-                  const r = await updateProject(project.id, { status: v || null });
-                  if (!r.error) {
-                    router.refresh();
-                    refreshSearch();
-                  }
-                  return r;
-                }}
-                placeholder="Add status..."
-                className="text-metadata text-foreground-muted mt-0.5"
-              />
-            </Link>
-
-            {project.project_people.length > 0 && (
-              <div className="flex flex-wrap gap-north-xs mt-north-xs">
-                {project.project_people.map((pp) => (
-                  <Link
-                    key={pp.people.id}
-                    href={`/people/${pp.people.id}`}
-                    className="text-[11px] text-primary hover:underline"
-                  >
-                    @{pp.people.name}
-                  </Link>
-                ))}
-              </div>
+      <div className="overflow-x-auto">
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="border-b border-border">
+              <th className={thClass}>
+                <SortableHeader label="Name" field="name" currentSort={sort} onSort={toggleSort} />
+              </th>
+              <th className={thClass}>
+                <SortableHeader
+                  label="Status"
+                  field="status"
+                  currentSort={sort}
+                  onSort={toggleSort}
+                />
+              </th>
+              <th className={`${thClass} text-center`}>
+                <SortableHeader
+                  label="Notes"
+                  field="note_count"
+                  currentSort={sort}
+                  onSort={toggleSort}
+                />
+              </th>
+              <th className={`${thClass} text-center`}>
+                <SortableHeader
+                  label="Tasks"
+                  field="open_task_count"
+                  currentSort={sort}
+                  onSort={toggleSort}
+                />
+              </th>
+              <th className={`${thClass} text-center`}>
+                <SortableHeader
+                  label="Questions"
+                  field="open_question_count"
+                  currentSort={sort}
+                  onSort={toggleSort}
+                />
+              </th>
+              <th className={thClass}>
+                <SortableHeader
+                  label="Last Activity"
+                  field="last_activity"
+                  currentSort={sort}
+                  onSort={toggleSort}
+                />
+              </th>
+              <th className={`${thClass} hidden md:table-cell`}>Summary</th>
+              <th className="w-8" />
+            </tr>
+          </thead>
+          <tbody>
+            {isAdding && (
+              <tr className="border-b border-border">
+                <td
+                  colSpan={8}
+                  className="px-north-md py-north-md border-l-[3px] border-l-[--entity-projects]"
+                >
+                  <InlineEditableText
+                    value=""
+                    onSave={async (v) => {
+                      handleCreate(v);
+                      return {};
+                    }}
+                    placeholder="Project name... (Enter to save)"
+                    className="text-body"
+                  />
+                </td>
+              </tr>
             )}
-          </div>
-        ))}
+
+            {filtered.map((project) => (
+              <tr
+                key={project.id}
+                className="group border-b border-border last:border-0 hover:bg-surface-subtle transition-colors cursor-pointer"
+                onClick={() => router.push(`/projects/${project.id}`)}
+              >
+                <td
+                  onClick={(e) => e.stopPropagation()}
+                  className="border-l-[3px] border-l-[--entity-projects] pl-north-md pr-north-sm py-north-sm min-w-40"
+                >
+                  <InlineEditableText
+                    value={project.name}
+                    onSave={async (v) => {
+                      const r = await updateProject(project.id, { name: v });
+                      if (!r.error) {
+                        router.refresh();
+                        refreshSearch();
+                      }
+                      return r;
+                    }}
+                    className="text-body font-medium"
+                  />
+                </td>
+                <td
+                  onClick={(e) => e.stopPropagation()}
+                  className="px-north-sm py-north-sm min-w-25"
+                >
+                  <InlineEditableText
+                    value={project.status || ''}
+                    onSave={async (v) => {
+                      const r = await updateProject(project.id, { status: v || null });
+                      if (!r.error) {
+                        router.refresh();
+                        refreshSearch();
+                      }
+                      return r;
+                    }}
+                    placeholder="Add status..."
+                    className="text-metadata text-foreground-muted"
+                  />
+                </td>
+                <td className="px-north-sm py-north-sm text-center text-metadata w-16">
+                  {project.note_count > 0 ? (
+                    project.note_count
+                  ) : (
+                    <span className="text-foreground-muted">—</span>
+                  )}
+                </td>
+                <td className="px-north-sm py-north-sm text-center text-metadata w-16">
+                  {project.open_task_count > 0 ? (
+                    <span className="text-amber-600 font-medium">{project.open_task_count}</span>
+                  ) : (
+                    <span className="text-foreground-muted">—</span>
+                  )}
+                </td>
+                <td className="px-north-sm py-north-sm text-center text-metadata w-24">
+                  {project.open_question_count > 0 ? (
+                    <span className="text-blue-600 font-medium">{project.open_question_count}</span>
+                  ) : (
+                    <span className="text-foreground-muted">—</span>
+                  )}
+                </td>
+                <td className="px-north-sm py-north-sm text-metadata text-foreground-muted whitespace-nowrap w-28">
+                  {formatRelativeDate(project.last_activity)}
+                </td>
+                <td className="px-north-sm py-north-sm text-metadata text-foreground-muted max-w-75 hidden md:table-cell">
+                  <span className="line-clamp-1">
+                    {summarizeSnippet(project.compiled_summary) || '—'}
+                  </span>
+                </td>
+                <td className="pr-north-sm py-north-sm w-8">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(project.id);
+                    }}
+                    disabled={isPending}
+                    className="opacity-0 group-hover:opacity-100 text-foreground-muted hover:text-destructive h-6 w-6 p-0"
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
       {filtered.length === 0 && (search.length >= 2 || Object.values(filters).some(Boolean)) && (

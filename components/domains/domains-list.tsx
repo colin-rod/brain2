@@ -10,16 +10,12 @@ import { SortableHeader } from '@/components/shared/sortable-header';
 import { useListState, applySorting } from '@/lib/hooks/use-list-state';
 import { useSearchRefresh } from '@/components/search/search-provider';
 import { createDomain, updateDomain, deleteDomain } from '@/lib/actions/entity-mutations';
-import Link from 'next/link';
+import { summarizeSnippet, formatRelativeDate } from '@/lib/utils';
 import { Plus, X } from 'lucide-react';
-import type { Domain } from '@/types/database';
-
-type DomainWithNotes = Domain & {
-  note_domains: { note_id: string }[];
-};
+import type { DomainListRow } from '@/types/database';
 
 interface DomainsListProps {
-  domains: DomainWithNotes[];
+  domains: DomainListRow[];
 }
 
 export function DomainsList({ domains }: DomainsListProps) {
@@ -28,7 +24,7 @@ export function DomainsList({ domains }: DomainsListProps) {
   const [isPending, startTransition] = useTransition();
   const [isAdding, setIsAdding] = useState(false);
 
-  const { sort, search, toggleSort, setSearch, searched } = useListState<DomainWithNotes>({
+  const { sort, search, toggleSort, setSearch, searched } = useListState<DomainListRow>({
     items: domains,
     searchKeys: ['name', 'description'],
   });
@@ -66,6 +62,9 @@ export function DomainsList({ domains }: DomainsListProps) {
     });
   }
 
+  const thClass =
+    'text-left px-north-sm py-north-sm text-metadata font-semibold uppercase tracking-widest text-foreground-muted whitespace-nowrap';
+
   return (
     <div className="space-y-north-md">
       <div className="flex items-center justify-between">
@@ -81,74 +80,124 @@ export function DomainsList({ domains }: DomainsListProps) {
         </Button>
       </div>
 
-      <div className="flex items-center gap-north-md px-north-xs">
-        <SortableHeader label="Name" field="name" currentSort={sort} onSort={toggleSort} />
-      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="border-b border-border">
+              <th className={thClass}>
+                <SortableHeader label="Name" field="name" currentSort={sort} onSort={toggleSort} />
+              </th>
+              <th className={`${thClass} text-center`}>
+                <SortableHeader
+                  label="Notes"
+                  field="note_count"
+                  currentSort={sort}
+                  onSort={toggleSort}
+                />
+              </th>
+              <th className={`${thClass} text-center`}>
+                <SortableHeader
+                  label="Questions"
+                  field="open_question_count"
+                  currentSort={sort}
+                  onSort={toggleSort}
+                />
+              </th>
+              <th className={thClass}>
+                <SortableHeader
+                  label="Last Activity"
+                  field="last_activity"
+                  currentSort={sort}
+                  onSort={toggleSort}
+                />
+              </th>
+              <th className={`${thClass} hidden md:table-cell`}>Summary</th>
+              <th className="w-8" />
+            </tr>
+          </thead>
+          <tbody>
+            {isAdding && (
+              <tr className="border-b border-border">
+                <td
+                  colSpan={6}
+                  className="px-north-md py-north-md border-l-[3px] border-l-[--entity-domains]"
+                >
+                  <InlineEditableText
+                    value=""
+                    onSave={async (v) => {
+                      handleCreate(v);
+                      return {};
+                    }}
+                    placeholder="Domain name... (Enter to save)"
+                    className="text-body"
+                  />
+                </td>
+              </tr>
+            )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-north-sm">
-        {isAdding && (
-          <div className="rounded-lg border border-primary/30 bg-surface px-north-base py-north-md animate-scale-in">
-            <InlineEditableText
-              value=""
-              onSave={async (v) => {
-                handleCreate(v);
-                return {};
-              }}
-              placeholder="Domain name... (Enter to save)"
-              className="text-issue-title"
-            />
-          </div>
-        )}
-
-        {filtered.map((domain, index) => (
-          <div
-            key={domain.id}
-            className="group relative rounded-lg border border-border bg-surface px-north-base py-north-md hover:bg-surface-subtle transition-colors border-l-[3px] border-l-(--entity-domains) animate-fade-in"
-            style={{ animationDelay: `${index * 30}ms` }}
-          >
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handleDelete(domain.id)}
-              disabled={isPending}
-              className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-foreground-muted hover:text-destructive h-6 w-6 p-0"
-            >
-              <X className="h-3 w-3" />
-            </Button>
-
-            <Link href={`/domains/${domain.id}`} className="block">
-              <InlineEditableText
-                value={domain.name}
-                onSave={async (v) => {
-                  const r = await updateDomain(domain.id, { name: v });
-                  if (!r.error) {
-                    router.refresh();
-                    refreshSearch();
-                  }
-                  return r;
-                }}
-                className="text-issue-title"
-              />
-              <InlineEditableText
-                value={domain.description || ''}
-                onSave={async (v) => {
-                  const r = await updateDomain(domain.id, { description: v || null });
-                  if (!r.error) {
-                    router.refresh();
-                    refreshSearch();
-                  }
-                  return r;
-                }}
-                placeholder="Add description..."
-                className="text-metadata text-foreground-muted mt-0.5"
-              />
-
-              <p className="text-[11px] text-foreground-muted mt-north-xs">
-                {domain.note_domains.length} {domain.note_domains.length === 1 ? 'note' : 'notes'}
-              </p>
-            </Link>
-          </div>
-        ))}
+            {filtered.map((domain) => (
+              <tr
+                key={domain.id}
+                className="group border-b border-border last:border-0 hover:bg-surface-subtle transition-colors cursor-pointer"
+                onClick={() => router.push(`/domains/${domain.id}`)}
+              >
+                <td
+                  onClick={(e) => e.stopPropagation()}
+                  className="border-l-[3px] border-l-[--entity-domains] pl-north-md pr-north-sm py-north-sm min-w-40"
+                >
+                  <InlineEditableText
+                    value={domain.name}
+                    onSave={async (v) => {
+                      const r = await updateDomain(domain.id, { name: v });
+                      if (!r.error) {
+                        router.refresh();
+                        refreshSearch();
+                      }
+                      return r;
+                    }}
+                    className="text-body font-medium"
+                  />
+                </td>
+                <td className="px-north-sm py-north-sm text-center text-metadata w-16">
+                  {domain.note_count > 0 ? (
+                    domain.note_count
+                  ) : (
+                    <span className="text-foreground-muted">—</span>
+                  )}
+                </td>
+                <td className="px-north-sm py-north-sm text-center text-metadata w-24">
+                  {domain.open_question_count > 0 ? (
+                    <span className="text-blue-600 font-medium">{domain.open_question_count}</span>
+                  ) : (
+                    <span className="text-foreground-muted">—</span>
+                  )}
+                </td>
+                <td className="px-north-sm py-north-sm text-metadata text-foreground-muted whitespace-nowrap w-28">
+                  {formatRelativeDate(domain.last_activity)}
+                </td>
+                <td className="px-north-sm py-north-sm text-metadata text-foreground-muted max-w-75 hidden md:table-cell">
+                  <span className="line-clamp-1">
+                    {summarizeSnippet(domain.compiled_summary) || '—'}
+                  </span>
+                </td>
+                <td className="pr-north-sm py-north-sm w-8">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(domain.id);
+                    }}
+                    disabled={isPending}
+                    className="opacity-0 group-hover:opacity-100 text-foreground-muted hover:text-destructive h-6 w-6 p-0"
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
       {filtered.length === 0 && search.length >= 2 && (

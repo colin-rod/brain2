@@ -86,9 +86,9 @@ export function QuestionsList({ questions }: QuestionsListProps) {
       <div className="flex flex-col sm:flex-row gap-north-sm">
         <SearchBar onSearch={setSearch} placeholder="Search questions…" />
         <FilterBar
-          configs={filterConfigs}
-          filters={filters}
-          onFilter={setFilter}
+          filters={filterConfigs}
+          values={filters}
+          onChange={setFilter}
           onClear={clearFilters}
         />
       </div>

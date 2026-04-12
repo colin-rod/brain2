@@ -41,7 +41,7 @@ function CollapsibleSection({ title, count, children, delay, onAdd }: Collapsibl
     <div className="animate-slide-in-up" style={{ animationDelay: delay }}>
       <Collapsible open={open} onOpenChange={setOpen}>
         <div className="flex items-center justify-between">
-          <CollapsibleTrigger className="flex items-center gap-north-xs py-north-xs hover:opacity-70 transition-opacity">
+          <CollapsibleTrigger className="flex items-center gap-north-xs py-north-xs hover:text-foreground transition-colors duration-150">
             <span className="text-section-header">
               {title}
               {count > 0 && (
@@ -52,7 +52,7 @@ function CollapsibleSection({ title, count, children, delay, onAdd }: Collapsibl
             </span>
             <ChevronDown
               className={cn(
-                'h-4 w-4 text-foreground-muted transition-transform',
+                'h-4 w-4 text-foreground-muted transition-transform duration-200',
                 open && 'rotate-180',
               )}
             />
@@ -236,12 +236,21 @@ export function ReviewClient({ capture, imageUrl }: ReviewClientProps) {
             onClick={handleSave}
             disabled={isSaving || isSaved}
             size="lg"
-            className={cn('transition-transform duration-150', saveSuccess && 'scale-105')}
+            className={cn(
+              'transition-[transform,box-shadow] duration-200',
+              saveSuccess && 'scale-105 ring-2 ring-primary/25',
+            )}
           >
             {isSaving ? (
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
             ) : isSaved ? (
-              <Check className="h-4 w-4 mr-2" />
+              <span
+                key="saved-check"
+                className="mr-2 animate-check-draw inline-flex"
+                style={{ strokeDasharray: 20 }}
+              >
+                <Check className="h-4 w-4" />
+              </span>
             ) : (
               <Save className="h-4 w-4 mr-2" />
             )}
@@ -252,11 +261,25 @@ export function ReviewClient({ capture, imageUrl }: ReviewClientProps) {
 
       {/* Mobile fixed save bar */}
       <div className="lg:hidden fixed bottom-[calc(3.5rem+env(safe-area-inset-bottom,0px))] inset-x-0 bg-surface border-t border-border p-north-sm z-40">
-        <Button onClick={handleSave} disabled={isSaving || isSaved} className="w-full" size="lg">
+        <Button
+          onClick={handleSave}
+          disabled={isSaving || isSaved}
+          className={cn(
+            'w-full transition-[transform,box-shadow] duration-200',
+            saveSuccess && 'scale-[1.02] ring-2 ring-primary/25',
+          )}
+          size="lg"
+        >
           {isSaving ? (
             <Loader2 className="h-4 w-4 mr-2 animate-spin" />
           ) : isSaved ? (
-            <Check className="h-4 w-4 mr-2" />
+            <span
+              key="saved-check-mobile"
+              className="mr-2 animate-check-draw inline-flex"
+              style={{ strokeDasharray: 20 }}
+            >
+              <Check className="h-4 w-4" />
+            </span>
           ) : (
             <Save className="h-4 w-4 mr-2" />
           )}

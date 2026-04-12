@@ -95,10 +95,11 @@ export function DomainsList({ domains }: DomainsListProps) {
             />
           </div>
         )}
-        {filtered.map((domain) => (
+        {filtered.map((domain, index) => (
           <div
             key={domain.id}
-            className="group rounded-lg border border-border bg-surface border-l-[3px] border-l-[--entity-domains] px-north-md py-north-sm cursor-pointer hover:bg-surface-subtle transition-colors"
+            className="group rounded-lg border border-border bg-surface border-l-[3px] border-l-[--entity-domains] px-north-md py-north-sm cursor-pointer hover:bg-surface-subtle transition-colors animate-slide-in-up"
+            style={{ animationDelay: `${Math.min(index, 8) * 35}ms` }}
             onClick={() => router.push(`/domains/${domain.id}`)}
           >
             <div className="flex items-start justify-between gap-north-sm">
@@ -193,10 +194,11 @@ export function DomainsList({ domains }: DomainsListProps) {
               </tr>
             )}
 
-            {filtered.map((domain) => (
+            {filtered.map((domain, index) => (
               <tr
                 key={domain.id}
-                className="group border-b border-border last:border-0 hover:bg-surface-subtle transition-colors cursor-pointer"
+                className="group border-b border-border last:border-0 hover:bg-surface-subtle transition-colors cursor-pointer animate-slide-in-up"
+                style={{ animationDelay: `${Math.min(index, 8) * 30}ms` }}
                 onClick={() => router.push(`/domains/${domain.id}`)}
               >
                 <td

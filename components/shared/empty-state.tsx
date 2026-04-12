@@ -21,24 +21,26 @@ export function EmptyState({
   ctaHref,
 }: EmptyStateProps) {
   return (
-    <div className="rounded-xl border border-border-divider bg-primary-tint-subtle p-north-2xl text-center">
-      <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary-tint mb-north-sm">
+    <div className="animate-fade-in rounded-xl border border-border-divider bg-primary-tint-subtle p-north-2xl text-center">
+      <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary-tint mb-north-sm animate-float">
         <Icon className="h-6 w-6 text-primary" />
       </div>
-      <p className="font-accent text-[17px] font-semibold text-foreground">{title}</p>
-      {description && (
-        <p className="text-[13px] text-foreground-secondary mt-north-xs leading-relaxed tracking-[0.01em]">
-          {description}
-        </p>
-      )}
-      {ctaLabel && ctaHref && (
-        <Link
-          href={ctaHref}
-          className="inline-flex items-center gap-1.5 mt-north-base text-[13px] font-medium text-primary hover:text-primary/80 transition-colors"
-        >
-          {ctaLabel} <span aria-hidden="true">&rarr;</span>
-        </Link>
-      )}
+      <div className="animate-slide-in-up" style={{ animationDelay: '80ms' }}>
+        <p className="font-accent text-[17px] font-semibold text-foreground">{title}</p>
+        {description && (
+          <p className="text-[13px] text-foreground-secondary mt-north-xs leading-relaxed tracking-[0.01em]">
+            {description}
+          </p>
+        )}
+        {ctaLabel && ctaHref && (
+          <Link
+            href={ctaHref}
+            className="inline-flex items-center gap-1.5 mt-north-base text-[13px] font-medium text-primary hover:text-primary/80 transition-colors"
+          >
+            {ctaLabel} <span aria-hidden="true">&rarr;</span>
+          </Link>
+        )}
+      </div>
     </div>
   );
 }

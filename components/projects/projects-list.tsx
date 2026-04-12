@@ -158,10 +158,11 @@ export function ProjectsList({
             />
           </div>
         )}
-        {filtered.map((project) => (
+        {filtered.map((project, index) => (
           <div
             key={project.id}
-            className="group rounded-lg border border-border bg-surface border-l-[3px] border-l-[--entity-projects] px-north-md py-north-sm cursor-pointer hover:bg-surface-subtle transition-colors"
+            className="group rounded-lg border border-border bg-surface border-l-[3px] border-l-[--entity-projects] px-north-md py-north-sm cursor-pointer hover:bg-surface-subtle transition-colors animate-slide-in-up"
+            style={{ animationDelay: `${Math.min(index, 8) * 35}ms` }}
             onClick={() => router.push(`/projects/${project.id}`)}
           >
             <div className="flex items-start justify-between gap-north-sm">
@@ -280,10 +281,11 @@ export function ProjectsList({
               </tr>
             )}
 
-            {filtered.map((project) => (
+            {filtered.map((project, index) => (
               <tr
                 key={project.id}
-                className="group border-b border-border last:border-0 hover:bg-surface-subtle transition-colors cursor-pointer"
+                className="group border-b border-border last:border-0 hover:bg-surface-subtle transition-colors cursor-pointer animate-slide-in-up"
+                style={{ animationDelay: `${Math.min(index, 8) * 30}ms` }}
                 onClick={() => router.push(`/projects/${project.id}`)}
               >
                 <td

@@ -149,10 +149,11 @@ export function PeopleList({
             />
           </div>
         )}
-        {filtered.map((person) => (
+        {filtered.map((person, index) => (
           <div
             key={person.id}
-            className="group rounded-lg border border-border bg-surface border-l-[3px] border-l-[--entity-people] px-north-md py-north-sm cursor-pointer hover:bg-surface-subtle transition-colors"
+            className="group rounded-lg border border-border bg-surface border-l-[3px] border-l-[--entity-people] px-north-md py-north-sm cursor-pointer hover:bg-surface-subtle transition-colors animate-slide-in-up"
+            style={{ animationDelay: `${Math.min(index, 8) * 35}ms` }}
             onClick={() => router.push(`/people/${person.id}`)}
           >
             <div className="flex items-start justify-between gap-north-sm">
@@ -264,10 +265,11 @@ export function PeopleList({
               </tr>
             )}
 
-            {filtered.map((person) => (
+            {filtered.map((person, index) => (
               <tr
                 key={person.id}
-                className="group border-b border-border last:border-0 hover:bg-surface-subtle transition-colors cursor-pointer"
+                className="group border-b border-border last:border-0 hover:bg-surface-subtle transition-colors cursor-pointer animate-slide-in-up"
+                style={{ animationDelay: `${Math.min(index, 8) * 30}ms` }}
                 onClick={() => router.push(`/people/${person.id}`)}
               >
                 <td

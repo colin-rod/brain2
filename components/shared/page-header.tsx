@@ -10,7 +10,7 @@ interface PageHeaderProps {
 export function PageHeader({ title, children, icon: Icon, iconColor }: PageHeaderProps) {
   return (
     <div className="flex flex-col gap-north-xs sm:flex-row sm:items-center sm:justify-between border-b border-border pb-north-md mb-north-md">
-      <div className="border-l-2 border-primary pl-north-sm">
+      <div className="border-l-2 border-primary pl-north-sm animate-slide-in-up">
         <p className="text-[11px] font-mono uppercase tracking-widest text-foreground-muted mb-0.5">
           BRAIN2
         </p>
@@ -24,7 +24,14 @@ export function PageHeader({ title, children, icon: Icon, iconColor }: PageHeade
           <h1 className="text-page-title">{title}</h1>
         </div>
       </div>
-      {children && <div className="flex items-center gap-north-sm">{children}</div>}
+      {children && (
+        <div
+          className="flex items-center gap-north-sm animate-slide-in-up"
+          style={{ animationDelay: '80ms' }}
+        >
+          {children}
+        </div>
+      )}
     </div>
   );
 }

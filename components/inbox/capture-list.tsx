@@ -116,10 +116,7 @@ function ProcessingIndicator() {
   return (
     <div className="flex items-center gap-north-sm shrink-0">
       <Loader2 className="h-4 w-4 text-status-processing animate-spin" />
-      <span
-        key={index}
-        className="text-metadata text-status-processing animate-in fade-in duration-500"
-      >
+      <span key={index} className="text-metadata text-status-processing animate-fade-in">
         {PROCESSING_MESSAGES[index]}
       </span>
     </div>
@@ -162,7 +159,10 @@ function CaptureCard({ capture, index }: { capture: Capture; index: number }) {
           {String(index + 1).padStart(2, '0')}
         </span>
         <span
-          className="h-1.5 w-1.5 rounded-full"
+          className={cn(
+            'h-1.5 w-1.5 rounded-full',
+            capture.status === 'processing' && 'animate-pulse-dot',
+          )}
           style={{ backgroundColor: statusDotColor[capture.status] }}
         />
         <span className="font-mono text-[9px] uppercase text-foreground-muted opacity-60">
@@ -176,7 +176,7 @@ function CaptureCard({ capture, index }: { capture: Capture; index: number }) {
             key={capture.status}
             variant="outline"
             className={cn(
-              'text-[11px] px-1.5 py-px rounded-none uppercase font-mono tracking-wider animate-scale-in',
+              'text-[11px] px-1.5 py-px rounded-none uppercase font-mono tracking-wider animate-scale-in transition-colors duration-300',
               statusStyles[capture.status],
             )}
           >

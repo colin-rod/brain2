@@ -25,8 +25,8 @@ export function DateInputWithShortcuts({
 
   if (inline) {
     return (
-      <div className={cn('flex items-center gap-north-xs flex-wrap', className)}>
-        <div className="flex items-center gap-north-xs">
+      <div className={cn('flex flex-col gap-north-xs', className)}>
+        <div className="flex items-center gap-north-xs flex-wrap">
           <Input
             type="date"
             value={value}

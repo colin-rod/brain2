@@ -98,25 +98,8 @@ export async function saveReviewedNote(payload: ReviewPayload): Promise<SaveResu
     }
   }
 
-  // Insert tasks (with resolved actionee_id)
-  if (payload.tasks.length > 0) {
-    const { error: tasksError } = await supabase.from('tasks').insert(
-      payload.tasks.map((t) => ({
-        user_id: user.id,
-        note_id: noteId,
-        title: t.title.trim(),
-        due_date: t.due_date || null,
-        priority: t.priority || null,
-        status: 'todo',
-        actionee_id: t.actionee_person_id ? (personIdMap.get(t.actionee_person_id) ?? null) : null,
-      })),
-    );
-    if (tasksError) {
-      return { error: `Failed to save tasks: ${tasksError.message}` };
-    }
-  }
-
   // Insert projects (new ones) and collect IDs for junction table
+  // Must run before tasks so we can inherit project_id on tasks
   const projectIds: string[] = [];
 
   for (const p of payload.projects) {
@@ -149,6 +132,28 @@ export async function saveReviewedNote(payload: ReviewPayload): Promise<SaveResu
     );
     if (npjError) {
       return { error: `Failed to link projects: ${npjError.message}` };
+    }
+  }
+
+  // When note links to exactly one project, inherit it on all tasks
+  const inferredProjectId = projectIds.length === 1 ? projectIds[0] : null;
+
+  // Insert tasks (with resolved actionee_id and inferred project_id)
+  if (payload.tasks.length > 0) {
+    const { error: tasksError } = await supabase.from('tasks').insert(
+      payload.tasks.map((t) => ({
+        user_id: user.id,
+        note_id: noteId,
+        title: t.title.trim(),
+        due_date: t.due_date || null,
+        priority: t.priority || null,
+        status: 'todo',
+        actionee_id: t.actionee_person_id ? (personIdMap.get(t.actionee_person_id) ?? null) : null,
+        project_id: inferredProjectId,
+      })),
+    );
+    if (tasksError) {
+      return { error: `Failed to save tasks: ${tasksError.message}` };
     }
   }
 

@@ -12,7 +12,7 @@ import { formatDate } from '@/lib/format-date';
 interface WikiSummaryProps {
   summary: string | null;
   generatedAt: string | null;
-  entityType: 'person' | 'project';
+  entityType: 'person' | 'project' | 'domain';
   entityId: string;
 }
 

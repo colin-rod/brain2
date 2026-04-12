@@ -1,7 +1,7 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
-import type { Person, Project, Note, Task, Decision, OpenQuestion } from '@/types/database';
+import type { Person, Project, Domain, Note, Task, Decision, OpenQuestion } from '@/types/database';
 
 /* ============================================================
    Timeline types
@@ -276,6 +276,120 @@ export async function fetchProjectWikiData(projectId: string): Promise<ProjectWi
     allPeople,
     openQuestions,
     linkedDomains,
+    timeline,
+  };
+}
+
+/* ============================================================
+   Domain wiki data
+   ============================================================ */
+
+export interface DomainWikiData {
+  domain: Domain;
+  notes: Note[];
+  tasks: Task[];
+  decisions: Decision[];
+  linkedPeople: { id: string; name: string; role: string | null }[];
+  linkedProjects: { id: string; name: string; status: string | null }[];
+  openQuestions: OpenQuestion[];
+  timeline: TimelineItem[];
+}
+
+export async function fetchDomainWikiData(domainId: string): Promise<DomainWikiData | null> {
+  const supabase = await createClient();
+
+  const { data: domain, error } = await supabase
+    .from('domains')
+    .select('*')
+    .eq('id', domainId)
+    .single();
+
+  if (error || !domain) return null;
+
+  const typedDomain = domain as Domain;
+
+  const { data: junctions } = await supabase
+    .from('note_domains')
+    .select('note_id')
+    .eq('domain_id', domainId);
+
+  const noteIds = (junctions ?? []).map((j) => j.note_id);
+
+  if (noteIds.length === 0) {
+    return {
+      domain: typedDomain,
+      notes: [],
+      tasks: [],
+      decisions: [],
+      linkedPeople: [],
+      linkedProjects: [],
+      openQuestions: [],
+      timeline: [],
+    };
+  }
+
+  const [notesRes, tasksRes, decisionsRes, questionsRes, peopleJunctions, projectJunctions] =
+    await Promise.all([
+      supabase
+        .from('notes')
+        .select('*')
+        .in('id', noteIds)
+        .order('created_at', { ascending: false }),
+      supabase.from('tasks').select('*').in('note_id', noteIds).order('created_at'),
+      supabase.from('decisions').select('*').in('note_id', noteIds).order('created_at'),
+      supabase.from('open_questions').select('*').in('note_id', noteIds).order('created_at'),
+      supabase
+        .from('note_people')
+        .select('person_id, people(id, name, role)')
+        .in('note_id', noteIds),
+      supabase
+        .from('note_projects')
+        .select('project_id, projects(id, name, status)')
+        .in('note_id', noteIds),
+    ]);
+
+  const notes = (notesRes.data ?? []) as Note[];
+  const tasks = (tasksRes.data ?? []) as Task[];
+  const decisions = (decisionsRes.data ?? []) as Decision[];
+  const openQuestions = (questionsRes.data ?? []) as OpenQuestion[];
+
+  // Deduplicate people
+  const peopleMap = new Map<string, { id: string; name: string; role: string | null }>();
+  for (const row of (peopleJunctions.data ?? []) as unknown as {
+    person_id: string;
+    people: { id: string; name: string; role: string | null };
+  }[]) {
+    peopleMap.set(row.people.id, row.people);
+  }
+  const linkedPeople = Array.from(peopleMap.values());
+
+  // Deduplicate projects
+  const projectMap = new Map<string, { id: string; name: string; status: string | null }>();
+  for (const row of (projectJunctions.data ?? []) as unknown as {
+    project_id: string;
+    projects: { id: string; name: string; status: string | null };
+  }[]) {
+    projectMap.set(row.projects.id, row.projects);
+  }
+  const linkedProjects = Array.from(projectMap.values());
+
+  const decisionItems = decisions.map((d) => ({
+    id: d.id,
+    decision_text: d.decision_text,
+    rationale: d.rationale,
+    decision_date: d.decision_date,
+  }));
+
+  const timeline = buildTimeline(notes, tasks, decisionItems, openQuestions);
+
+  return {
+    domain: typedDomain,
+    notes,
+    tasks,
+    decisions,
+    linkedPeople,
+    linkedProjects,
+    openQuestions,
     timeline,
   };
 }

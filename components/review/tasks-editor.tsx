@@ -36,8 +36,8 @@ export function TasksEditor() {
       <div className="space-y-north-sm">
         {tasks.map((task) => (
           <EditorItemCard key={task.id} variant="subtle" className="animate-scale-in">
-            {/* Row 1: title + date + shortcuts + remove */}
-            <div className="flex items-center gap-north-sm flex-wrap">
+            {/* Row 1: title + remove */}
+            <div className="flex items-center gap-north-sm">
               <Input
                 aria-label="Task title"
                 value={task.title}
@@ -45,12 +45,6 @@ export function TasksEditor() {
                 placeholder="Task title"
                 maxLength={500}
                 className="flex-1 min-w-40"
-              />
-              <DateInputWithShortcuts
-                aria-label="Due date"
-                value={task.due_date || ''}
-                onChange={(v) => updateTask(task.id, { due_date: v || null })}
-                inline
               />
               <Button
                 variant="ghost"
@@ -61,6 +55,14 @@ export function TasksEditor() {
                 <X className="h-4 w-4" />
               </Button>
             </div>
+
+            {/* Row 2: date + shortcuts */}
+            <DateInputWithShortcuts
+              aria-label="Due date"
+              value={task.due_date || ''}
+              onChange={(v) => updateTask(task.id, { due_date: v || null })}
+              inline
+            />
 
             {/* Row 2: actionee + priority */}
             <div className="flex gap-north-sm">

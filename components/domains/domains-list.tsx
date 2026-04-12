@@ -10,6 +10,7 @@ import { SortableHeader } from '@/components/shared/sortable-header';
 import { useListState, applySorting } from '@/lib/hooks/use-list-state';
 import { useSearchRefresh } from '@/components/search/search-provider';
 import { createDomain, updateDomain, deleteDomain } from '@/lib/actions/entity-mutations';
+import Link from 'next/link';
 import { Plus, X } from 'lucide-react';
 import type { Domain } from '@/types/database';
 
@@ -115,35 +116,37 @@ export function DomainsList({ domains }: DomainsListProps) {
               <X className="h-3 w-3" />
             </Button>
 
-            <InlineEditableText
-              value={domain.name}
-              onSave={async (v) => {
-                const r = await updateDomain(domain.id, { name: v });
-                if (!r.error) {
-                  router.refresh();
-                  refreshSearch();
-                }
-                return r;
-              }}
-              className="text-issue-title"
-            />
-            <InlineEditableText
-              value={domain.description || ''}
-              onSave={async (v) => {
-                const r = await updateDomain(domain.id, { description: v || null });
-                if (!r.error) {
-                  router.refresh();
-                  refreshSearch();
-                }
-                return r;
-              }}
-              placeholder="Add description..."
-              className="text-metadata text-foreground-muted mt-0.5"
-            />
+            <Link href={`/domains/${domain.id}`} className="block">
+              <InlineEditableText
+                value={domain.name}
+                onSave={async (v) => {
+                  const r = await updateDomain(domain.id, { name: v });
+                  if (!r.error) {
+                    router.refresh();
+                    refreshSearch();
+                  }
+                  return r;
+                }}
+                className="text-issue-title"
+              />
+              <InlineEditableText
+                value={domain.description || ''}
+                onSave={async (v) => {
+                  const r = await updateDomain(domain.id, { description: v || null });
+                  if (!r.error) {
+                    router.refresh();
+                    refreshSearch();
+                  }
+                  return r;
+                }}
+                placeholder="Add description..."
+                className="text-metadata text-foreground-muted mt-0.5"
+              />
 
-            <p className="text-[11px] text-foreground-muted mt-north-xs">
-              {domain.note_domains.length} {domain.note_domains.length === 1 ? 'note' : 'notes'}
-            </p>
+              <p className="text-[11px] text-foreground-muted mt-north-xs">
+                {domain.note_domains.length} {domain.note_domains.length === 1 ? 'note' : 'notes'}
+              </p>
+            </Link>
           </div>
         ))}
       </div>

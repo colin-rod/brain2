@@ -150,6 +150,8 @@ export interface Domain {
   user_id: string;
   name: string;
   description: string | null;
+  compiled_summary: string | null;
+  summary_generated_at: string | null;
   created_at: string;
   updated_at: string;
 }

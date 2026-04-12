@@ -76,8 +76,12 @@
       "mcp__claude_ai_Vercel__list_teams",
       "Bash(grep -n \"domain\" /Users/colinrodrigues/Brain2/supabase/migrations/*.sql)",
       "Bash(grep -A 20 \"create table.*tasks\" /Users/colinrodrigues/Brain2/supabase/migrations/*.sql)",
-      "Bash(npx supabase:*)"
+      "Bash(npx supabase:*)",
+      "Bash(grep -E \"\\\\.\\(tsx|ts\\)$\")"
     ],
-    "additionalDirectories": ["/Users/colinrodrigues/Brain2/app/(app)/review"]
+    "additionalDirectories": [
+      "/Users/colinrodrigues/Brain2/app/(app)/review",
+      "/Users/colinrodrigues/Brain2/app/(app)/domains"
+    ]
   }
 }

@@ -46,6 +46,8 @@ export function NotesList({
   const [localNotes, setLocalNotes] = useState(notes);
   const [noteSort, setNoteSort] = useState<NoteSort>('newest');
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+  const [groupBy, setGroupBy] = useState<'none' | 'project' | 'person' | 'domain' | 'date'>('none');
+  const [dateGroupMode, setDateGroupMode] = useState<'month' | 'week'>('month');
 
   // Keep localNotes in sync when server data changes (e.g. after router.refresh)
   useEffect(() => {
@@ -106,6 +108,35 @@ export function NotesList({
     return result;
   }, [searched, filters, noteSort]);
 
+  const groupedNotes = useMemo(() => {
+    if (groupBy === 'none') return [{ label: null, notes: sorted }];
+
+    const groups = new Map<string, NoteWithMeta[]>();
+    for (const note of sorted) {
+      let key: string;
+      if (groupBy === 'project') {
+        key = note.projects[0]?.name ?? 'No Project';
+      } else if (groupBy === 'person') {
+        key = note.people[0]?.name ?? 'No Person';
+      } else if (groupBy === 'domain') {
+        key = note.domains[0]?.name ?? 'No Domain';
+      } else {
+        const d = new Date(note.created_at);
+        if (dateGroupMode === 'month') {
+          key = d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+        } else {
+          const day = d.getDay();
+          const monday = new Date(d);
+          monday.setDate(d.getDate() - ((day + 6) % 7));
+          key = `Week of ${monday.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+        }
+      }
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key)!.push(note);
+    }
+    return Array.from(groups.entries()).map(([label, notes]) => ({ label, notes }));
+  }, [sorted, groupBy, dateGroupMode]);
+
   function handleArchive(noteId: string) {
     setLocalNotes((prev) => prev.filter((n) => n.id !== noteId));
     startTransition(async () => {
@@ -156,160 +187,219 @@ export function NotesList({
         </Select>
       </div>
 
-      {/* Filters */}
-      {filterConfigs.length > 0 && (
-        <FilterBar
-          filters={filterConfigs}
-          values={filters}
-          onChange={setFilter}
-          onClear={clearFilters}
-        />
-      )}
+      {/* Filters + Group By */}
+      <div className="flex items-center gap-north-sm flex-wrap">
+        {filterConfigs.length > 0 && (
+          <FilterBar
+            filters={filterConfigs}
+            values={filters}
+            onChange={setFilter}
+            onClear={clearFilters}
+          />
+        )}
+        <Select value={groupBy} onValueChange={(v) => setGroupBy(v as typeof groupBy)}>
+          <SelectTrigger size="sm" className="text-metadata w-auto">
+            <SelectValue>
+              {groupBy === 'none'
+                ? 'Group by'
+                : `Group: ${groupBy.charAt(0).toUpperCase() + groupBy.slice(1)}`}
+            </SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="none">No grouping</SelectItem>
+            <SelectItem value="project">Project</SelectItem>
+            <SelectItem value="person">Person</SelectItem>
+            <SelectItem value="domain">Domain</SelectItem>
+            <SelectItem value="date">Date</SelectItem>
+          </SelectContent>
+        </Select>
+        {groupBy === 'date' && (
+          <div className="flex items-center rounded-md border border-border overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setDateGroupMode('month')}
+              className={cn(
+                'px-2 h-7 text-metadata transition-colors',
+                dateGroupMode === 'month'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'text-foreground-muted hover:text-foreground',
+              )}
+            >
+              Month
+            </button>
+            <button
+              type="button"
+              onClick={() => setDateGroupMode('week')}
+              className={cn(
+                'px-2 h-7 text-metadata transition-colors',
+                dateGroupMode === 'week'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'text-foreground-muted hover:text-foreground',
+              )}
+            >
+              Week
+            </button>
+          </div>
+        )}
+      </div>
 
       {/* List */}
       <div className="divide-y divide-border border-t border-border">
-        {sorted.map((note, index) => (
-          <div
-            key={note.id}
-            className="group relative flex items-start gap-north-md px-north-sm py-north-sm border-l-[3px] border-l-(--entity-notes) animate-fade-in hover:bg-surface-subtle transition-colors duration-150"
-            style={{ animationDelay: `${index * 30}ms` }}
-          >
-            {/* Left: clickable content */}
-            <div className="flex-1 min-w-0">
-              <Link href={`/notes/${note.id}`} className="block">
-                <p className="text-issue-title text-foreground">{note.title}</p>
-                {note.summary && (
-                  <p className="text-body text-foreground-secondary mt-0.5 line-clamp-3">
-                    {note.summary}
-                  </p>
-                )}
-              </Link>
-              {/* Chips */}
-              {(note.projects.length > 0 ||
-                note.people.length > 0 ||
-                note.domains.length > 0 ||
-                note.tasks.length > 0 ||
-                note.decisions.length > 0 ||
-                note.question_count > 0) && (
-                <div className="flex flex-wrap gap-north-xs mt-north-xs">
-                  {note.projects.map((p) => (
-                    <Link
-                      key={p.id}
-                      href={`/projects/${p.id}`}
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <Badge
-                        variant="outline"
-                        className="text-[11px] cursor-pointer hover:bg-accent"
-                      >
-                        {p.name}
-                      </Badge>
-                    </Link>
-                  ))}
-                  {note.people.map((p) => (
-                    <Link key={p.id} href={`/people/${p.id}`} onClick={(e) => e.stopPropagation()}>
-                      <Badge
-                        variant="outline"
-                        className="text-[11px] cursor-pointer hover:bg-accent"
-                      >
-                        {p.name}
-                      </Badge>
-                    </Link>
-                  ))}
-                  {note.domains.map((d) => (
-                    <Link key={d.id} href="/domains" onClick={(e) => e.stopPropagation()}>
-                      <Badge
-                        variant="outline"
-                        className="text-[11px] cursor-pointer bg-primary/10 border-primary/20 hover:bg-primary/20"
-                      >
-                        {d.name}
-                      </Badge>
-                    </Link>
-                  ))}
-                  {note.tasks.length > 0 && (
-                    <div className="relative group/tasks">
-                      <Badge variant="secondary" className="text-[11px] cursor-default">
-                        {note.tasks.length} task{note.tasks.length !== 1 ? 's' : ''}
-                      </Badge>
-                      <div className="absolute bottom-full left-0 mb-1.5 z-50 hidden group-hover/tasks:block min-w-48 max-w-72 rounded-lg border border-border bg-popover shadow-md p-north-xs">
-                        <ul className="space-y-1">
-                          {note.tasks.map((t) => (
-                            <li key={t.id} className="flex items-center gap-north-xs">
-                              <TaskStatusBadge status={t.status} />
-                              <span className="text-[11px] text-foreground truncate">
-                                {t.title}
-                              </span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
+        {groupedNotes.map(({ label, notes: groupNotes }) => (
+          <div key={label ?? '__all__'}>
+            {label !== null && (
+              <div className="font-mono text-[10px] uppercase tracking-wider text-foreground-muted px-north-sm py-1 bg-surface-subtle border-b border-border">
+                {label}
+              </div>
+            )}
+            {groupNotes.map((note, index) => (
+              <div
+                key={note.id}
+                className="group relative flex items-start gap-north-md px-north-sm py-north-sm border-l-[3px] border-l-(--entity-notes) animate-fade-in hover:bg-surface-subtle transition-colors duration-150"
+                style={{ animationDelay: `${index * 30}ms` }}
+              >
+                {/* Left: clickable content */}
+                <div className="flex-1 min-w-0">
+                  <Link href={`/notes/${note.id}`} className="block">
+                    <p className="text-issue-title text-foreground">{note.title}</p>
+                    {note.summary && (
+                      <p className="text-body text-foreground-secondary mt-0.5 line-clamp-3">
+                        {note.summary}
+                      </p>
+                    )}
+                  </Link>
+                  {/* Chips */}
+                  {(note.projects.length > 0 ||
+                    note.people.length > 0 ||
+                    note.domains.length > 0 ||
+                    note.tasks.length > 0 ||
+                    note.decisions.length > 0 ||
+                    note.question_count > 0) && (
+                    <div className="flex flex-wrap gap-north-xs mt-north-xs">
+                      {note.projects.map((p) => (
+                        <Link
+                          key={p.id}
+                          href={`/projects/${p.id}`}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <Badge
+                            variant="outline"
+                            className="text-[11px] cursor-pointer hover:bg-accent"
+                          >
+                            {p.name}
+                          </Badge>
+                        </Link>
+                      ))}
+                      {note.people.map((p) => (
+                        <Link
+                          key={p.id}
+                          href={`/people/${p.id}`}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <Badge
+                            variant="outline"
+                            className="text-[11px] cursor-pointer hover:bg-accent"
+                          >
+                            {p.name}
+                          </Badge>
+                        </Link>
+                      ))}
+                      {note.domains.map((d) => (
+                        <Link key={d.id} href="/domains" onClick={(e) => e.stopPropagation()}>
+                          <Badge
+                            variant="outline"
+                            className="text-[11px] cursor-pointer bg-primary/10 border-primary/20 hover:bg-primary/20"
+                          >
+                            {d.name}
+                          </Badge>
+                        </Link>
+                      ))}
+                      {note.tasks.length > 0 && (
+                        <div className="relative group/tasks">
+                          <Badge variant="secondary" className="text-[11px] cursor-default">
+                            {note.tasks.length} task{note.tasks.length !== 1 ? 's' : ''}
+                          </Badge>
+                          <div className="absolute bottom-full left-0 mb-1.5 z-50 hidden group-hover/tasks:block min-w-48 max-w-72 rounded-lg border border-border bg-popover shadow-md p-north-xs">
+                            <ul className="space-y-1">
+                              {note.tasks.map((t) => (
+                                <li key={t.id} className="flex items-center gap-north-xs">
+                                  <TaskStatusBadge status={t.status} />
+                                  <span className="text-[11px] text-foreground truncate">
+                                    {t.title}
+                                  </span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+                      )}
+                      {note.decisions.length > 0 && (
+                        <div className="relative group/decisions">
+                          <Badge variant="secondary" className="text-[11px] cursor-default">
+                            {note.decisions.length} decision{note.decisions.length !== 1 ? 's' : ''}
+                          </Badge>
+                          <div className="absolute bottom-full left-0 mb-1.5 z-50 hidden group-hover/decisions:block min-w-48 max-w-72 rounded-lg border border-border bg-popover shadow-md p-north-xs">
+                            <ul className="space-y-1">
+                              {note.decisions.map((d) => (
+                                <li key={d.id} className="text-[11px] text-foreground line-clamp-2">
+                                  {d.decision_text}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+                      )}
+                      {note.question_count > 0 && (
+                        <Badge variant="secondary" className="text-[11px]">
+                          {note.question_count} question{note.question_count !== 1 ? 's' : ''}
+                        </Badge>
+                      )}
                     </div>
-                  )}
-                  {note.decisions.length > 0 && (
-                    <div className="relative group/decisions">
-                      <Badge variant="secondary" className="text-[11px] cursor-default">
-                        {note.decisions.length} decision{note.decisions.length !== 1 ? 's' : ''}
-                      </Badge>
-                      <div className="absolute bottom-full left-0 mb-1.5 z-50 hidden group-hover/decisions:block min-w-48 max-w-72 rounded-lg border border-border bg-popover shadow-md p-north-xs">
-                        <ul className="space-y-1">
-                          {note.decisions.map((d) => (
-                            <li key={d.id} className="text-[11px] text-foreground line-clamp-2">
-                              {d.decision_text}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    </div>
-                  )}
-                  {note.question_count > 0 && (
-                    <Badge variant="secondary" className="text-[11px]">
-                      {note.question_count} question{note.question_count !== 1 ? 's' : ''}
-                    </Badge>
                   )}
                 </div>
-              )}
-            </div>
 
-            {/* Right: date + menu */}
-            <div className="flex items-center gap-north-xs shrink-0 pt-0.5">
-              <span className="font-mono text-[11px] tabular-nums text-foreground-muted">
-                {formatDate(note.created_at)}
-              </span>
-              <Menu.Root>
-                <Menu.Trigger
-                  render={
-                    <button
-                      className={cn(
-                        'flex items-center justify-center h-6 w-6 rounded-md text-foreground-muted',
-                        'opacity-0 group-hover:opacity-100 hover:bg-surface-subtle hover:text-foreground',
-                        'transition-opacity duration-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-                      )}
-                      aria-label="Note actions"
-                    >
-                      <MoreHorizontal className="h-3.5 w-3.5" />
-                    </button>
-                  }
-                />
-                <Menu.Portal>
-                  <Menu.Positioner sideOffset={4} align="end">
-                    <Menu.Popup className="z-50 min-w-32 rounded-lg border border-border bg-popover p-1 text-popover-foreground shadow-md data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95">
-                      <Menu.Item
-                        className="flex w-full cursor-default select-none items-center rounded-md px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                        onClick={() => handleArchive(note.id)}
-                      >
-                        {showArchived ? 'Unarchive' : 'Archive'}
-                      </Menu.Item>
-                      <Menu.Item
-                        className="flex w-full cursor-default select-none items-center rounded-md px-2 py-1.5 text-sm text-destructive outline-none hover:bg-destructive/10 focus:bg-destructive/10"
-                        onClick={() => setPendingDeleteId(note.id)}
-                      >
-                        Delete
-                      </Menu.Item>
-                    </Menu.Popup>
-                  </Menu.Positioner>
-                </Menu.Portal>
-              </Menu.Root>
-            </div>
+                {/* Right: date + menu */}
+                <div className="flex items-center gap-north-xs shrink-0 pt-0.5">
+                  <span className="font-mono text-[11px] tabular-nums text-foreground-muted">
+                    {formatDate(note.created_at)}
+                  </span>
+                  <Menu.Root>
+                    <Menu.Trigger
+                      render={
+                        <button
+                          className={cn(
+                            'flex items-center justify-center h-6 w-6 rounded-md text-foreground-muted',
+                            'opacity-0 group-hover:opacity-100 hover:bg-surface-subtle hover:text-foreground',
+                            'transition-opacity duration-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                          )}
+                          aria-label="Note actions"
+                        >
+                          <MoreHorizontal className="h-3.5 w-3.5" />
+                        </button>
+                      }
+                    />
+                    <Menu.Portal>
+                      <Menu.Positioner sideOffset={4} align="end">
+                        <Menu.Popup className="z-50 min-w-32 rounded-lg border border-border bg-popover p-1 text-popover-foreground shadow-md data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95">
+                          <Menu.Item
+                            className="flex w-full cursor-default select-none items-center rounded-md px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                            onClick={() => handleArchive(note.id)}
+                          >
+                            {showArchived ? 'Unarchive' : 'Archive'}
+                          </Menu.Item>
+                          <Menu.Item
+                            className="flex w-full cursor-default select-none items-center rounded-md px-2 py-1.5 text-sm text-destructive outline-none hover:bg-destructive/10 focus:bg-destructive/10"
+                            onClick={() => setPendingDeleteId(note.id)}
+                          >
+                            Delete
+                          </Menu.Item>
+                        </Menu.Popup>
+                      </Menu.Positioner>
+                    </Menu.Portal>
+                  </Menu.Root>
+                </div>
+              </div>
+            ))}
           </div>
         ))}
 

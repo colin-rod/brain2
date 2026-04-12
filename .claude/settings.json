@@ -81,7 +81,8 @@
       "Bash(grep -rn \"tailwind\\\\|table\\\\b\" /Users/colinrodrigues/Brain2/tailwind.config.*)",
       "Bash(ls /Users/colinrodrigues/Brain2/tailwind.config*)",
       "Bash(ls /Users/colinrodrigues/Brain2/*.config*)",
-      "Bash(ls /Users/colinrodrigues/Brain2/*.css)"
+      "Bash(ls /Users/colinrodrigues/Brain2/*.css)",
+      "Bash(find /Users/colinrodrigues/Brain2 -maxdepth 1 -type f \\\\\\( -name \"tailwind*\" -o -name \"postcss*\" \\\\\\) -exec cat {} \\\\;)"
     ],
     "additionalDirectories": [
       "/Users/colinrodrigues/Brain2/app/(app)/review",

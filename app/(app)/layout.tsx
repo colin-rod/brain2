@@ -29,7 +29,7 @@ export default function AppLayout({
       </header>
       <Sidebar />
       <main id="main-content" className="md:ml-52 lg:ml-60 flex-1 pb-16 md:pb-0">
-        <div className="mx-auto max-w-5xl px-north-base py-north-md md:px-north-lg md:py-north-lg">
+        <div className="mx-auto max-w-5xl px-north-base py-north-md md:px-north-md md:py-north-lg lg:px-north-lg">
           {children}
         </div>
       </main>

@@ -19,7 +19,7 @@ interface SourcePreviewProps {
 }
 
 export function SourcePreview({ capture, imageUrl }: SourcePreviewProps) {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   const Icon = sourceIcons[capture.source_type];
 
   return (

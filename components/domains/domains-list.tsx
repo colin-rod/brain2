@@ -80,7 +80,65 @@ export function DomainsList({ domains }: DomainsListProps) {
         </Button>
       </div>
 
-      <div className="overflow-x-auto">
+      {/* Mobile cards */}
+      <div className="sm:hidden space-y-north-xs">
+        {isAdding && (
+          <div className="rounded-lg border border-border bg-surface border-l-[3px] border-l-[--entity-domains] px-north-md py-north-sm">
+            <InlineEditableText
+              value=""
+              onSave={async (v) => {
+                handleCreate(v);
+                return {};
+              }}
+              placeholder="Domain name... (Enter to save)"
+              className="text-body"
+            />
+          </div>
+        )}
+        {filtered.map((domain) => (
+          <div
+            key={domain.id}
+            className="group rounded-lg border border-border bg-surface border-l-[3px] border-l-[--entity-domains] px-north-md py-north-sm cursor-pointer hover:bg-surface-subtle transition-colors"
+            onClick={() => router.push(`/domains/${domain.id}`)}
+          >
+            <div className="flex items-start justify-between gap-north-sm">
+              <div className="min-w-0 flex-1">
+                <p className="text-body font-medium truncate">{domain.name}</p>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDelete(domain.id);
+                }}
+                disabled={isPending}
+                className="text-foreground-muted hover:text-destructive h-7 w-7 p-0 shrink-0"
+              >
+                <X className="h-3 w-3" />
+              </Button>
+            </div>
+            <div className="flex flex-wrap items-center gap-x-north-md gap-y-0.5 mt-north-xs">
+              {domain.note_count > 0 && (
+                <span className="text-metadata text-foreground-muted">
+                  {domain.note_count} notes
+                </span>
+              )}
+              {domain.open_question_count > 0 && (
+                <span className="text-metadata text-blue-600">
+                  {domain.open_question_count} questions
+                </span>
+              )}
+              <span className="text-metadata text-foreground-muted ml-auto">
+                {formatRelativeDate(domain.last_activity)}
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop table */}
+      <div className="hidden sm:block overflow-x-auto">
         <table className="w-full border-collapse">
           <thead>
             <tr className="border-b border-border">

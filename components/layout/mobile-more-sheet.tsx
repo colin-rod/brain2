@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -36,33 +37,51 @@ interface MobileMoreSheetProps {
 
 export function MobileMoreSheet({ onClose }: MobileMoreSheetProps) {
   const pathname = usePathname();
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setVisible(true));
+    return () => cancelAnimationFrame(id);
+  }, []);
+
+  function handleClose() {
+    setVisible(false);
+    setTimeout(onClose, 250);
+  }
 
   return (
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/40 z-[60] md:hidden"
-        onClick={onClose}
+        className={cn(
+          'fixed inset-0 bg-black/40 z-[60] md:hidden transition-opacity duration-200',
+          visible ? 'opacity-100' : 'opacity-0',
+        )}
+        onClick={handleClose}
         aria-hidden="true"
       />
 
       {/* Panel */}
       <div
-        className="fixed bottom-0 inset-x-0 bg-surface border-t border-border z-[70] rounded-t-lg md:hidden"
+        className={cn(
+          'fixed bottom-0 inset-x-0 bg-surface border-t border-border z-[70] rounded-t-lg md:hidden',
+          'transform transition-transform duration-[250ms] ease-out',
+          visible ? 'translate-y-0' : 'translate-y-full',
+        )}
         style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
       >
         <div className="flex items-center justify-center pt-north-sm pb-north-xs">
           <div className="w-8 h-1 rounded-full bg-border" />
         </div>
 
-        <nav className="py-north-sm">
+        <nav className="py-north-sm overflow-y-auto max-h-[calc(85dvh-2.5rem)]">
           {sheetItems.map((item) => {
             const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                onClick={onClose}
+                onClick={handleClose}
                 className={cn(
                   'flex items-center gap-north-md px-north-lg py-north-sm text-body font-medium transition-colors',
                   isActive ? 'text-primary' : 'text-foreground-secondary hover:text-foreground',

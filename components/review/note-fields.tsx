@@ -42,7 +42,7 @@ export function NoteFields() {
           id="summary"
           value={summary}
           onChange={(e) => setSummary(e.target.value)}
-          placeholder="Brief summary of the note..."
+          placeholder="What's the one-sentence takeaway?"
           maxLength={2000}
           rows={3}
           className="resize-y"
@@ -57,7 +57,7 @@ export function NoteFields() {
           Full Text
         </label>
         <p className="text-metadata text-foreground-muted mb-north-xs">
-          Cleaned-up version of the original — edit if anything was missed.
+          The cleaned-up version of your input. Edit anything that was missed or wrong.
         </p>
         <Textarea
           id="cleaned-text"

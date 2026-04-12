@@ -16,7 +16,7 @@ export default async function InboxPage() {
       <CaptureForm />
 
       <div>
-        <h2 className="text-section-header mb-north-md">Recent Captures</h2>
+        <h2 className="text-section-header mb-north-md">Pending</h2>
         <CaptureList captures={captures} />
       </div>
     </div>

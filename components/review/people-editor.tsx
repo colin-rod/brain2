@@ -13,7 +13,7 @@ export function PeopleEditor() {
 
   return (
     <div className="space-y-north-sm">
-      {people.length === 0 && <EditorEmptyMessage message="No one mentioned." />}
+      {people.length === 0 && <EditorEmptyMessage message="No people found — add one if needed." />}
 
       <div className="space-y-north-xs">
         {people.map((person) => (

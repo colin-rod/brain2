@@ -28,7 +28,7 @@ export function SourcePreview({ capture, imageUrl }: SourcePreviewProps) {
         <CollapsibleTrigger className="flex w-full items-center justify-between px-north-base py-north-md hover:bg-surface-subtle transition-colors">
           <div className="flex items-center gap-north-sm">
             <Icon className="h-4 w-4 text-foreground-secondary" />
-            <span className="text-section-header">Original</span>
+            <span className="text-section-header">Source</span>
           </div>
           <ChevronDown
             className={cn(

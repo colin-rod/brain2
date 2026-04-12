@@ -67,7 +67,9 @@ export function TasksEditor() {
             {/* Row 2: actionee + priority */}
             <div className="flex gap-north-sm">
               <div className="flex-1">
-                <label className="text-metadata text-foreground-muted block mb-1">Actionee</label>
+                <label className="text-metadata text-foreground-muted block mb-1">
+                  Assigned to
+                </label>
                 <Select
                   value={task.actionee_person_id || 'none'}
                   onValueChange={(v) =>
@@ -110,10 +112,10 @@ export function TasksEditor() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">None</SelectItem>
-                    <SelectItem value="P0">P0</SelectItem>
-                    <SelectItem value="P1">P1</SelectItem>
-                    <SelectItem value="P2">P2</SelectItem>
-                    <SelectItem value="P3">P3</SelectItem>
+                    <SelectItem value="P0">P0 — Critical</SelectItem>
+                    <SelectItem value="P1">P1 — High</SelectItem>
+                    <SelectItem value="P2">P2 — Medium</SelectItem>
+                    <SelectItem value="P3">P3 — Low</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

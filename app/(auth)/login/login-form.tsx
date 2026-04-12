@@ -77,7 +77,13 @@ export default function LoginForm() {
           {error && <p className="text-metadata text-destructive">{error}</p>}
 
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? 'Loading...' : isSignUp ? 'Sign Up' : 'Sign In'}
+            {loading
+              ? isSignUp
+                ? 'Creating account…'
+                : 'Signing in…'
+              : isSignUp
+                ? 'Sign Up'
+                : 'Sign In'}
           </Button>
         </form>
 

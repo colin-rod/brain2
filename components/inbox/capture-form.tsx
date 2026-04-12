@@ -100,7 +100,7 @@ export function CaptureForm() {
       <div className="mt-north-base flex justify-end">
         <Button onClick={handleSubmit} disabled={!canSubmit}>
           {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          Add to Inbox
+          Capture
         </Button>
       </div>
     </div>

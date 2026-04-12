@@ -35,7 +35,7 @@ const statusLabels: Record<CaptureStatus, string> = {
   processing: 'Processing',
   ocr_complete: 'Extracted',
   parsed: 'Ready to review',
-  in_review: 'In Review',
+  in_review: 'In review',
   saved: 'Saved',
   failed: 'Failed',
 };
@@ -84,7 +84,7 @@ export function CaptureList({ captures }: CaptureListProps) {
     return (
       <EmptyState
         icon={InboxIcon}
-        title="Inbox clear"
+        title="Nothing pending"
         description="Drop an image or paste text above — Brain2 will find what matters."
       />
     );
@@ -213,7 +213,7 @@ function CaptureCard({ capture, index }: { capture: Capture; index: number }) {
           ) : (
             <>
               <Sparkles className="h-3.5 w-3.5 mr-1.5" />
-              Extract
+              Analyze
             </>
           )}
         </Button>

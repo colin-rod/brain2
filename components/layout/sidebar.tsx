@@ -63,6 +63,12 @@ export function Sidebar() {
                 style={item.iconColor ? { color: item.iconColor } : undefined}
               />
               {item.label}
+              {isActive && (
+                <span
+                  aria-hidden="true"
+                  className="ml-auto h-1 w-1 rounded-full bg-primary animate-scale-in"
+                />
+              )}
             </Link>
           );
         })}

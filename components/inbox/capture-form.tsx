@@ -18,11 +18,13 @@ export function CaptureForm() {
   const router = useRouter();
   const refreshSearch = useSearchRefresh();
   const [isPending, startTransition] = useTransition();
+  const [showCheck, setShowCheck] = useState(false);
   const [mode, setMode] = useState<InputMode>('image');
   const [text, setText] = useState('');
   const [file, setFile] = useState<File | null>(null);
 
-  const canSubmit = !isPending && (mode === 'image' ? file !== null : text.trim().length > 0);
+  const canSubmit =
+    !isPending && !showCheck && (mode === 'image' ? file !== null : text.trim().length > 0);
 
   function handleSubmit() {
     startTransition(async () => {
@@ -42,7 +44,9 @@ export function CaptureForm() {
         return;
       }
 
-      toast.success('Added to inbox');
+      toast.success('Captured.');
+      setShowCheck(true);
+      setTimeout(() => setShowCheck(false), 1200);
       setText('');
       setFile(null);
       router.refresh();
@@ -99,8 +103,24 @@ export function CaptureForm() {
 
       <div className="mt-north-base flex justify-end">
         <Button onClick={handleSubmit} disabled={!canSubmit}>
-          {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          Capture
+          {isPending ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : showCheck ? (
+            <svg
+              className="mr-2 h-4 w-4 animate-check-draw text-current"
+              viewBox="0 0 16 16"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ strokeDasharray: 20 }}
+              aria-hidden="true"
+            >
+              <polyline points="2,8 6,12 14,4" />
+            </svg>
+          ) : null}
+          {isPending ? 'Capturing…' : showCheck ? 'Captured' : 'Capture'}
         </Button>
       </div>
     </div>

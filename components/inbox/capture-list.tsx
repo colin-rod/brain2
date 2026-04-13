@@ -138,7 +138,7 @@ function CaptureCard({ capture, index }: { capture: Capture; index: number }) {
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success('Ready to review');
+        toast.success('Ready for you.');
         router.refresh();
         refreshSearch();
       }

@@ -34,6 +34,43 @@ interface CollapsibleSectionProps {
   onAdd: () => void;
 }
 
+function SaveCelebration({ active }: { active: boolean }) {
+  if (!active) return null;
+
+  const dots = [
+    { tx: '0px', ty: '-28px', color: 'hsl(16 95% 37%)', delay: '0ms' },
+    { tx: '24px', ty: '-14px', color: 'hsl(32 95% 54%)', delay: '30ms' },
+    { tx: '24px', ty: '14px', color: 'hsl(16 95% 37%)', delay: '60ms' },
+    { tx: '0px', ty: '28px', color: 'hsl(45 95% 45%)', delay: '30ms' },
+    { tx: '-24px', ty: '14px', color: 'hsl(32 95% 54%)', delay: '60ms' },
+    { tx: '-24px', ty: '-14px', color: 'hsl(16 95% 37%)', delay: '0ms' },
+  ];
+
+  return (
+    <div
+      aria-hidden="true"
+      className="pointer-events-none fixed inset-0 z-50 flex items-end justify-end pb-24 pr-8"
+    >
+      <div className="relative h-0 w-0">
+        {dots.map((dot, i) => (
+          <span
+            key={i}
+            className="animate-burst-dot absolute h-2 w-2 rounded-full"
+            style={
+              {
+                backgroundColor: dot.color,
+                animationDelay: dot.delay,
+                '--tx': dot.tx,
+                '--ty': dot.ty,
+              } as React.CSSProperties
+            }
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function CollapsibleSection({ title, count, children, delay, onAdd }: CollapsibleSectionProps) {
   const [open, setOpen] = useState(count > 0);
 
@@ -130,7 +167,7 @@ export function ReviewClient({ capture, imageUrl }: ReviewClientProps) {
         return;
       }
 
-      toast.success('Saved to Notes');
+      toast.success('Locked in.');
       setIsSaved(true);
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 600);
@@ -144,6 +181,7 @@ export function ReviewClient({ capture, imageUrl }: ReviewClientProps) {
 
   return (
     <>
+      <SaveCelebration active={saveSuccess} />
       <div className="space-y-north-lg pb-20 lg:pb-0">
         {/* Title, Summary, Full Text — full width above the grid */}
         <div className="animate-slide-in-up" style={{ animationDelay: '0ms' }}>

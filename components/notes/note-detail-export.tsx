@@ -25,7 +25,7 @@ export function NoteDetailExport({ noteId, hasExport }: NoteDetailExportProps) {
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success('Markdown exported');
+        toast.success('Exported.');
         router.refresh();
         refreshSearch();
       }

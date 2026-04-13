@@ -17,6 +17,7 @@ import { InlineEditableText } from '@/components/notes/inline-editable-text';
 import { EntityCombobox } from '@/components/notes/entity-combobox';
 import { SearchBar } from '@/components/shared/search-bar';
 import { FilterBar, type FilterConfig } from '@/components/shared/filter-bar';
+import { GroupLabel } from '@/components/shared/group-label';
 import { SortableHeader } from '@/components/shared/sortable-header';
 import { TaskStatusBadge } from '@/components/shared/status-badge';
 import { useListState, applySorting } from '@/lib/hooks/use-list-state';
@@ -299,11 +300,7 @@ export function TasksList({
 
         {groupedTasks.map(({ label, tasks: groupTasks }) => (
           <div key={label ?? '__all__'}>
-            {label !== null && (
-              <div className="font-mono text-[10px] uppercase tracking-wider text-foreground-muted px-north-sm py-1 bg-surface-subtle border-b border-border">
-                {label}
-              </div>
-            )}
+            {label !== null && <GroupLabel label={label} />}
             {groupTasks.map((task, index) => (
               <div
                 key={task.id}

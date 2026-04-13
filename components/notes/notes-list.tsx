@@ -8,6 +8,7 @@ import { Menu } from '@base-ui/react/menu';
 import { AlertDialog } from '@base-ui/react/alert-dialog';
 import { SearchBar } from '@/components/shared/search-bar';
 import { FilterBar, type FilterConfig } from '@/components/shared/filter-bar';
+import { GroupLabel } from '@/components/shared/group-label';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -247,11 +248,7 @@ export function NotesList({
       <div className="divide-y divide-border border-t border-border">
         {groupedNotes.map(({ label, notes: groupNotes }) => (
           <div key={label ?? '__all__'}>
-            {label !== null && (
-              <div className="font-mono text-[10px] uppercase tracking-wider text-foreground-muted px-north-sm py-1 bg-surface-subtle border-b border-border">
-                {label}
-              </div>
-            )}
+            {label !== null && <GroupLabel label={label} />}
             {groupNotes.map((note, index) => (
               <div
                 key={note.id}

@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { TaskStatusBadge } from '@/components/shared/status-badge';
+import { EditorItemCard } from '@/components/shared/editor-item-card';
 import { formatDate } from '@/lib/format-date';
 import { CheckSquare, FileText, FolderOpen, Scale, HelpCircle, Users, Layers } from 'lucide-react';
 import type { Task, Decision, OpenQuestion } from '@/types/database';
@@ -79,10 +80,7 @@ export function EntitySections({
           </h2>
           <div className="space-y-north-xs">
             {assignedTasks.map((task) => (
-              <div
-                key={task.id}
-                className="flex items-center justify-between rounded-md border border-border bg-surface px-north-md py-north-sm"
-              >
+              <EditorItemCard key={task.id} className="flex items-center justify-between">
                 <div>
                   <p className="text-body">{task.title}</p>
                   {task.notes && (
@@ -95,7 +93,7 @@ export function EntitySections({
                   )}
                 </div>
                 <TaskStatusBadge status={task.status} />
-              </div>
+              </EditorItemCard>
             ))}
           </div>
         </div>
@@ -110,13 +108,10 @@ export function EntitySections({
           </h2>
           <div className="space-y-north-xs">
             {tasks.map((task) => (
-              <div
-                key={task.id}
-                className="flex items-center justify-between rounded-md border border-border bg-surface px-north-md py-north-sm"
-              >
+              <EditorItemCard key={task.id} className="flex items-center justify-between">
                 <p className="text-body">{task.title}</p>
                 <TaskStatusBadge status={task.status} />
-              </div>
+              </EditorItemCard>
             ))}
           </div>
         </div>
@@ -155,10 +150,7 @@ export function EntitySections({
           </h2>
           <div className="space-y-north-sm">
             {decisions.map((d) => (
-              <div
-                key={d.id}
-                className="rounded-md border border-border bg-surface px-north-md py-north-sm"
-              >
+              <EditorItemCard key={d.id}>
                 <p className="text-body">{d.decision_text}</p>
                 {d.rationale && (
                   <p className="text-metadata text-foreground-secondary mt-0.5">
@@ -170,7 +162,7 @@ export function EntitySections({
                     {formatDate(d.decision_date)}
                   </p>
                 )}
-              </div>
+              </EditorItemCard>
             ))}
           </div>
         </div>
@@ -185,16 +177,13 @@ export function EntitySections({
           </h2>
           <div className="space-y-north-xs">
             {openQuestions.map((q) => (
-              <div
-                key={q.id}
-                className="rounded-md border border-border bg-surface px-north-md py-north-sm"
-              >
+              <EditorItemCard key={q.id}>
                 <p
                   className={`text-body ${q.status === 'resolved' ? 'line-through text-foreground-muted' : ''}`}
                 >
                   {q.question_text}
                 </p>
-              </div>
+              </EditorItemCard>
             ))}
           </div>
         </div>

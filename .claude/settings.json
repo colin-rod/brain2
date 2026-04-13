@@ -83,7 +83,8 @@
       "Bash(ls /Users/colinrodrigues/Brain2/*.config*)",
       "Bash(ls /Users/colinrodrigues/Brain2/*.css)",
       "Bash(find /Users/colinrodrigues/Brain2 -maxdepth 1 -type f \\\\\\( -name \"tailwind*\" -o -name \"postcss*\" \\\\\\) -exec cat {} \\\\;)",
-      "Bash(grep -E \"\\\\.tsx$\")"
+      "Bash(grep -E \"\\\\.tsx$\")",
+      "Bash(find /Users/colinrodrigues/Brain2/app -name \"*.tsx\" -exec grep -l \"useCallback\\\\|useMemo\\\\|memo\\\\|React.memo\" {} \\\\;)"
     ],
     "additionalDirectories": [
       "/Users/colinrodrigues/Brain2/app/(app)/review",

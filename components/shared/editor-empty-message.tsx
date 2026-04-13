@@ -3,5 +3,9 @@ interface EditorEmptyMessageProps {
 }
 
 export function EditorEmptyMessage({ message }: EditorEmptyMessageProps) {
-  return <p className="text-metadata text-foreground-muted py-north-sm italic">{message}</p>;
+  return (
+    <p role="status" className="text-metadata text-foreground-muted py-north-sm italic">
+      {message}
+    </p>
+  );
 }

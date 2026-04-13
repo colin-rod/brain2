@@ -32,10 +32,11 @@ export function IdeasEditor() {
               <Button
                 variant="ghost"
                 size="sm"
+                aria-label="Remove idea"
                 onClick={() => removeIdea(idea.id)}
                 className="shrink-0 text-foreground-muted hover:text-destructive mt-north-xs"
               >
-                <X className="h-4 w-4" />
+                <X className="h-4 w-4" aria-hidden="true" />
               </Button>
             </div>
           </EditorItemCard>

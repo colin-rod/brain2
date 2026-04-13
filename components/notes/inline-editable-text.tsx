@@ -109,6 +109,8 @@ export function InlineEditableText({
   return (
     <button
       type="button"
+      title="Click to edit"
+      aria-label={value ? `Edit: ${value}` : placeholder}
       onClick={() => {
         setDraft(value);
         setIsEditing(true);

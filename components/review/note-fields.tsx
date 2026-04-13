@@ -29,6 +29,14 @@ export function NoteFields() {
           maxLength={200}
           className="text-issue-title"
         />
+        {title.length > 160 && (
+          <p
+            className={`text-metadata mt-1 text-right ${title.length >= 200 ? 'text-destructive' : 'text-foreground-muted'}`}
+            aria-live="polite"
+          >
+            {title.length}/200
+          </p>
+        )}
       </div>
 
       <div>
@@ -47,6 +55,14 @@ export function NoteFields() {
           rows={3}
           className="resize-y"
         />
+        {summary.length > 1600 && (
+          <p
+            className={`text-metadata mt-1 text-right ${summary.length >= 2000 ? 'text-destructive' : 'text-foreground-muted'}`}
+            aria-live="polite"
+          >
+            {summary.length}/2000
+          </p>
+        )}
       </div>
 
       <div>

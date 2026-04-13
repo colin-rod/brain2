@@ -95,7 +95,7 @@ function CollapsibleSection({ title, count, children, delay, onAdd }: Collapsibl
             />
           </CollapsibleTrigger>
           <Button variant="ghost" size="sm" onClick={onAdd} className="gap-1">
-            <Plus className="h-3.5 w-3.5" />
+            <Plus className="h-3.5 w-3.5" aria-hidden="true" />
             Add
           </Button>
         </div>

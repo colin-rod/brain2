@@ -39,10 +39,11 @@ export function PeopleEditor() {
               <Button
                 variant="ghost"
                 size="sm"
+                aria-label="Remove person"
                 onClick={() => removePerson(person.id)}
                 className="shrink-0 text-foreground-muted hover:text-destructive"
               >
-                <X className="h-4 w-4" />
+                <X className="h-4 w-4" aria-hidden="true" />
               </Button>
             </div>
           </EditorItemCard>

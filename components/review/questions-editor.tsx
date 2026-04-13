@@ -33,10 +33,11 @@ export function QuestionsEditor() {
               <Button
                 variant="ghost"
                 size="sm"
+                aria-label="Remove question"
                 onClick={() => removeQuestion(q.id)}
                 className="shrink-0 text-foreground-muted hover:text-destructive"
               >
-                <X className="h-4 w-4" />
+                <X className="h-4 w-4" aria-hidden="true" />
               </Button>
             </div>
           </EditorItemCard>

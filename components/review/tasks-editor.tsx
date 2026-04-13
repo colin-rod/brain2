@@ -49,10 +49,11 @@ export function TasksEditor() {
               <Button
                 variant="ghost"
                 size="sm"
+                aria-label="Remove task"
                 onClick={() => removeTask(task.id)}
                 className="shrink-0 text-foreground-muted hover:text-destructive"
               >
-                <X className="h-4 w-4" />
+                <X className="h-4 w-4" aria-hidden="true" />
               </Button>
             </div>
 

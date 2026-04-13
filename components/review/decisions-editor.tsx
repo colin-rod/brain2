@@ -25,6 +25,7 @@ export function DecisionsEditor() {
           <EditorItemCard key={decision.id} variant="subtle" className="animate-scale-in">
             <div className="flex items-start gap-north-sm">
               <Textarea
+                aria-label="Decision"
                 value={decision.decision_text}
                 onChange={(e) => updateDecision(decision.id, { decision_text: e.target.value })}
                 placeholder="What was decided?"
@@ -35,10 +36,11 @@ export function DecisionsEditor() {
               <Button
                 variant="ghost"
                 size="sm"
+                aria-label="Remove decision"
                 onClick={() => removeDecision(decision.id)}
                 className="shrink-0 text-foreground-muted hover:text-destructive"
               >
-                <X className="h-4 w-4" />
+                <X className="h-4 w-4" aria-hidden="true" />
               </Button>
             </div>
 

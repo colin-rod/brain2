@@ -86,6 +86,7 @@ export function CaptureForm() {
             value={text}
             onChange={(e) => setText(e.target.value)}
             rows={6}
+            maxLength={50000}
             className="resize-y"
           />
         </TabsContent>
@@ -96,6 +97,7 @@ export function CaptureForm() {
             value={text}
             onChange={(e) => setText(e.target.value)}
             rows={6}
+            maxLength={50000}
             className="resize-y"
           />
         </TabsContent>

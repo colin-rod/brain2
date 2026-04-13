@@ -38,12 +38,12 @@ function SaveCelebration({ active }: { active: boolean }) {
   if (!active) return null;
 
   const dots = [
-    { tx: '0px', ty: '-28px', color: 'hsl(16 95% 37%)', delay: '0ms' },
-    { tx: '24px', ty: '-14px', color: 'hsl(32 95% 54%)', delay: '30ms' },
-    { tx: '24px', ty: '14px', color: 'hsl(16 95% 37%)', delay: '60ms' },
-    { tx: '0px', ty: '28px', color: 'hsl(45 95% 45%)', delay: '30ms' },
-    { tx: '-24px', ty: '14px', color: 'hsl(32 95% 54%)', delay: '60ms' },
-    { tx: '-24px', ty: '-14px', color: 'hsl(16 95% 37%)', delay: '0ms' },
+    { tx: '0px', ty: '-28px', color: 'var(--primary)', delay: '0ms' },
+    { tx: '24px', ty: '-14px', color: 'var(--entity-projects)', delay: '30ms' },
+    { tx: '24px', ty: '14px', color: 'var(--primary)', delay: '60ms' },
+    { tx: '0px', ty: '28px', color: 'var(--entity-ideas)', delay: '30ms' },
+    { tx: '-24px', ty: '14px', color: 'var(--entity-projects)', delay: '60ms' },
+    { tx: '-24px', ty: '-14px', color: 'var(--primary)', delay: '0ms' },
   ];
 
   return (

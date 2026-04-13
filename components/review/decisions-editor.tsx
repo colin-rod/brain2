@@ -46,10 +46,11 @@ export function DecisionsEditor() {
 
             <div className="flex gap-north-sm">
               <div className="flex-1">
-                <label className="text-metadata text-foreground-muted block mb-north-xs">
+                <p className="text-metadata text-foreground-muted mb-north-xs">
                   Rationale (optional)
-                </label>
+                </p>
                 <Input
+                  aria-label="Rationale"
                   value={decision.rationale || ''}
                   onChange={(e) =>
                     updateDecision(decision.id, {
@@ -61,10 +62,9 @@ export function DecisionsEditor() {
                 />
               </div>
               <div className="w-48">
-                <label className="text-metadata text-foreground-muted block mb-north-xs">
-                  Date
-                </label>
+                <p className="text-metadata text-foreground-muted mb-north-xs">Date</p>
                 <DateInputWithShortcuts
+                  aria-label="Decision date"
                   value={decision.decision_date || ''}
                   onChange={(v) =>
                     updateDecision(decision.id, {

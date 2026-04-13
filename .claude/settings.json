@@ -84,7 +84,12 @@
       "Bash(ls /Users/colinrodrigues/Brain2/*.css)",
       "Bash(find /Users/colinrodrigues/Brain2 -maxdepth 1 -type f \\\\\\( -name \"tailwind*\" -o -name \"postcss*\" \\\\\\) -exec cat {} \\\\;)",
       "Bash(grep -E \"\\\\.tsx$\")",
-      "Bash(find /Users/colinrodrigues/Brain2/app -name \"*.tsx\" -exec grep -l \"useCallback\\\\|useMemo\\\\|memo\\\\|React.memo\" {} \\\\;)"
+      "Bash(find /Users/colinrodrigues/Brain2/app -name \"*.tsx\" -exec grep -l \"useCallback\\\\|useMemo\\\\|memo\\\\|React.memo\" {} \\\\;)",
+      "Bash(find /Users/colinrodrigues/Brain2/components -name \"*.tsx\" -exec grep -l \"useCallback\\\\|useMemo\\\\|memo\\\\|React.memo\" {} \\\\;)",
+      "Bash(find /Users/colinrodrigues/Brain2/components/review -name \"*.tsx\" -exec wc -l {} \\\\;)",
+      "Bash(find /Users/colinrodrigues/Brain2/lib -name \"*.ts\" -exec grep -l \"fetch\\\\|query\" {} \\\\;)",
+      "Bash(find /Users/colinrodrigues/Brain2/app -name \"*.tsx\" -exec grep -l \"use client\\\\|'use client'\" {} \\\\;)",
+      "Bash(find /Users/colinrodrigues/Brain2/components -name \"*.tsx\" -exec grep -l \"use client\\\\|'use client'\" {} \\\\;)"
     ],
     "additionalDirectories": [
       "/Users/colinrodrigues/Brain2/app/(app)/review",

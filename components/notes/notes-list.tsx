@@ -260,7 +260,7 @@ export function NotesList({
                   <Link href={`/notes/${note.id}`} className="block">
                     <p className="text-issue-title text-foreground">{note.title}</p>
                     {note.summary && (
-                      <p className="text-body text-foreground-secondary mt-0.5 line-clamp-3">
+                      <p className="text-body text-foreground-secondary mt-north-xs line-clamp-3">
                         {note.summary}
                       </p>
                     )}
@@ -281,7 +281,7 @@ export function NotesList({
                         >
                           <Badge
                             variant="outline"
-                            className="text-[11px] cursor-pointer hover:bg-accent"
+                            className="text-label cursor-pointer hover:bg-accent"
                           >
                             {p.name}
                           </Badge>
@@ -295,7 +295,7 @@ export function NotesList({
                         >
                           <Badge
                             variant="outline"
-                            className="text-[11px] cursor-pointer hover:bg-accent"
+                            className="text-label cursor-pointer hover:bg-accent"
                           >
                             {p.name}
                           </Badge>
@@ -305,7 +305,7 @@ export function NotesList({
                         <Link key={d.id} href="/domains" onClick={(e) => e.stopPropagation()}>
                           <Badge
                             variant="outline"
-                            className="text-[11px] cursor-pointer bg-primary/10 border-primary/20 hover:bg-primary/20"
+                            className="text-label cursor-pointer bg-primary/10 border-primary/20 hover:bg-primary/20"
                           >
                             {d.name}
                           </Badge>
@@ -313,15 +313,15 @@ export function NotesList({
                       ))}
                       {note.tasks.length > 0 && (
                         <div className="relative group/tasks">
-                          <Badge variant="secondary" className="text-[11px] cursor-default">
+                          <Badge variant="secondary" className="text-label cursor-default">
                             {note.tasks.length} task{note.tasks.length !== 1 ? 's' : ''}
                           </Badge>
                           <div className="absolute bottom-full left-0 mb-1.5 z-50 hidden group-hover/tasks:block min-w-48 max-w-72 rounded-lg border border-border bg-popover shadow-md p-north-xs">
-                            <ul className="space-y-1">
+                            <ul className="space-y-north-xs">
                               {note.tasks.map((t) => (
                                 <li key={t.id} className="flex items-center gap-north-xs">
                                   <TaskStatusBadge status={t.status} />
-                                  <span className="text-[11px] text-foreground truncate">
+                                  <span className="text-label text-foreground truncate">
                                     {t.title}
                                   </span>
                                 </li>
@@ -332,13 +332,13 @@ export function NotesList({
                       )}
                       {note.decisions.length > 0 && (
                         <div className="relative group/decisions">
-                          <Badge variant="secondary" className="text-[11px] cursor-default">
+                          <Badge variant="secondary" className="text-label cursor-default">
                             {note.decisions.length} decision{note.decisions.length !== 1 ? 's' : ''}
                           </Badge>
                           <div className="absolute bottom-full left-0 mb-1.5 z-50 hidden group-hover/decisions:block min-w-48 max-w-72 rounded-lg border border-border bg-popover shadow-md p-north-xs">
-                            <ul className="space-y-1">
+                            <ul className="space-y-north-xs">
                               {note.decisions.map((d) => (
-                                <li key={d.id} className="text-[11px] text-foreground line-clamp-2">
+                                <li key={d.id} className="text-label text-foreground line-clamp-2">
                                   {d.decision_text}
                                 </li>
                               ))}
@@ -348,13 +348,13 @@ export function NotesList({
                       )}
                       {note.questions.length > 0 && (
                         <div className="relative group/questions">
-                          <Badge variant="secondary" className="text-[11px] cursor-default">
+                          <Badge variant="secondary" className="text-label cursor-default">
                             {note.questions.length} question{note.questions.length !== 1 ? 's' : ''}
                           </Badge>
                           <div className="absolute bottom-full left-0 mb-1.5 z-50 hidden group-hover/questions:block min-w-48 max-w-72 rounded-lg border border-border bg-popover shadow-md p-north-xs">
-                            <ul className="space-y-1">
+                            <ul className="space-y-north-xs">
                               {note.questions.map((q) => (
-                                <li key={q.id} className="text-[11px] text-foreground line-clamp-2">
+                                <li key={q.id} className="text-label text-foreground line-clamp-2">
                                   {q.question_text}
                                 </li>
                               ))}
@@ -367,8 +367,8 @@ export function NotesList({
                 </div>
 
                 {/* Right: date + menu */}
-                <div className="flex items-center gap-north-xs shrink-0 pt-0.5">
-                  <span className="font-mono text-[11px] tabular-nums text-foreground-muted">
+                <div className="flex items-center gap-north-xs shrink-0 pt-north-xs">
+                  <span className="font-mono text-label tabular-nums text-foreground-muted">
                     {formatDate(note.created_at)}
                   </span>
                   <Menu.Root>

@@ -192,12 +192,12 @@ export function ProjectsList({
                 </span>
               )}
               {project.open_task_count > 0 && (
-                <span className="text-metadata text-amber-600">
+                <span className="text-metadata text-(--entity-tasks)">
                   {project.open_task_count} tasks
                 </span>
               )}
               {project.open_question_count > 0 && (
-                <span className="text-metadata text-blue-600">
+                <span className="text-metadata text-(--entity-questions)">
                   {project.open_question_count} questions
                 </span>
               )}
@@ -332,14 +332,18 @@ export function ProjectsList({
                 </td>
                 <td className="px-north-sm py-north-sm text-center text-metadata w-16">
                   {project.open_task_count > 0 ? (
-                    <span className="text-amber-600 font-medium">{project.open_task_count}</span>
+                    <span className="text-(--entity-tasks) font-medium">
+                      {project.open_task_count}
+                    </span>
                   ) : (
                     <span className="text-foreground-muted">—</span>
                   )}
                 </td>
                 <td className="px-north-sm py-north-sm text-center text-metadata w-24">
                   {project.open_question_count > 0 ? (
-                    <span className="text-blue-600 font-medium">{project.open_question_count}</span>
+                    <span className="text-(--entity-questions) font-medium">
+                      {project.open_question_count}
+                    </span>
                   ) : (
                     <span className="text-foreground-muted">—</span>
                   )}

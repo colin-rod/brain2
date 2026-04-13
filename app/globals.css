@@ -261,6 +261,13 @@
     letter-spacing: 0.01em;
   }
 
+  .text-subtitle {
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1.3;
+    font-family: var(--font-accent);
+  }
+
   .font-accent {
     font-family: var(--font-accent);
   }

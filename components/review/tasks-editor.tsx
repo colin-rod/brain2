@@ -67,7 +67,7 @@ export function TasksEditor() {
             {/* Row 2: actionee + priority */}
             <div className="flex gap-north-sm">
               <div className="flex-1">
-                <label className="text-metadata text-foreground-muted block mb-1">
+                <label className="text-metadata text-foreground-muted block mb-north-xs">
                   Assigned to
                 </label>
                 <Select
@@ -98,7 +98,9 @@ export function TasksEditor() {
                 </Select>
               </div>
               <div className="w-32">
-                <label className="text-metadata text-foreground-muted block mb-1">Priority</label>
+                <label className="text-metadata text-foreground-muted block mb-north-xs">
+                  Priority
+                </label>
                 <Select
                   value={task.priority || 'none'}
                   onValueChange={(v) =>

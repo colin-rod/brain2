@@ -255,7 +255,7 @@ export function TasksList({
 
       {/* Column headers */}
       <div className="hidden sm:grid sm:grid-cols-[24px_1fr_100px_60px_90px_100px_100px_32px] gap-north-sm px-north-sm items-center border-b-2 border-border pb-north-xs">
-        <span className="font-mono text-[10px] text-foreground-muted uppercase">#</span>
+        <span className="font-mono text-label text-foreground-muted uppercase">#</span>
         <SortableHeader label="Title" field="title" currentSort={sort} onSort={toggleSort} />
         <SortableHeader
           label="Status"
@@ -309,7 +309,7 @@ export function TasksList({
               >
                 {/* Desktop: grid layout */}
                 <div className="hidden sm:grid sm:grid-cols-[24px_1fr_100px_60px_90px_100px_100px_32px] gap-north-sm items-center">
-                  <span className="font-mono text-[10px] tabular-nums text-foreground-muted">
+                  <span className="font-mono text-label tabular-nums text-foreground-muted">
                     {String(index + 1).padStart(2, '0')}
                   </span>
 

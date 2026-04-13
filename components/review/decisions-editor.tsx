@@ -44,7 +44,7 @@ export function DecisionsEditor() {
 
             <div className="flex gap-north-sm">
               <div className="flex-1">
-                <label className="text-metadata text-foreground-muted block mb-1">
+                <label className="text-metadata text-foreground-muted block mb-north-xs">
                   Rationale (optional)
                 </label>
                 <Input
@@ -59,7 +59,9 @@ export function DecisionsEditor() {
                 />
               </div>
               <div className="w-48">
-                <label className="text-metadata text-foreground-muted block mb-1">Date</label>
+                <label className="text-metadata text-foreground-muted block mb-north-xs">
+                  Date
+                </label>
                 <DateInputWithShortcuts
                   value={decision.decision_date || ''}
                   onChange={(v) =>

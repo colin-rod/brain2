@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 import { useReviewStore } from '@/lib/stores/review-store';
 import { EditorEmptyMessage } from '@/components/shared/editor-empty-message';
+import { EditorItemCard } from '@/components/shared/editor-item-card';
 
 export function IdeasEditor() {
   const ideas = useReviewStore((s) => s.ideas);
@@ -17,25 +18,27 @@ export function IdeasEditor() {
 
       <div className="space-y-north-xs">
         {ideas.map((idea) => (
-          <div key={idea.id} className="flex items-start gap-north-sm animate-scale-in">
-            <Textarea
-              aria-label="Idea"
-              value={idea.idea_text}
-              onChange={(e) => updateIdea(idea.id, { idea_text: e.target.value })}
-              placeholder="Describe the idea or possibility..."
-              maxLength={2000}
-              rows={2}
-              className="flex-1 resize-none"
-            />
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => removeIdea(idea.id)}
-              className="shrink-0 text-foreground-muted hover:text-destructive mt-1"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
+          <EditorItemCard key={idea.id} className="animate-scale-in">
+            <div className="flex items-start gap-north-sm">
+              <Textarea
+                aria-label="Idea"
+                value={idea.idea_text}
+                onChange={(e) => updateIdea(idea.id, { idea_text: e.target.value })}
+                placeholder="Describe the idea or possibility..."
+                maxLength={2000}
+                rows={2}
+                className="flex-1 resize-none"
+              />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => removeIdea(idea.id)}
+                className="shrink-0 text-foreground-muted hover:text-destructive mt-north-xs"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          </EditorItemCard>
         ))}
       </div>
     </div>

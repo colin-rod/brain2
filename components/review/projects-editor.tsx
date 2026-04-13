@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 import { useReviewStore } from '@/lib/stores/review-store';
 import { EditorEmptyMessage } from '@/components/shared/editor-empty-message';
+import { EditorItemCard } from '@/components/shared/editor-item-card';
 
 export function ProjectsEditor() {
   const projects = useReviewStore((s) => s.projects);
@@ -17,24 +18,26 @@ export function ProjectsEditor() {
 
       <div className="space-y-north-xs">
         {projects.map((project) => (
-          <div key={project.id} className="flex items-center gap-north-sm animate-scale-in">
-            <Input
-              aria-label="Project name"
-              value={project.name}
-              onChange={(e) => updateProject(project.id, { name: e.target.value })}
-              placeholder="Project name"
-              maxLength={200}
-              className="flex-1"
-            />
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => removeProject(project.id)}
-              className="shrink-0 text-foreground-muted hover:text-destructive"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
+          <EditorItemCard key={project.id} className="animate-scale-in">
+            <div className="flex items-center gap-north-sm">
+              <Input
+                aria-label="Project name"
+                value={project.name}
+                onChange={(e) => updateProject(project.id, { name: e.target.value })}
+                placeholder="Project name"
+                maxLength={200}
+                className="flex-1"
+              />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => removeProject(project.id)}
+                className="shrink-0 text-foreground-muted hover:text-destructive"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          </EditorItemCard>
         ))}
       </div>
     </div>

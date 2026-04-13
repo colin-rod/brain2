@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 import { useReviewStore } from '@/lib/stores/review-store';
 import { EditorEmptyMessage } from '@/components/shared/editor-empty-message';
+import { EditorItemCard } from '@/components/shared/editor-item-card';
 
 export function PeopleEditor() {
   const people = useReviewStore((s) => s.people);
@@ -17,32 +18,34 @@ export function PeopleEditor() {
 
       <div className="space-y-north-xs">
         {people.map((person) => (
-          <div key={person.id} className="flex items-center gap-north-sm animate-scale-in">
-            <Input
-              aria-label="Person name"
-              value={person.name}
-              onChange={(e) => updatePerson(person.id, { name: e.target.value })}
-              placeholder="Name"
-              maxLength={200}
-              className="flex-1"
-            />
-            <Input
-              aria-label="Person role"
-              value={person.role || ''}
-              onChange={(e) => updatePerson(person.id, { role: e.target.value || null })}
-              placeholder="Role (optional)"
-              maxLength={200}
-              className="flex-1"
-            />
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => removePerson(person.id)}
-              className="shrink-0 text-foreground-muted hover:text-destructive"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
+          <EditorItemCard key={person.id} className="animate-scale-in">
+            <div className="flex items-center gap-north-sm">
+              <Input
+                aria-label="Person name"
+                value={person.name}
+                onChange={(e) => updatePerson(person.id, { name: e.target.value })}
+                placeholder="Name"
+                maxLength={200}
+                className="flex-1"
+              />
+              <Input
+                aria-label="Person role"
+                value={person.role || ''}
+                onChange={(e) => updatePerson(person.id, { role: e.target.value || null })}
+                placeholder="Role (optional)"
+                maxLength={200}
+                className="flex-1"
+              />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => removePerson(person.id)}
+                className="shrink-0 text-foreground-muted hover:text-destructive"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          </EditorItemCard>
         ))}
       </div>
     </div>

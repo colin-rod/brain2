@@ -126,7 +126,7 @@ export function DomainsList({ domains }: DomainsListProps) {
                 </span>
               )}
               {domain.open_question_count > 0 && (
-                <span className="text-metadata text-blue-600">
+                <span className="text-metadata text-(--entity-questions)">
                   {domain.open_question_count} questions
                 </span>
               )}
@@ -227,7 +227,9 @@ export function DomainsList({ domains }: DomainsListProps) {
                 </td>
                 <td className="px-north-sm py-north-sm text-center text-metadata w-24">
                   {domain.open_question_count > 0 ? (
-                    <span className="text-blue-600 font-medium">{domain.open_question_count}</span>
+                    <span className="text-(--entity-questions) font-medium">
+                      {domain.open_question_count}
+                    </span>
                   ) : (
                     <span className="text-foreground-muted">—</span>
                   )}

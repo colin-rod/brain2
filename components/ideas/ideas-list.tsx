@@ -39,8 +39,8 @@ const STATUS_LABELS: Record<IdeaStatus, string> = {
 
 const STATUS_COLORS: Record<IdeaStatus, string> = {
   raw: 'text-foreground-muted',
-  developing: 'text-blue-600',
-  accepted: 'text-green-600',
+  developing: 'text-status-processing',
+  accepted: 'text-status-saved',
   rejected: 'text-destructive',
   archived: 'text-foreground-muted opacity-50',
 };
@@ -206,7 +206,7 @@ export function IdeasList({ ideas }: IdeasListProps) {
                 value={idea.status}
                 onValueChange={(v) => handleStatusChange(idea.id, v as IdeaStatus)}
               >
-                <SelectTrigger className="h-7 text-[11px] w-32">
+                <SelectTrigger className="h-7 text-label w-32">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>

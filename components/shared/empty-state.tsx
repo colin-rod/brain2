@@ -26,16 +26,16 @@ export function EmptyState({
         <Icon className="h-6 w-6 text-primary" />
       </div>
       <div className="animate-slide-in-up" style={{ animationDelay: '80ms' }}>
-        <p className="font-accent text-[17px] font-semibold text-foreground">{title}</p>
+        <p className="text-subtitle text-foreground">{title}</p>
         {description && (
-          <p className="text-[13px] text-foreground-secondary mt-north-xs leading-relaxed tracking-[0.01em]">
+          <p className="text-metadata text-foreground-secondary mt-north-xs leading-relaxed tracking-[0.01em]">
             {description}
           </p>
         )}
         {ctaLabel && ctaHref && (
           <Link
             href={ctaHref}
-            className="inline-flex items-center gap-1.5 mt-north-base text-[13px] font-medium text-primary hover:text-primary/80 transition-colors"
+            className="inline-flex items-center gap-north-sm mt-north-base text-metadata font-medium text-primary hover:text-primary/80 transition-colors"
           >
             {ctaLabel} <span aria-hidden="true">&rarr;</span>
           </Link>

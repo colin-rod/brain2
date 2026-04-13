@@ -97,8 +97,7 @@ export function QuestionsList({ questions }: QuestionsListProps) {
         {filtered.map((q) => (
           <div
             key={q.id}
-            className="group rounded-lg border border-border bg-surface border-l-[3px] px-north-md py-north-sm flex items-start gap-north-sm animate-fade-in"
-            style={{ borderLeftColor: 'var(--entity-questions)' }}
+            className="group rounded-lg border border-border bg-surface border-l-[3px] border-l-(--entity-questions) px-north-md py-north-sm flex items-start gap-north-sm animate-fade-in"
           >
             <div className="flex-1 min-w-0 space-y-north-xs">
               <InlineEditableText

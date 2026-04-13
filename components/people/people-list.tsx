@@ -183,10 +183,12 @@ export function PeopleList({
                 </span>
               )}
               {person.open_task_count > 0 && (
-                <span className="text-metadata text-amber-600">{person.open_task_count} tasks</span>
+                <span className="text-metadata text-(--entity-tasks)">
+                  {person.open_task_count} tasks
+                </span>
               )}
               {person.open_question_count > 0 && (
-                <span className="text-metadata text-blue-600">
+                <span className="text-metadata text-(--entity-questions)">
                   {person.open_question_count} questions
                 </span>
               )}
@@ -316,14 +318,18 @@ export function PeopleList({
                 </td>
                 <td className="px-north-sm py-north-sm text-center text-metadata w-16">
                   {person.open_task_count > 0 ? (
-                    <span className="text-amber-600 font-medium">{person.open_task_count}</span>
+                    <span className="text-(--entity-tasks) font-medium">
+                      {person.open_task_count}
+                    </span>
                   ) : (
                     <span className="text-foreground-muted">—</span>
                   )}
                 </td>
                 <td className="px-north-sm py-north-sm text-center text-metadata w-24">
                   {person.open_question_count > 0 ? (
-                    <span className="text-blue-600 font-medium">{person.open_question_count}</span>
+                    <span className="text-(--entity-questions) font-medium">
+                      {person.open_question_count}
+                    </span>
                   ) : (
                     <span className="text-foreground-muted">—</span>
                   )}

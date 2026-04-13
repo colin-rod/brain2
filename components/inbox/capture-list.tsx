@@ -155,7 +155,7 @@ function CaptureCard({ capture, index }: { capture: Capture; index: number }) {
       )}
     >
       <div className="flex flex-col items-center shrink-0 w-8 gap-0.5">
-        <span className="font-mono text-[10px] tabular-nums text-foreground-muted">
+        <span className="font-mono text-label tabular-nums text-foreground-muted">
           {String(index + 1).padStart(2, '0')}
         </span>
         <span
@@ -165,18 +165,18 @@ function CaptureCard({ capture, index }: { capture: Capture; index: number }) {
           )}
           style={{ backgroundColor: statusDotColor[capture.status] }}
         />
-        <span className="font-mono text-[9px] uppercase text-foreground-muted opacity-60">
+        <span className="font-mono text-label uppercase text-foreground-muted opacity-60">
           {sourceShort[capture.source_type]}
         </span>
       </div>
 
       <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-north-sm mb-0.5">
+        <div className="flex items-center gap-north-sm mb-north-xs">
           <Badge
             key={capture.status}
             variant="outline"
             className={cn(
-              'text-[11px] px-1.5 py-px rounded-none uppercase font-mono tracking-wider animate-scale-in transition-colors duration-300',
+              'text-label px-north-xs py-px rounded-none uppercase font-mono tracking-wider animate-scale-in transition-colors duration-300',
               statusStyles[capture.status],
             )}
           >
@@ -185,12 +185,12 @@ function CaptureCard({ capture, index }: { capture: Capture; index: number }) {
         </div>
         <p className="text-body text-foreground font-medium truncate">{getPreviewText(capture)}</p>
         {capture.status === 'failed' && capture.error_message && (
-          <p className="text-metadata text-status-failed mt-0.5 flex items-center gap-1">
+          <p className="text-metadata text-status-failed mt-north-xs flex items-center gap-1">
             <AlertCircle className="h-3 w-3 shrink-0" aria-hidden="true" />
             {capture.error_message.slice(0, 80)}
           </p>
         )}
-        <p className="font-mono text-[11px] tabular-nums text-foreground-muted/70 mt-0.5">
+        <p className="font-mono text-label tabular-nums text-foreground-muted/70 mt-north-xs">
           {formatRelativeTime(capture.created_at)}
         </p>
       </div>
@@ -207,12 +207,12 @@ function CaptureCard({ capture, index }: { capture: Capture; index: number }) {
             <Loader2 className="h-4 w-4 animate-spin" />
           ) : capture.status === 'failed' ? (
             <>
-              <RotateCcw className="h-3.5 w-3.5 mr-1.5" />
+              <RotateCcw className="h-3.5 w-3.5 mr-north-xs" />
               Retry
             </>
           ) : (
             <>
-              <Sparkles className="h-3.5 w-3.5 mr-1.5" />
+              <Sparkles className="h-3.5 w-3.5 mr-north-xs" />
               Analyze
             </>
           )}

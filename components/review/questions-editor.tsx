@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 import { useReviewStore } from '@/lib/stores/review-store';
 import { EditorEmptyMessage } from '@/components/shared/editor-empty-message';
+import { EditorItemCard } from '@/components/shared/editor-item-card';
 
 export function QuestionsEditor() {
   const questions = useReviewStore((s) => s.open_questions);
@@ -19,24 +20,26 @@ export function QuestionsEditor() {
 
       <div className="space-y-north-xs">
         {questions.map((q) => (
-          <div key={q.id} className="flex items-center gap-north-sm animate-scale-in">
-            <Input
-              aria-label="Question"
-              value={q.question_text}
-              onChange={(e) => updateQuestion(q.id, { question_text: e.target.value })}
-              placeholder="What needs to be resolved?"
-              maxLength={1000}
-              className="flex-1"
-            />
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => removeQuestion(q.id)}
-              className="shrink-0 text-foreground-muted hover:text-destructive"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
+          <EditorItemCard key={q.id} className="animate-scale-in">
+            <div className="flex items-center gap-north-sm">
+              <Input
+                aria-label="Question"
+                value={q.question_text}
+                onChange={(e) => updateQuestion(q.id, { question_text: e.target.value })}
+                placeholder="What needs to be resolved?"
+                maxLength={1000}
+                className="flex-1"
+              />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => removeQuestion(q.id)}
+                className="shrink-0 text-foreground-muted hover:text-destructive"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          </EditorItemCard>
         ))}
       </div>
     </div>

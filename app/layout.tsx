@@ -8,6 +8,15 @@ const fraunces = Fraunces({ subsets: ['latin'], variable: '--font-fraunces', dis
 export const metadata: Metadata = {
   title: 'Brain2',
   description: 'Turn messy work inputs into durable, structured knowledge',
+  manifest: '/manifest.webmanifest',
+  appleWebApp: {
+    capable: true,
+    title: 'Brain2',
+    statusBarStyle: 'default',
+  },
+  formatDetection: {
+    telephone: false,
+  },
 };
 
 export default function RootLayout({

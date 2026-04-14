@@ -16,7 +16,8 @@ import {
 import { InlineEditableText } from '@/components/notes/inline-editable-text';
 import { EntityCombobox } from '@/components/notes/entity-combobox';
 import { SearchBar } from '@/components/shared/search-bar';
-import { FilterBar, type FilterConfig } from '@/components/shared/filter-bar';
+import { type FilterConfig } from '@/components/shared/filter-bar';
+import { ViewOptionsMenu } from '@/components/shared/view-options-menu';
 import { GroupLabel } from '@/components/shared/group-label';
 import { SortableHeader } from '@/components/shared/sortable-header';
 import { TaskStatusBadge } from '@/components/shared/status-badge';
@@ -54,6 +55,14 @@ const PRIORITY_OPTIONS = [
   { value: 'P1', label: 'P1' },
   { value: 'P2', label: 'P2' },
   { value: 'P3', label: 'P3' },
+];
+
+const GROUP_OPTIONS: { value: string; label: string }[] = [
+  { value: 'none', label: 'No grouping' },
+  { value: 'status', label: 'Status' },
+  { value: 'priority', label: 'Priority' },
+  { value: 'project', label: 'Project' },
+  { value: 'assignee', label: 'Assignee' },
 ];
 
 const STATUS_BORDER: Record<TaskStatus, string> = {
@@ -213,10 +222,19 @@ export function TasksList({
 
   return (
     <div className="space-y-north-md">
-      <div className="flex items-center justify-between">
-        <div className="flex-1 min-w-0 mr-north-md">
+      <div className="flex items-center gap-north-sm">
+        <div className="flex-1 min-w-0">
           <SearchBar placeholder="Search tasks..." onSearch={setSearch} />
         </div>
+        <ViewOptionsMenu
+          filterConfigs={filterConfigs}
+          filterValues={filters}
+          onFilterChange={setFilter}
+          onFilterClear={clearFilters}
+          groupOptions={GROUP_OPTIONS}
+          groupValue={groupBy}
+          onGroupChange={(v) => setGroupBy(v ?? 'none')}
+        />
         <Button
           variant="ghost"
           size="sm"
@@ -226,31 +244,6 @@ export function TasksList({
           <Plus className="h-3.5 w-3.5" />
           New Task
         </Button>
-      </div>
-
-      <div className="flex items-center gap-north-sm flex-wrap">
-        <FilterBar
-          filters={filterConfigs}
-          values={filters}
-          onChange={setFilter}
-          onClear={clearFilters}
-        />
-        <Select value={groupBy} onValueChange={(v) => setGroupBy(v ?? 'none')}>
-          <SelectTrigger size="sm" className="text-metadata w-auto">
-            <SelectValue>
-              {groupBy === 'none'
-                ? 'Group by'
-                : `Group: ${groupBy.charAt(0).toUpperCase() + groupBy.slice(1)}`}
-            </SelectValue>
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="none">No grouping</SelectItem>
-            <SelectItem value="status">Status</SelectItem>
-            <SelectItem value="priority">Priority</SelectItem>
-            <SelectItem value="project">Project</SelectItem>
-            <SelectItem value="assignee">Assignee</SelectItem>
-          </SelectContent>
-        </Select>
       </div>
 
       {/* Column headers */}

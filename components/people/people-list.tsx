@@ -6,7 +6,8 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { InlineEditableText } from '@/components/notes/inline-editable-text';
 import { SearchBar } from '@/components/shared/search-bar';
-import { FilterBar, type FilterConfig } from '@/components/shared/filter-bar';
+import { type FilterConfig } from '@/components/shared/filter-bar';
+import { ViewOptionsMenu } from '@/components/shared/view-options-menu';
 import { SortableHeader } from '@/components/shared/sortable-header';
 import { useListState, applySorting } from '@/lib/hooks/use-list-state';
 import { useSearchRefresh } from '@/components/search/search-provider';
@@ -114,25 +115,26 @@ export function PeopleList({
 
   return (
     <div className="space-y-north-md">
-      <div className="flex items-center justify-between">
-        <SearchBar placeholder="Search people..." onSearch={setSearch} />
+      <div className="flex items-center gap-north-sm">
+        <div className="flex-1">
+          <SearchBar placeholder="Search people..." onSearch={setSearch} />
+        </div>
+        <ViewOptionsMenu
+          filterConfigs={filterConfigs}
+          filterValues={filters}
+          onFilterChange={setFilter}
+          onFilterClear={clearFilters}
+        />
         <Button
           variant="ghost"
           size="sm"
           onClick={() => setIsAdding(true)}
-          className="gap-1 ml-north-md shrink-0"
+          className="gap-1 shrink-0"
         >
           <Plus className="h-3.5 w-3.5" />
           New Person
         </Button>
       </div>
-
-      <FilterBar
-        filters={filterConfigs}
-        values={filters}
-        onChange={setFilter}
-        onClear={clearFilters}
-      />
 
       {/* Mobile cards */}
       <div className="sm:hidden space-y-north-xs">

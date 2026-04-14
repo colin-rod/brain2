@@ -14,7 +14,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { SearchBar } from '@/components/shared/search-bar';
-import { FilterBar, type FilterConfig } from '@/components/shared/filter-bar';
+import { type FilterConfig } from '@/components/shared/filter-bar';
+import { ViewOptionsMenu } from '@/components/shared/view-options-menu';
 import { useListState, applySorting } from '@/lib/hooks/use-list-state';
 import { useSearchRefresh } from '@/components/search/search-provider';
 import { createIdea, deleteIdea, updateIdeaStatus } from '@/lib/actions/entity-mutations';
@@ -125,25 +126,26 @@ export function IdeasList({ ideas }: IdeasListProps) {
 
   return (
     <div className="space-y-north-md">
-      <div className="flex items-center justify-between">
-        <SearchBar placeholder="Search ideas..." onSearch={setSearch} />
+      <div className="flex items-center gap-north-sm">
+        <div className="flex-1">
+          <SearchBar placeholder="Search ideas..." onSearch={setSearch} />
+        </div>
+        <ViewOptionsMenu
+          filterConfigs={filterConfigs}
+          filterValues={filters}
+          onFilterChange={setFilter}
+          onFilterClear={clearFilters}
+        />
         <Button
           variant="ghost"
           size="sm"
           onClick={() => setIsAdding(true)}
-          className="gap-1 ml-north-md shrink-0"
+          className="gap-1 shrink-0"
         >
           <Plus className="h-3.5 w-3.5" />
           New Idea
         </Button>
       </div>
-
-      <FilterBar
-        filters={filterConfigs}
-        values={filters}
-        onChange={setFilter}
-        onClear={clearFilters}
-      />
 
       <div className="space-y-north-sm">
         {isAdding && (

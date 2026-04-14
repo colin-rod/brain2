@@ -9,8 +9,8 @@ import { Input } from '@/components/ui/input';
 import { InlineEditableText } from '@/components/notes/inline-editable-text';
 import { EntityCombobox } from '@/components/notes/entity-combobox';
 import { SearchBar } from '@/components/shared/search-bar';
-import { FilterBar, type FilterConfig } from '@/components/shared/filter-bar';
-import { SortableHeader } from '@/components/shared/sortable-header';
+import { type FilterConfig } from '@/components/shared/filter-bar';
+import { ViewOptionsMenu } from '@/components/shared/view-options-menu';
 import { useListState, applySorting } from '@/lib/hooks/use-list-state';
 import { useSearchRefresh } from '@/components/search/search-provider';
 import { updateDecision, deleteDecision } from '@/lib/actions/note-mutations';
@@ -21,6 +21,14 @@ import {
 } from '@/lib/actions/entity-mutations';
 import { Plus, X } from 'lucide-react';
 import type { Decision, Person, Project, NoteDomain } from '@/types/database';
+
+const SORT_OPTIONS = [
+  { value: 'none', label: 'Default' },
+  { value: 'decision_text:asc', label: 'Decision A→Z' },
+  { value: 'decision_text:desc', label: 'Decision Z→A' },
+  { value: 'decision_date:desc', label: 'Date (newest)' },
+  { value: 'decision_date:asc', label: 'Date (oldest)' },
+];
 
 type DecisionWithRelations = Decision & {
   notes: { id: string; title: string } | null;
@@ -69,11 +77,21 @@ export function DecisionsList({
     [allProjects, allDomains],
   );
 
-  const { filters, sort, search, setFilter, clearFilters, toggleSort, setSearch, searched } =
+  const { filters, sort, search, setFilter, clearFilters, setSort, setSearch, searched } =
     useListState<DecisionWithRelations>({
       items: decisions,
       searchKeys: ['decision_text', 'rationale'],
     });
+
+  const sortValue = sort ? `${sort.field}:${sort.direction}` : 'none';
+  function handleSortChange(v: string) {
+    if (v === 'none') {
+      setSort(null);
+    } else {
+      const [field, direction] = v.split(':');
+      setSort({ field, direction: direction as 'asc' | 'desc' });
+    }
+  }
 
   const filtered = useMemo(() => {
     let result = searched;
@@ -170,34 +188,28 @@ export function DecisionsList({
 
   return (
     <div className="space-y-north-md">
-      <div className="flex items-center justify-between">
-        <SearchBar placeholder="Search decisions..." onSearch={setSearch} />
+      <div className="flex items-center gap-north-sm">
+        <div className="flex-1">
+          <SearchBar placeholder="Search decisions..." onSearch={setSearch} />
+        </div>
+        <ViewOptionsMenu
+          sortOptions={SORT_OPTIONS}
+          sortValue={sortValue}
+          onSortChange={handleSortChange}
+          filterConfigs={filterConfigs}
+          filterValues={filters}
+          onFilterChange={setFilter}
+          onFilterClear={clearFilters}
+        />
         <Button
           variant="ghost"
           size="sm"
           onClick={() => setIsAdding(true)}
-          className="gap-1 ml-north-md shrink-0"
+          className="gap-1 shrink-0"
         >
           <Plus className="h-3.5 w-3.5" />
           New Decision
         </Button>
-      </div>
-
-      <FilterBar
-        filters={filterConfigs}
-        values={filters}
-        onChange={setFilter}
-        onClear={clearFilters}
-      />
-
-      <div className="flex items-center gap-north-lg px-north-xs">
-        <SortableHeader
-          label="Decision"
-          field="decision_text"
-          currentSort={sort}
-          onSort={toggleSort}
-        />
-        <SortableHeader label="Date" field="decision_date" currentSort={sort} onSort={toggleSort} />
       </div>
 
       <div className="space-y-north-sm">

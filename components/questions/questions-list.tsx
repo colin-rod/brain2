@@ -6,7 +6,8 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { SearchBar } from '@/components/shared/search-bar';
-import { FilterBar, type FilterConfig } from '@/components/shared/filter-bar';
+import { type FilterConfig } from '@/components/shared/filter-bar';
+import { ViewOptionsMenu } from '@/components/shared/view-options-menu';
 import { QuestionStatusBadge } from '@/components/shared/status-badge';
 import { InlineEditableText } from '@/components/notes/inline-editable-text';
 import { useListState, applySorting } from '@/lib/hooks/use-list-state';
@@ -83,13 +84,15 @@ export function QuestionsList({ questions }: QuestionsListProps) {
 
   return (
     <div className="space-y-north-md">
-      <div className="flex flex-col sm:flex-row gap-north-sm">
-        <SearchBar onSearch={setSearch} placeholder="Search questions…" />
-        <FilterBar
-          filters={filterConfigs}
-          values={filters}
-          onChange={setFilter}
-          onClear={clearFilters}
+      <div className="flex items-center gap-north-sm">
+        <div className="flex-1">
+          <SearchBar onSearch={setSearch} placeholder="Search questions…" />
+        </div>
+        <ViewOptionsMenu
+          filterConfigs={filterConfigs}
+          filterValues={filters}
+          onFilterChange={setFilter}
+          onFilterClear={clearFilters}
         />
       </div>
 

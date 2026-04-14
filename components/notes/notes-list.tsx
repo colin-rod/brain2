@@ -7,23 +7,31 @@ import { MoreHorizontal } from 'lucide-react';
 import { Menu } from '@base-ui/react/menu';
 import { AlertDialog } from '@base-ui/react/alert-dialog';
 import { SearchBar } from '@/components/shared/search-bar';
-import { FilterBar, type FilterConfig } from '@/components/shared/filter-bar';
+import { type FilterConfig } from '@/components/shared/filter-bar';
+import { ViewOptionsMenu } from '@/components/shared/view-options-menu';
 import { GroupLabel } from '@/components/shared/group-label';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { formatDate } from '@/lib/format-date';
 import { useListState } from '@/lib/hooks/use-list-state';
 import { archiveNote, deleteNote } from '@/lib/actions/note-mutations';
 import { TaskStatusBadge } from '@/components/shared/status-badge';
 import type { NoteWithMeta } from '@/types/database';
 import { cn } from '@/lib/utils';
+
+const SORT_OPTIONS = [
+  { value: 'newest', label: 'Newest first' },
+  { value: 'oldest', label: 'Oldest first' },
+  { value: 'title-az', label: 'Title A–Z' },
+];
+
+const GROUP_OPTIONS: { value: string; label: string }[] = [
+  { value: 'none', label: 'No grouping' },
+  { value: 'project', label: 'Project' },
+  { value: 'person', label: 'Person' },
+  { value: 'domain', label: 'Domain' },
+  { value: 'date', label: 'Date' },
+];
 
 type NoteSort = 'newest' | 'oldest' | 'title-az';
 
@@ -171,77 +179,53 @@ export function NotesList({
         </Link>
       </div>
 
-      {/* Search + Sort */}
+      {/* Search + View Options */}
       <div className="flex items-center gap-north-sm">
         <div className="flex-1">
           <SearchBar placeholder="Search notes..." onSearch={setSearch} />
         </div>
-        <Select value={noteSort} onValueChange={(v) => setNoteSort(v as NoteSort)}>
-          <SelectTrigger size="sm" className="text-metadata shrink-0 w-36">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="newest">Newest first</SelectItem>
-            <SelectItem value="oldest">Oldest first</SelectItem>
-            <SelectItem value="title-az">Title A–Z</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* Filters + Group By */}
-      <div className="flex items-center gap-north-sm flex-wrap">
-        {filterConfigs.length > 0 && (
-          <FilterBar
-            filters={filterConfigs}
-            values={filters}
-            onChange={setFilter}
-            onClear={clearFilters}
-          />
-        )}
-        <Select value={groupBy} onValueChange={(v) => setGroupBy(v as typeof groupBy)}>
-          <SelectTrigger size="sm" className="text-metadata w-auto">
-            <SelectValue>
-              {groupBy === 'none'
-                ? 'Group by'
-                : `Group: ${groupBy.charAt(0).toUpperCase() + groupBy.slice(1)}`}
-            </SelectValue>
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="none">No grouping</SelectItem>
-            <SelectItem value="project">Project</SelectItem>
-            <SelectItem value="person">Person</SelectItem>
-            <SelectItem value="domain">Domain</SelectItem>
-            <SelectItem value="date">Date</SelectItem>
-          </SelectContent>
-        </Select>
-        {groupBy === 'date' && (
-          <div className="flex items-center rounded-md border border-border overflow-hidden">
-            <button
-              type="button"
-              onClick={() => setDateGroupMode('month')}
-              className={cn(
-                'px-2 h-7 text-metadata transition-colors',
-                dateGroupMode === 'month'
-                  ? 'bg-primary text-primary-foreground'
-                  : 'text-foreground-muted hover:text-foreground',
-              )}
-            >
-              Month
-            </button>
-            <button
-              type="button"
-              onClick={() => setDateGroupMode('week')}
-              className={cn(
-                'px-2 h-7 text-metadata transition-colors',
-                dateGroupMode === 'week'
-                  ? 'bg-primary text-primary-foreground'
-                  : 'text-foreground-muted hover:text-foreground',
-              )}
-            >
-              Week
-            </button>
-          </div>
-        )}
+        <ViewOptionsMenu
+          sortOptions={SORT_OPTIONS}
+          sortValue={noteSort}
+          onSortChange={(v) => setNoteSort(v as NoteSort)}
+          filterConfigs={filterConfigs}
+          filterValues={filters}
+          onFilterChange={setFilter}
+          onFilterClear={clearFilters}
+          groupOptions={GROUP_OPTIONS}
+          groupValue={groupBy}
+          onGroupChange={(v) => setGroupBy(v as typeof groupBy)}
+          extra={
+            groupBy === 'date' ? (
+              <div className="flex items-center rounded-md border border-border overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => setDateGroupMode('month')}
+                  className={cn(
+                    'px-2 h-7 text-metadata transition-colors',
+                    dateGroupMode === 'month'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'text-foreground-muted hover:text-foreground',
+                  )}
+                >
+                  Month
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setDateGroupMode('week')}
+                  className={cn(
+                    'px-2 h-7 text-metadata transition-colors',
+                    dateGroupMode === 'week'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'text-foreground-muted hover:text-foreground',
+                  )}
+                >
+                  Week
+                </button>
+              </div>
+            ) : undefined
+          }
+        />
       </div>
 
       {/* List */}

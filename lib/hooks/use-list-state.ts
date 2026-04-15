@@ -60,6 +60,7 @@ export function useListState<T extends Record<string, any>>({
     setFilter,
     clearFilters,
     toggleSort,
+    setSort,
     setSearch,
     searched,
   };

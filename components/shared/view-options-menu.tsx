@@ -31,10 +31,10 @@ interface ViewOptionsMenuProps {
   onFilterClear?: () => void;
   sortOptions?: ViewSortOption[];
   sortValue?: string;
-  onSortChange?: (value: string) => void;
+  onSortChange?: (value: string | null) => void;
   groupOptions?: ViewGroupOption[];
   groupValue?: string;
-  onGroupChange?: (value: string) => void;
+  onGroupChange?: (value: string | null) => void;
   extra?: React.ReactNode;
 }
 
@@ -55,7 +55,8 @@ export function ViewOptionsMenu({
   const defaultSort = sortOptions?.[0]?.value;
   const hasActiveSort = !!sortValue && sortValue !== defaultSort;
   const hasActiveGroup = !!groupValue && groupValue !== 'none';
-  const activeCount = (hasActiveFilters ? 1 : 0) + (hasActiveSort ? 1 : 0) + (hasActiveGroup ? 1 : 0);
+  const activeCount =
+    (hasActiveFilters ? 1 : 0) + (hasActiveSort ? 1 : 0) + (hasActiveGroup ? 1 : 0);
 
   const hasSections =
     (sortOptions && sortOptions.length > 0) ||
@@ -89,7 +90,10 @@ export function ViewOptionsMenu({
                     <p className="font-mono text-[10px] uppercase tracking-wider text-foreground-muted mb-north-xs">
                       Sort
                     </p>
-                    <Select value={sortValue || defaultSort} onValueChange={onSortChange}>
+                    <Select
+                      value={sortValue || defaultSort}
+                      onValueChange={(val) => val && onSortChange?.(val)}
+                    >
                       <SelectTrigger size="sm" className="w-full text-metadata">
                         <SelectValue />
                       </SelectTrigger>
@@ -124,6 +128,7 @@ export function ViewOptionsMenu({
                               <Select
                                 value={filterValues[filter.key] || ''}
                                 onValueChange={(val) =>
+                                  val !== null &&
                                   onFilterChange?.(filter.key, val === '__all__' ? '' : val)
                                 }
                               >
@@ -192,7 +197,10 @@ export function ViewOptionsMenu({
                     <p className="font-mono text-[10px] uppercase tracking-wider text-foreground-muted mb-north-xs">
                       Group by
                     </p>
-                    <Select value={groupValue || 'none'} onValueChange={onGroupChange}>
+                    <Select
+                      value={groupValue || 'none'}
+                      onValueChange={(val) => val && onGroupChange?.(val)}
+                    >
                       <SelectTrigger size="sm" className="w-full text-metadata">
                         <SelectValue />
                       </SelectTrigger>

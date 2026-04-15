@@ -84,8 +84,8 @@ export function DecisionsList({
     });
 
   const sortValue = sort ? `${sort.field}:${sort.direction}` : 'none';
-  function handleSortChange(v: string) {
-    if (v === 'none') {
+  function handleSortChange(v: string | null) {
+    if (!v || v === 'none') {
       setSort(null);
     } else {
       const [field, direction] = v.split(':');

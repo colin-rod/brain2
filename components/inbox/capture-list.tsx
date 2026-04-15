@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useTransition } from 'react';
+import React, { useEffect, useState, useTransition } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
@@ -123,7 +123,13 @@ function ProcessingIndicator() {
   );
 }
 
-function CaptureCard({ capture, index }: { capture: Capture; index: number }) {
+const CaptureCard = React.memo(function CaptureCard({
+  capture,
+  index,
+}: {
+  capture: Capture;
+  index: number;
+}) {
   const router = useRouter();
   const refreshSearch = useSearchRefresh();
   const [isParsing, startTransition] = useTransition();
@@ -230,4 +236,4 @@ function CaptureCard({ capture, index }: { capture: Capture; index: number }) {
       {wrapped}
     </div>
   );
-}
+});

@@ -113,18 +113,17 @@ export function ReviewClient({ capture, imageUrl }: ReviewClientProps) {
   const [isSaved, setIsSaved] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
-  const store = useReviewStore();
-  const captureId = store.captureId;
-  const initFromParsed = store.initFromParsed;
-  const reset = store.reset;
+  const captureId = useReviewStore((s) => s.captureId);
+  const initFromParsed = useReviewStore((s) => s.initFromParsed);
+  const reset = useReviewStore((s) => s.reset);
 
-  const tasks = useReviewStore((s) => s.tasks);
-  const people = useReviewStore((s) => s.people);
-  const projects = useReviewStore((s) => s.projects);
-  const domains = useReviewStore((s) => s.domains);
-  const decisions = useReviewStore((s) => s.decisions);
-  const open_questions = useReviewStore((s) => s.open_questions);
-  const ideas = useReviewStore((s) => s.ideas);
+  const taskCount = useReviewStore((s) => s.tasks.length);
+  const personCount = useReviewStore((s) => s.people.length);
+  const projectCount = useReviewStore((s) => s.projects.length);
+  const domainCount = useReviewStore((s) => s.domains.length);
+  const decisionCount = useReviewStore((s) => s.decisions.length);
+  const questionCount = useReviewStore((s) => s.open_questions.length);
+  const ideaCount = useReviewStore((s) => s.ideas.length);
 
   const addTask = useReviewStore((s) => s.addTask);
   const addPerson = useReviewStore((s) => s.addPerson);
@@ -143,18 +142,19 @@ export function ReviewClient({ capture, imageUrl }: ReviewClientProps) {
 
   function handleSave() {
     startTransition(async () => {
+      const state = useReviewStore.getState();
       const result = await saveReviewedNote({
         captureId: capture.id,
-        title: store.title,
-        summary: store.summary,
-        cleaned_text: store.cleaned_text,
-        tasks: store.tasks,
-        people: store.people,
-        projects: store.projects,
-        domains: store.domains,
-        decisions: store.decisions,
-        open_questions: store.open_questions,
-        ideas: store.ideas,
+        title: state.title,
+        summary: state.summary,
+        cleaned_text: state.cleaned_text,
+        tasks: state.tasks,
+        people: state.people,
+        projects: state.projects,
+        domains: state.domains,
+        decisions: state.decisions,
+        open_questions: state.open_questions,
+        ideas: state.ideas,
       });
 
       if (result.validationErrors) {
@@ -201,14 +201,14 @@ export function ReviewClient({ capture, imageUrl }: ReviewClientProps) {
 
           {/* Right column: structured editors */}
           <div className="lg:col-span-3 space-y-north-sm divide-y divide-border">
-            <CollapsibleSection title="Tasks" count={tasks.length} delay="50ms" onAdd={addTask}>
+            <CollapsibleSection title="Tasks" count={taskCount} delay="50ms" onAdd={addTask}>
               <TasksEditor />
             </CollapsibleSection>
 
             <div className="pt-north-sm">
               <CollapsibleSection
                 title="People"
-                count={people.length}
+                count={personCount}
                 delay="100ms"
                 onAdd={addPerson}
               >
@@ -219,7 +219,7 @@ export function ReviewClient({ capture, imageUrl }: ReviewClientProps) {
             <div className="pt-north-sm">
               <CollapsibleSection
                 title="Projects"
-                count={projects.length}
+                count={projectCount}
                 delay="150ms"
                 onAdd={addProject}
               >
@@ -230,7 +230,7 @@ export function ReviewClient({ capture, imageUrl }: ReviewClientProps) {
             <div className="pt-north-sm">
               <CollapsibleSection
                 title="Domains"
-                count={domains.length}
+                count={domainCount}
                 delay="175ms"
                 onAdd={addDomain}
               >
@@ -241,7 +241,7 @@ export function ReviewClient({ capture, imageUrl }: ReviewClientProps) {
             <div className="pt-north-sm">
               <CollapsibleSection
                 title="Decisions"
-                count={decisions.length}
+                count={decisionCount}
                 delay="225ms"
                 onAdd={addDecision}
               >
@@ -252,7 +252,7 @@ export function ReviewClient({ capture, imageUrl }: ReviewClientProps) {
             <div className="pt-north-sm">
               <CollapsibleSection
                 title="Questions"
-                count={open_questions.length}
+                count={questionCount}
                 delay="275ms"
                 onAdd={addQuestion}
               >
@@ -261,7 +261,7 @@ export function ReviewClient({ capture, imageUrl }: ReviewClientProps) {
             </div>
 
             <div className="pt-north-sm">
-              <CollapsibleSection title="Ideas" count={ideas.length} delay="325ms" onAdd={addIdea}>
+              <CollapsibleSection title="Ideas" count={ideaCount} delay="325ms" onAdd={addIdea}>
                 <IdeasEditor />
               </CollapsibleSection>
             </div>

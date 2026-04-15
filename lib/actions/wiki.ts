@@ -56,7 +56,9 @@ export async function fetchPersonWikiData(personId: string): Promise<PersonWikiD
       supabase.from('note_people').select('note_id').eq('person_id', personId),
       supabase
         .from('tasks')
-        .select('*, notes(id, title)')
+        .select(
+          'id, title, status, priority, due_date, created_at, actionee_id, note_id, project_id, notes(id, title)',
+        )
         .eq('actionee_id', personId)
         .order('created_at'),
       supabase
@@ -69,7 +71,7 @@ export async function fetchPersonWikiData(personId: string): Promise<PersonWikiD
         .eq('person_id', personId),
     ]);
 
-  const assignedTasks = (assignedTasksRes.data ?? []) as (Task & {
+  const assignedTasks = (assignedTasksRes.data ?? []) as unknown as (Task & {
     notes: { id: string; title: string } | null;
   })[];
 
@@ -101,13 +103,13 @@ export async function fetchPersonWikiData(personId: string): Promise<PersonWikiD
     const [notesRes, questionsRes, domainJunctions] = await Promise.all([
       supabase
         .from('notes')
-        .select('*')
+        .select('id, title, summary, created_at, user_id')
         .in('id', noteIds)
         .order('created_at', { ascending: false }),
       supabase.from('open_questions').select('*').in('note_id', noteIds).order('created_at'),
       supabase.from('note_domains').select('domain_id, domains(id, name)').in('note_id', noteIds),
     ]);
-    notes = (notesRes.data ?? []) as Note[];
+    notes = (notesRes.data ?? []) as unknown as Note[];
     openQuestions = (questionsRes.data ?? []) as OpenQuestion[];
 
     // Deduplicate domains across notes
@@ -185,19 +187,27 @@ export async function fetchProjectWikiData(projectId: string): Promise<ProjectWi
     noteIds.length > 0
       ? supabase
           .from('notes')
-          .select('*')
+          .select('id, title, summary, created_at, user_id')
           .in('id', noteIds)
           .order('created_at', { ascending: false })
       : Promise.resolve({ data: [] }),
     noteIds.length > 0
-      ? supabase.from('tasks').select('*').in('note_id', noteIds).order('created_at')
+      ? supabase
+          .from('tasks')
+          .select(
+            'id, title, status, priority, due_date, created_at, actionee_id, note_id, project_id',
+          )
+          .in('note_id', noteIds)
+          .order('created_at')
       : Promise.resolve({ data: [] }),
     noteIds.length > 0
       ? supabase.from('decisions').select('*').in('note_id', noteIds).order('created_at')
       : Promise.resolve({ data: [] }),
     supabase
       .from('tasks')
-      .select('*, actionee:people!actionee_id(id, name)')
+      .select(
+        'id, title, status, priority, due_date, created_at, actionee_id, note_id, project_id, actionee:people!actionee_id(id, name)',
+      )
       .eq('project_id', projectId)
       .order('created_at'),
     supabase.from('decisions').select('*').eq('project_id', projectId).order('created_at'),
@@ -208,12 +218,12 @@ export async function fetchProjectWikiData(projectId: string): Promise<ProjectWi
     supabase.from('people').select('id, name').order('name'),
   ]);
 
-  const notes = (notesRes.data ?? []) as Note[];
+  const notes = (notesRes.data ?? []) as unknown as Note[];
 
   // Merge note-linked and direct-linked tasks, deduplicate by id
   const allTasks = [
-    ...((noteTasksRes.data ?? []) as Task[]),
-    ...((directTasksRes.data ?? []) as Task[]),
+    ...((noteTasksRes.data ?? []) as unknown as Task[]),
+    ...((directTasksRes.data ?? []) as unknown as Task[]),
   ];
   const taskMap = new Map<string, Task>();
   for (const t of allTasks) taskMap.set(t.id, t);
@@ -332,10 +342,16 @@ export async function fetchDomainWikiData(domainId: string): Promise<DomainWikiD
     await Promise.all([
       supabase
         .from('notes')
-        .select('*')
+        .select('id, title, summary, created_at, user_id')
         .in('id', noteIds)
         .order('created_at', { ascending: false }),
-      supabase.from('tasks').select('*').in('note_id', noteIds).order('created_at'),
+      supabase
+        .from('tasks')
+        .select(
+          'id, title, status, priority, due_date, created_at, actionee_id, note_id, project_id',
+        )
+        .in('note_id', noteIds)
+        .order('created_at'),
       supabase.from('decisions').select('*').in('note_id', noteIds).order('created_at'),
       supabase.from('open_questions').select('*').in('note_id', noteIds).order('created_at'),
       supabase
@@ -348,8 +364,8 @@ export async function fetchDomainWikiData(domainId: string): Promise<DomainWikiD
         .in('note_id', noteIds),
     ]);
 
-  const notes = (notesRes.data ?? []) as Note[];
-  const tasks = (tasksRes.data ?? []) as Task[];
+  const notes = (notesRes.data ?? []) as unknown as Note[];
+  const tasks = (tasksRes.data ?? []) as unknown as Task[];
   const decisions = (decisionsRes.data ?? []) as Decision[];
   const openQuestions = (questionsRes.data ?? []) as OpenQuestion[];
 

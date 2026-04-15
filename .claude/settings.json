@@ -89,7 +89,9 @@
       "Bash(find /Users/colinrodrigues/Brain2/components/review -name \"*.tsx\" -exec wc -l {} \\\\;)",
       "Bash(find /Users/colinrodrigues/Brain2/lib -name \"*.ts\" -exec grep -l \"fetch\\\\|query\" {} \\\\;)",
       "Bash(find /Users/colinrodrigues/Brain2/app -name \"*.tsx\" -exec grep -l \"use client\\\\|'use client'\" {} \\\\;)",
-      "Bash(find /Users/colinrodrigues/Brain2/components -name \"*.tsx\" -exec grep -l \"use client\\\\|'use client'\" {} \\\\;)"
+      "Bash(find /Users/colinrodrigues/Brain2/components -name \"*.tsx\" -exec grep -l \"use client\\\\|'use client'\" {} \\\\;)",
+      "Bash(git fetch:*)",
+      "Bash(git pull:*)"
     ],
     "additionalDirectories": [
       "/Users/colinrodrigues/Brain2/app/(app)/review",

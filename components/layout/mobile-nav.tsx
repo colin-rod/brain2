@@ -53,7 +53,8 @@ export function MobileNav() {
           <button
             type="button"
             onClick={() => setShowMore(true)}
-            className="flex flex-1 flex-col items-center justify-center gap-0.5 transition-colors text-foreground-muted"
+            aria-label="More navigation items"
+            className="flex flex-1 flex-col items-center justify-center gap-0.5 transition-colors text-foreground-muted hover:text-foreground active:bg-sidebar-accent/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
           >
             <MoreHorizontal aria-hidden="true" className="h-5 w-5" />
             <span className="text-xs font-medium">More</span>

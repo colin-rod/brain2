@@ -50,7 +50,7 @@ export function NoteFields() {
           id="summary"
           value={summary}
           onChange={(e) => setSummary(e.target.value)}
-          placeholder="What's the one-sentence takeaway?"
+          placeholder="One-sentence takeaway"
           maxLength={2000}
           rows={3}
           className="resize-y"
@@ -79,7 +79,7 @@ export function NoteFields() {
           id="cleaned-text"
           value={cleaned_text}
           onChange={(e) => setCleanedText(e.target.value)}
-          placeholder="Full content of the note..."
+          placeholder="Full content of the note"
           maxLength={50000}
           rows={8}
           className="resize-y"

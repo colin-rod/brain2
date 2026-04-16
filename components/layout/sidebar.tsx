@@ -78,7 +78,7 @@ export function Sidebar() {
         <form action={signOut}>
           <button
             type="submit"
-            className="flex w-full items-center gap-north-md px-north-md py-north-xs rounded-none text-[13px] font-mono uppercase tracking-wider border-l-2 border-transparent text-foreground-secondary hover:border-primary/40 hover:bg-sidebar-accent/20 hover:text-foreground transition-colors"
+            className="flex w-full items-center gap-north-md px-north-md py-north-xs rounded-none text-[13px] font-mono uppercase tracking-wider border-l-2 border-transparent text-foreground-secondary hover:border-primary/40 hover:bg-sidebar-accent/20 hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
           >
             <LogOut aria-hidden="true" className="h-3.5 w-3.5 shrink-0 opacity-70" />
             Sign out

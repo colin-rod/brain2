@@ -83,8 +83,10 @@ export function MobileMoreSheet({ onClose }: MobileMoreSheetProps) {
                 href={item.href}
                 onClick={handleClose}
                 className={cn(
-                  'flex items-center gap-north-md px-north-lg py-north-sm text-body font-medium transition-colors',
-                  isActive ? 'text-primary' : 'text-foreground-secondary hover:text-foreground',
+                  'flex items-center gap-north-md px-north-lg py-north-sm text-body font-medium transition-colors rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                  isActive
+                    ? 'text-primary'
+                    : 'text-foreground-secondary hover:text-foreground hover:bg-sidebar-accent/20 active:bg-sidebar-accent/40',
                 )}
               >
                 <item.icon
@@ -100,7 +102,7 @@ export function MobileMoreSheet({ onClose }: MobileMoreSheetProps) {
             <form action={signOut}>
               <button
                 type="submit"
-                className="flex w-full items-center gap-north-md px-north-lg py-north-sm text-body font-medium text-foreground-secondary hover:text-foreground transition-colors"
+                className="flex w-full items-center gap-north-md px-north-lg py-north-sm text-body font-medium text-foreground-secondary hover:text-foreground hover:bg-sidebar-accent/20 active:bg-sidebar-accent/40 transition-colors rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 <LogOut className="h-4 w-4 shrink-0 opacity-70" />
                 Sign out

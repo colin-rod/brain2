@@ -153,12 +153,12 @@ export function EntitySections({
               <EditorItemCard key={d.id}>
                 <p className="text-body">{d.decision_text}</p>
                 {d.rationale && (
-                  <p className="text-metadata text-foreground-secondary mt-0.5">
+                  <p className="text-metadata text-foreground-secondary mt-north-xs">
                     Rationale: {d.rationale}
                   </p>
                 )}
                 {d.decision_date && (
-                  <p className="text-metadata text-foreground-muted mt-0.5">
+                  <p className="text-metadata text-foreground-muted mt-north-xs">
                     {formatDate(d.decision_date)}
                   </p>
                 )}

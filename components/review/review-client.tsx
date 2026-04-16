@@ -78,7 +78,7 @@ function CollapsibleSection({ title, count, children, delay, onAdd }: Collapsibl
     <div className="animate-slide-in-up" style={{ animationDelay: delay }}>
       <Collapsible open={open} onOpenChange={setOpen}>
         <div className="flex items-center justify-between">
-          <CollapsibleTrigger className="flex items-center gap-north-xs py-north-xs min-h-11 hover:text-foreground transition-colors duration-150">
+          <CollapsibleTrigger className="flex items-center gap-north-xs py-north-xs min-h-11 hover:text-foreground transition-colors duration-200">
             <span className="text-section-header">
               {title}
               {count > 0 && (
@@ -167,7 +167,7 @@ export function ReviewClient({ capture, imageUrl }: ReviewClientProps) {
         return;
       }
 
-      toast.success('Locked in.');
+      toast.success('Note saved.');
       setIsSaved(true);
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 600);
@@ -304,7 +304,7 @@ export function ReviewClient({ capture, imageUrl }: ReviewClientProps) {
           disabled={isSaving || isSaved}
           className={cn(
             'w-full transition-[transform,box-shadow] duration-200',
-            saveSuccess && 'scale-[1.02] ring-2 ring-primary/25',
+            saveSuccess && 'scale-105 ring-2 ring-primary/25',
           )}
           size="lg"
         >

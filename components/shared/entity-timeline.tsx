@@ -49,7 +49,7 @@ export function EntityTimeline({ items }: EntityTimelineProps) {
 
           const content = (
             <div className="flex gap-north-sm py-north-xs pl-north-md border-l-2 border-border ml-1.5">
-              <div className={`shrink-0 mt-0.5 ${colorClass}`}>
+              <div className={`shrink-0 mt-north-xs ${colorClass}`}>
                 <Icon className="h-3.5 w-3.5" />
               </div>
               <div className="min-w-0 flex-1">
@@ -63,7 +63,7 @@ export function EntityTimeline({ items }: EntityTimelineProps) {
                   )}
                 </div>
                 {item.snippet && (
-                  <p className="text-metadata text-foreground-secondary truncate mt-0.5">
+                  <p className="text-metadata text-foreground-secondary truncate mt-north-xs">
                     {item.snippet}
                   </p>
                 )}

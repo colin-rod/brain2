@@ -230,6 +230,7 @@ export function ViewOptionsMenu({
                     className={cn(
                       'text-metadata text-foreground-muted hover:text-foreground transition-colors',
                       'font-mono text-[10px] uppercase tracking-wider',
+                      'rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                     )}
                   >
                     ✕ Clear all

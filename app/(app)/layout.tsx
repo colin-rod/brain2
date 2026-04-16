@@ -17,7 +17,7 @@ export default function AppLayout({
       >
         Skip to content
       </a>
-      <header className="sticky top-0 z-30 w-full h-14 flex items-center gap-north-md border-b border-border border-t-2 border-t-primary bg-surface px-north-md shadow-header">
+      <header className="sticky top-0 z-30 w-full h-14 flex items-center gap-north-md border-b border-border border-t-2 border-t-primary bg-surface px-north-md shadow-header pt-[env(safe-area-inset-top,0px)]">
         <span className="font-mono text-[11px] text-primary select-none">[</span>
         <span className="font-accent text-lg font-semibold tracking-tight text-foreground">
           Brain<span className="text-primary italic">2</span>
@@ -28,7 +28,10 @@ export default function AppLayout({
         </div>
       </header>
       <Sidebar />
-      <main id="main-content" className="md:ml-52 lg:ml-60 flex-1 pb-16 md:pb-0">
+      <main
+        id="main-content"
+        className="md:ml-52 lg:ml-60 flex-1 pb-[calc(4rem+env(safe-area-inset-bottom,0px))] md:pb-0"
+      >
         <div className="mx-auto max-w-5xl px-north-base py-north-md md:px-north-md md:py-north-lg lg:px-north-lg">
           {children}
         </div>

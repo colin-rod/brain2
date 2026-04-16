@@ -91,7 +91,11 @@
       "Bash(find /Users/colinrodrigues/Brain2/app -name \"*.tsx\" -exec grep -l \"use client\\\\|'use client'\" {} \\\\;)",
       "Bash(find /Users/colinrodrigues/Brain2/components -name \"*.tsx\" -exec grep -l \"use client\\\\|'use client'\" {} \\\\;)",
       "Bash(git fetch:*)",
-      "Bash(git pull:*)"
+      "Bash(git pull:*)",
+      "Read(//Users/colinrodrigues/Brain2/**)",
+      "Bash(gh pr:*)",
+      "Bash(grep -r \"md:\\\\|lg:\\\\|xl:\" /Users/colinrodrigues/Brain2/components/layout/*.tsx)",
+      "Bash(grep -rn \"#[0-9a-fA-F]\\\\{3,6\\\\}\\\\|rgb\\\\|hsl\\\\|rgba\" /Users/colinrodrigues/Brain2/components --include=\"*.tsx\")"
     ],
     "additionalDirectories": [
       "/Users/colinrodrigues/Brain2/app/(app)/review",

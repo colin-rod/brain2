@@ -361,3 +361,17 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* iOS PWA / touch utilities */
+@media (hover: none) {
+  .touch-reveal {
+    opacity: 1 !important;
+  }
+}
+
+@layer base {
+  a,
+  button {
+    -webkit-tap-highlight-color: transparent;
+  }
+}

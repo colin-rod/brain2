@@ -84,7 +84,7 @@ export function NotePeopleSection({ noteId, people, allPeople, onMutate }: NoteP
                 type="button"
                 onClick={() => handleUnlink(person.id)}
                 disabled={isPending}
-                className="opacity-0 group-hover:opacity-100 text-foreground-muted hover:text-destructive transition-all"
+                className="opacity-0 group-hover:opacity-100 touch-reveal text-foreground-muted hover:text-destructive transition-all"
               >
                 <X className="h-3.5 w-3.5" />
               </button>

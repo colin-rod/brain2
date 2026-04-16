@@ -42,7 +42,7 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="hidden md:flex md:w-52 lg:w-60 md:flex-col md:fixed md:top-14 md:bottom-0 bg-sidebar border-r border-sidebar-border shadow-[2px_0_8px_rgba(0,0,0,0.03)]">
+    <aside className="hidden md:flex md:w-52 lg:w-60 md:flex-col md:fixed md:top-[calc(3.5rem+env(safe-area-inset-top,0px))] md:bottom-0 bg-sidebar border-r border-sidebar-border shadow-[2px_0_8px_rgba(0,0,0,0.03)]">
       <nav aria-label="Main navigation" className="flex-1 px-0 py-north-sm space-y-0">
         {navItems.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(item.href + '/');

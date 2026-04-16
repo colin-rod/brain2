@@ -361,7 +361,7 @@ export function NotesList({
                         <button
                           className={cn(
                             'flex items-center justify-center h-6 w-6 rounded-md text-foreground-muted',
-                            'opacity-0 group-hover:opacity-100 hover:bg-surface-subtle hover:text-foreground',
+                            'opacity-0 group-hover:opacity-100 touch-reveal hover:bg-surface-subtle hover:text-foreground',
                             'transition-opacity duration-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                           )}
                           aria-label="Note actions"

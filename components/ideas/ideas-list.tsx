@@ -197,7 +197,7 @@ export function IdeasList({ ideas }: IdeasListProps) {
                 size="sm"
                 onClick={() => handleDelete(idea.id)}
                 disabled={isPending}
-                className="opacity-0 group-hover:opacity-100 shrink-0 text-foreground-muted hover:text-destructive h-7 w-7 p-0"
+                className="opacity-0 group-hover:opacity-100 touch-reveal shrink-0 text-foreground-muted hover:text-destructive h-7 w-7 p-0"
               >
                 <X className="h-3.5 w-3.5" />
               </Button>

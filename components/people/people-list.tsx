@@ -353,7 +353,7 @@ export function PeopleList({
                       handleDelete(person.id);
                     }}
                     disabled={isPending}
-                    className="opacity-0 group-hover:opacity-100 text-foreground-muted hover:text-destructive h-6 w-6 p-0"
+                    className="opacity-0 group-hover:opacity-100 touch-reveal text-foreground-muted hover:text-destructive h-6 w-6 p-0"
                   >
                     <X className="h-3 w-3" />
                   </Button>

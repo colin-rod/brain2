@@ -66,7 +66,7 @@ export function TasksEditor() {
             />
 
             {/* Row 2: actionee + priority */}
-            <div className="flex gap-north-sm">
+            <div className="flex flex-col gap-north-sm sm:flex-row">
               <div className="flex-1">
                 <p className="text-metadata text-foreground-muted mb-north-xs">Assigned to</p>
                 <Select
@@ -96,7 +96,7 @@ export function TasksEditor() {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="w-32">
+              <div className="sm:w-32">
                 <p className="text-metadata text-foreground-muted mb-north-xs">Priority</p>
                 <Select
                   value={task.priority || 'none'}

@@ -16,6 +16,7 @@ import { formatDate } from '@/lib/format-date';
 import { useListState } from '@/lib/hooks/use-list-state';
 import { archiveNote, deleteNote } from '@/lib/actions/note-mutations';
 import { TaskStatusBadge } from '@/components/shared/status-badge';
+import { NoteItemTooltip } from '@/components/notes/note-item-tooltip';
 import type { NoteWithMeta } from '@/types/database';
 import { cn } from '@/lib/utils';
 
@@ -237,7 +238,7 @@ export function NotesList({
               <div
                 key={note.id}
                 className="group relative flex items-start gap-north-md px-north-sm py-north-sm border-l-[3px] border-l-(--entity-notes) animate-fade-in hover:bg-surface-subtle transition-colors duration-150"
-                style={{ animationDelay: `${index * 30}ms` }}
+                style={{ animationDelay: `${Math.min(index * 30, 300)}ms` }}
               >
                 {/* Left: clickable content */}
                 <div className="flex-1 min-w-0">
@@ -296,55 +297,46 @@ export function NotesList({
                         </Link>
                       ))}
                       {note.tasks.length > 0 && (
-                        <div className="relative group/tasks">
-                          <Badge variant="secondary" className="text-label cursor-default">
-                            {note.tasks.length} task{note.tasks.length !== 1 ? 's' : ''}
-                          </Badge>
-                          <div className="absolute bottom-full left-0 mb-1.5 z-50 hidden group-hover/tasks:block min-w-48 max-w-72 rounded-lg border border-border bg-popover shadow-md p-north-xs">
-                            <ul className="space-y-north-xs">
-                              {note.tasks.map((t) => (
-                                <li key={t.id} className="flex items-center gap-north-xs">
-                                  <TaskStatusBadge status={t.status} />
-                                  <span className="text-label text-foreground truncate">
-                                    {t.title}
-                                  </span>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        </div>
+                        <NoteItemTooltip
+                          label={`${note.tasks.length} task${note.tasks.length !== 1 ? 's' : ''}`}
+                        >
+                          <ul className="space-y-north-xs">
+                            {note.tasks.map((t) => (
+                              <li key={t.id} className="flex items-center gap-north-xs">
+                                <TaskStatusBadge status={t.status} />
+                                <span className="text-label text-foreground truncate">
+                                  {t.title}
+                                </span>
+                              </li>
+                            ))}
+                          </ul>
+                        </NoteItemTooltip>
                       )}
                       {note.decisions.length > 0 && (
-                        <div className="relative group/decisions">
-                          <Badge variant="secondary" className="text-label cursor-default">
-                            {note.decisions.length} decision{note.decisions.length !== 1 ? 's' : ''}
-                          </Badge>
-                          <div className="absolute bottom-full left-0 mb-1.5 z-50 hidden group-hover/decisions:block min-w-48 max-w-72 rounded-lg border border-border bg-popover shadow-md p-north-xs">
-                            <ul className="space-y-north-xs">
-                              {note.decisions.map((d) => (
-                                <li key={d.id} className="text-label text-foreground line-clamp-2">
-                                  {d.decision_text}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        </div>
+                        <NoteItemTooltip
+                          label={`${note.decisions.length} decision${note.decisions.length !== 1 ? 's' : ''}`}
+                        >
+                          <ul className="space-y-north-xs">
+                            {note.decisions.map((d) => (
+                              <li key={d.id} className="text-label text-foreground line-clamp-2">
+                                {d.decision_text}
+                              </li>
+                            ))}
+                          </ul>
+                        </NoteItemTooltip>
                       )}
                       {note.questions.length > 0 && (
-                        <div className="relative group/questions">
-                          <Badge variant="secondary" className="text-label cursor-default">
-                            {note.questions.length} question{note.questions.length !== 1 ? 's' : ''}
-                          </Badge>
-                          <div className="absolute bottom-full left-0 mb-1.5 z-50 hidden group-hover/questions:block min-w-48 max-w-72 rounded-lg border border-border bg-popover shadow-md p-north-xs">
-                            <ul className="space-y-north-xs">
-                              {note.questions.map((q) => (
-                                <li key={q.id} className="text-label text-foreground line-clamp-2">
-                                  {q.question_text}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        </div>
+                        <NoteItemTooltip
+                          label={`${note.questions.length} question${note.questions.length !== 1 ? 's' : ''}`}
+                        >
+                          <ul className="space-y-north-xs">
+                            {note.questions.map((q) => (
+                              <li key={q.id} className="text-label text-foreground line-clamp-2">
+                                {q.question_text}
+                              </li>
+                            ))}
+                          </ul>
+                        </NoteItemTooltip>
                       )}
                     </div>
                   )}

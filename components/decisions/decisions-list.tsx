@@ -266,9 +266,10 @@ export function DecisionsList({
                 size="sm"
                 onClick={() => handleDelete(d.id)}
                 disabled={isPending}
-                className="opacity-0 group-hover:opacity-100 touch-reveal shrink-0 text-foreground-muted hover:text-destructive h-7 w-7 p-0"
+                aria-label="Delete decision"
+                className="relative touch-target opacity-0 group-hover:opacity-100 focus-visible:opacity-100 touch-reveal shrink-0 text-foreground-muted hover:text-destructive h-7 w-7 p-0"
               >
-                <X className="h-3.5 w-3.5" />
+                <X className="h-3.5 w-3.5" aria-hidden="true" />
               </Button>
             </div>
 
@@ -278,7 +279,7 @@ export function DecisionsList({
                 type="date"
                 value={d.decision_date || ''}
                 onChange={(e) => handleFieldUpdate(d.id, { decision_date: e.target.value || null })}
-                className="h-7 text-[11px] w-32"
+                className="h-7 text-caption w-32"
               />
 
               {/* Project */}
@@ -326,7 +327,7 @@ export function DecisionsList({
               {d.decision_people.map((dp) => (
                 <span
                   key={dp.people.id}
-                  className="inline-flex items-center gap-1 text-[11px] text-primary bg-primary-tint rounded px-1.5 py-0.5"
+                  className="inline-flex items-center gap-1 text-caption text-primary bg-primary-tint rounded px-1.5 py-0.5"
                 >
                   <Link href={`/people/${dp.people.id}`} className="hover:underline">
                     @{dp.people.name}
@@ -355,7 +356,7 @@ export function DecisionsList({
                 <button
                   type="button"
                   onClick={() => setAddingPerson(d.id)}
-                  className="text-[11px] text-foreground-muted hover:text-foreground opacity-0 group-hover:opacity-100 touch-reveal"
+                  className="relative touch-target text-caption text-foreground-muted hover:text-foreground opacity-0 group-hover:opacity-100 focus-visible:opacity-100 touch-reveal"
                 >
                   + Person
                 </button>

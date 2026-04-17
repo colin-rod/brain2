@@ -95,7 +95,7 @@ export function GlobalSearch() {
 
   return (
     <div ref={containerRef} className="relative w-full max-w-md">
-      <div className="relative flex items-center border border-input rounded-none bg-transparent focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/30">
+      <div className="relative flex items-center border border-input rounded-none bg-transparent focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/50">
         <span className="pl-2.5 font-mono text-sm text-primary select-none shrink-0">&gt;</span>
         <Input
           ref={inputRef}
@@ -107,8 +107,15 @@ export function GlobalSearch() {
           onFocus={() => setIsOpen(true)}
           onKeyDown={handleKeyDown}
           placeholder={isLoading ? 'Loading...' : 'Search everything...'}
-          className="border-0 rounded-none pl-1.5 pr-16 focus-visible:border-0 focus-visible:ring-0 placeholder:uppercase placeholder:tracking-wider placeholder:font-mono placeholder:text-[12px] bg-transparent"
+          className="border-0 rounded-none pl-1.5 pr-16 focus-visible:border-0 focus-visible:ring-0 placeholder:uppercase placeholder:tracking-wider placeholder:font-mono placeholder:text-label bg-transparent"
           disabled={isLoading}
+          role="combobox"
+          aria-expanded={isOpen && query.length >= 2}
+          aria-controls="search-listbox"
+          aria-autocomplete="list"
+          aria-activedescendant={
+            isOpen && activeIndex >= 0 ? `search-option-${activeIndex}` : undefined
+          }
         />
         <kbd className="absolute right-3 top-1/2 -translate-y-1/2 hidden sm:inline-flex items-center gap-0.5 rounded-none border border-border bg-surface-subtle px-1.5 py-0.5 text-label font-mono text-foreground-muted">
           <span className="text-xs">⌘</span>K
@@ -116,36 +123,48 @@ export function GlobalSearch() {
       </div>
 
       {isOpen && query.length >= 2 && (
-        <div className="absolute top-full left-0 right-0 z-50 mt-0.5 max-h-96 overflow-y-auto rounded-none border border-border bg-surface shadow-lg">
+        <div
+          id="search-listbox"
+          role="listbox"
+          aria-label="Search results"
+          className="absolute top-full left-0 right-0 z-50 mt-0.5 max-h-96 overflow-y-auto rounded-none border border-border bg-surface shadow-lg"
+        >
           {flatResults.length === 0 ? (
-            <div className="px-north-base py-north-lg text-center text-metadata text-foreground-muted">
-              No results for &ldquo;{query}&rdquo;
-            </div>
+            <>
+              <span className="sr-only">No results for {query}</span>
+              <div className="px-north-base py-north-lg text-center text-metadata text-foreground-muted">
+                No results for &ldquo;{query}&rdquo;
+              </div>
+            </>
           ) : (
-            <div className="py-north-xs">
-              {groups.map((group) => {
-                const meta = getEntityMeta(group.type);
-                return (
-                  <div key={group.type}>
-                    <p className="px-north-base py-north-xs text-metadata font-mono uppercase tracking-widest text-foreground-muted border-b border-border">
-                      {meta.pluralLabel}
-                    </p>
-                    {group.items.map((item) => {
-                      const idx = flatIndex++;
-                      return (
-                        <SearchResultItem
-                          key={item.id}
-                          item={item}
-                          isActive={idx === activeIndex}
-                          onClick={() => navigate(item)}
-                          onMouseEnter={() => setActiveIndex(idx)}
-                        />
-                      );
-                    })}
-                  </div>
-                );
-              })}
-            </div>
+            <>
+              <span className="sr-only">{flatResults.length} results</span>
+              <div className="py-north-xs">
+                {groups.map((group) => {
+                  const meta = getEntityMeta(group.type);
+                  return (
+                    <div key={group.type}>
+                      <p className="px-north-base py-north-xs text-metadata font-mono uppercase tracking-widest text-foreground-muted border-b border-border">
+                        {meta.pluralLabel}
+                      </p>
+                      {group.items.map((item) => {
+                        const idx = flatIndex++;
+                        return (
+                          <SearchResultItem
+                            key={item.id}
+                            id={`search-option-${idx}`}
+                            item={item}
+                            isActive={idx === activeIndex}
+                            onClick={() => navigate(item)}
+                            onMouseEnter={() => setActiveIndex(idx)}
+                          />
+                        );
+                      })}
+                    </div>
+                  );
+                })}
+              </div>
+            </>
           )}
         </div>
       )}

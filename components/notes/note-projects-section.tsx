@@ -84,7 +84,7 @@ export function NoteProjectsSection({
                 type="button"
                 onClick={() => handleUnlink(project.id)}
                 disabled={isPending}
-                className="opacity-0 group-hover:opacity-100 touch-reveal text-foreground-muted hover:text-destructive transition-all"
+                className="opacity-0 group-hover:opacity-100 focus-visible:opacity-100 touch-reveal text-foreground-muted hover:text-destructive transition-all"
               >
                 <X className="h-3.5 w-3.5" />
               </button>

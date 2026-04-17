@@ -298,7 +298,7 @@ export function TasksList({
               <div
                 key={task.id}
                 className={`px-north-sm py-north-xs border-l-[3px] animate-fade-in hover:bg-surface-subtle transition-colors ${STATUS_BORDER[task.status]} ${STATUS_ROW_MUTED[task.status]} ${editingAssignee === task.id || editingProject === task.id ? 'relative z-10' : ''}`}
-                style={{ animationDelay: `${index * 25}ms` }}
+                style={{ animationDelay: `${Math.min(index * 25, 250)}ms` }}
               >
                 {/* Desktop: grid layout */}
                 <div className="hidden sm:grid sm:grid-cols-[24px_1fr_100px_60px_90px_100px_100px_32px] gap-north-sm items-center">
@@ -335,6 +335,7 @@ export function TasksList({
                   >
                     <SelectTrigger
                       size="sm"
+                      aria-label={`Status for ${task.title}`}
                       className="text-label font-mono uppercase tracking-wider rounded-none"
                     >
                       <SelectValue />
@@ -358,6 +359,7 @@ export function TasksList({
                   >
                     <SelectTrigger
                       size="sm"
+                      aria-label={`Priority for ${task.title}`}
                       className="text-label font-mono uppercase tracking-wider rounded-none"
                     >
                       <SelectValue placeholder="--" />
@@ -378,6 +380,7 @@ export function TasksList({
                     onChange={(e) =>
                       handleFieldUpdate(task.id, { due_date: e.target.value || null })
                     }
+                    aria-label={`Due date for ${task.title}`}
                     className="h-7 text-label font-mono rounded-none"
                   />
 
@@ -444,7 +447,7 @@ export function TasksList({
                     size="icon-sm"
                     onClick={() => handleDelete(task.id)}
                     disabled={isPending}
-                    className="shrink-0 text-foreground-muted hover:text-destructive"
+                    className="relative touch-target shrink-0 text-foreground-muted hover:text-destructive"
                   >
                     <X className="h-3.5 w-3.5" />
                   </Button>
@@ -470,7 +473,7 @@ export function TasksList({
                       size="icon-sm"
                       onClick={() => handleDelete(task.id)}
                       disabled={isPending}
-                      className="shrink-0 text-foreground-muted hover:text-destructive"
+                      className="relative touch-target shrink-0 text-foreground-muted hover:text-destructive"
                     >
                       <X className="h-3.5 w-3.5" />
                     </Button>

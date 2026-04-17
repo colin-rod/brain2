@@ -46,7 +46,11 @@ export function WikiSummary({ summary, generatedAt, entityType, entityId }: Wiki
 
   if (isPending || (!summary && !generatedAt)) {
     return (
-      <div className="rounded-lg border border-border border-l-[3px] border-l-primary bg-surface-subtle px-north-base py-north-md space-y-north-sm">
+      <div
+        aria-busy="true"
+        aria-label="Loading summary"
+        className="rounded-lg border border-border border-l-[3px] border-l-primary bg-surface-subtle px-north-base py-north-md space-y-north-sm"
+      >
         <Skeleton className="h-4 w-3/4" />
         <Skeleton className="h-4 w-full" />
         <Skeleton className="h-4 w-5/6" />
@@ -60,6 +64,7 @@ export function WikiSummary({ summary, generatedAt, entityType, entityId }: Wiki
 
   return (
     <div className="rounded-lg border border-border border-l-[3px] border-l-primary bg-surface-subtle px-north-base py-north-md">
+      <h2 className="sr-only">Summary</h2>
       <div className="text-body whitespace-pre-line">{summary}</div>
       <div className="mt-north-sm flex items-center justify-between">
         <p className="text-metadata text-foreground-muted">
@@ -70,7 +75,7 @@ export function WikiSummary({ summary, generatedAt, entityType, entityId }: Wiki
           size="sm"
           onClick={handleRegenerate}
           disabled={isPending}
-          className="text-foreground-muted hover:text-foreground gap-1 h-7"
+          className="relative touch-target text-foreground-muted hover:text-foreground gap-1 h-7"
         >
           <RefreshCw className={`h-3 w-3 ${isPending ? 'animate-spin' : ''}`} />
           Regenerate

@@ -71,7 +71,7 @@ export function ViewOptionsMenu({
             <SlidersHorizontal className="h-3.5 w-3.5" />
             View
             {activeCount > 0 && (
-              <span className="flex items-center justify-center h-4 min-w-4 rounded-full bg-primary text-primary-foreground text-[10px] font-semibold px-1 leading-none">
+              <span className="flex items-center justify-center h-4 min-w-4 rounded-full bg-primary text-primary-foreground text-caption font-semibold px-1 leading-none">
                 {activeCount}
               </span>
             )}
@@ -87,7 +87,7 @@ export function ViewOptionsMenu({
                 {/* Sort */}
                 {sortOptions && sortOptions.length > 0 && (
                   <div>
-                    <p className="font-mono text-[10px] uppercase tracking-wider text-foreground-muted mb-north-xs">
+                    <p className="font-mono text-caption uppercase tracking-wider text-foreground-muted mb-north-xs">
                       Sort
                     </p>
                     <Select
@@ -111,7 +111,7 @@ export function ViewOptionsMenu({
                 {/* Filters */}
                 {filterConfigs.length > 0 && (
                   <div>
-                    <p className="font-mono text-[10px] uppercase tracking-wider text-foreground-muted mb-north-xs">
+                    <p className="font-mono text-caption uppercase tracking-wider text-foreground-muted mb-north-xs">
                       Filter
                     </p>
                     <div className="space-y-north-xs">
@@ -194,7 +194,7 @@ export function ViewOptionsMenu({
                 {/* Group by */}
                 {groupOptions && groupOptions.length > 0 && (
                   <div>
-                    <p className="font-mono text-[10px] uppercase tracking-wider text-foreground-muted mb-north-xs">
+                    <p className="font-mono text-caption uppercase tracking-wider text-foreground-muted mb-north-xs">
                       Group by
                     </p>
                     <Select
@@ -229,7 +229,7 @@ export function ViewOptionsMenu({
                     }}
                     className={cn(
                       'text-metadata text-foreground-muted hover:text-foreground transition-colors',
-                      'font-mono text-[10px] uppercase tracking-wider',
+                      'font-mono text-caption uppercase tracking-wider',
                       'rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                     )}
                   >

@@ -107,7 +107,7 @@ const PROCESSING_MESSAGES = [
   'Finding what matters...',
 ];
 
-function ProcessingIndicator() {
+const ProcessingIndicator = React.memo(function ProcessingIndicator() {
   const [index, setIndex] = useState(0);
   useEffect(() => {
     const id = setInterval(() => setIndex((i) => (i + 1) % PROCESSING_MESSAGES.length), 2500);
@@ -121,7 +121,7 @@ function ProcessingIndicator() {
       </span>
     </div>
   );
-}
+});
 
 const CaptureCard = React.memo(function CaptureCard({
   capture,
@@ -232,7 +232,10 @@ const CaptureCard = React.memo(function CaptureCard({
   const wrapped = isClickable ? <Link href={`/review/${capture.id}`}>{content}</Link> : content;
 
   return (
-    <div className="animate-slide-in-up" style={{ animationDelay: `${index * 40}ms` }}>
+    <div
+      className="animate-slide-in-up"
+      style={{ animationDelay: `${Math.min(index * 40, 300)}ms` }}
+    >
       {wrapped}
     </div>
   );

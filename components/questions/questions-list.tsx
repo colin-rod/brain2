@@ -132,7 +132,7 @@ export function QuestionsList({ questions }: QuestionsListProps) {
               size="icon-sm"
               onClick={() => handleDelete(q.id)}
               disabled={isPending}
-              className="shrink-0 opacity-0 group-hover:opacity-100 touch-reveal text-foreground-muted hover:text-destructive transition-opacity"
+              className="shrink-0 opacity-0 group-hover:opacity-100 focus-visible:opacity-100 touch-reveal text-foreground-muted hover:text-destructive transition-opacity"
             >
               <X className="h-3.5 w-3.5" />
             </Button>

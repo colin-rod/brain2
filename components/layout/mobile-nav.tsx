@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Inbox, FileText, CheckSquare, FolderOpen, MoreHorizontal } from 'lucide-react';
@@ -17,6 +17,7 @@ const mobileNavItems = [
 export function MobileNav() {
   const pathname = usePathname();
   const [showMore, setShowMore] = useState(false);
+  const moreButtonRef = useRef<HTMLButtonElement>(null);
 
   return (
     <>
@@ -51,9 +52,12 @@ export function MobileNav() {
             );
           })}
           <button
+            ref={moreButtonRef}
             type="button"
             onClick={() => setShowMore(true)}
             aria-label="More navigation items"
+            aria-expanded={showMore}
+            aria-haspopup="dialog"
             className="flex flex-1 flex-col items-center justify-center gap-0.5 transition-colors text-foreground-muted hover:text-foreground active:bg-sidebar-accent/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
           >
             <MoreHorizontal aria-hidden="true" className="h-5 w-5" />
@@ -61,7 +65,9 @@ export function MobileNav() {
           </button>
         </div>
       </nav>
-      {showMore && <MobileMoreSheet onClose={() => setShowMore(false)} />}
+      {showMore && (
+        <MobileMoreSheet onClose={() => setShowMore(false)} triggerRef={moreButtonRef} />
+      )}
     </>
   );
 }

@@ -62,24 +62,28 @@ export function FilterBar({ filters, values, onChange, onClear }: FilterBarProps
         if (filter.type === 'date-range') {
           return (
             <div key={filter.key} className="flex items-center gap-north-xs">
-              <span className="font-mono text-[10px] uppercase tracking-wider text-foreground-muted shrink-0">
+              <span className="font-mono text-caption uppercase tracking-wider text-foreground-muted shrink-0">
                 {filter.label}:
               </span>
-              <Input
-                type="date"
-                value={values[`${filter.key}_from`] || ''}
-                onChange={(e) => onChange(`${filter.key}_from`, e.target.value)}
-                className="h-7 text-metadata w-32"
-                placeholder="From"
-              />
+              <div className="relative touch-target">
+                <Input
+                  type="date"
+                  value={values[`${filter.key}_from`] || ''}
+                  onChange={(e) => onChange(`${filter.key}_from`, e.target.value)}
+                  className="h-7 text-metadata w-32"
+                  placeholder="From"
+                />
+              </div>
               <span className="text-metadata text-foreground-muted">to</span>
-              <Input
-                type="date"
-                value={values[`${filter.key}_to`] || ''}
-                onChange={(e) => onChange(`${filter.key}_to`, e.target.value)}
-                className="h-7 text-metadata w-32"
-                placeholder="To"
-              />
+              <div className="relative touch-target">
+                <Input
+                  type="date"
+                  value={values[`${filter.key}_to`] || ''}
+                  onChange={(e) => onChange(`${filter.key}_to`, e.target.value)}
+                  className="h-7 text-metadata w-32"
+                  placeholder="To"
+                />
+              </div>
             </div>
           );
         }

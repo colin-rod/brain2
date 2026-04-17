@@ -261,6 +261,13 @@
     letter-spacing: 0.01em;
   }
 
+  .text-caption {
+    font-size: 10px;
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: 0.02em;
+  }
+
   .text-subtitle {
     font-size: 17px;
     font-weight: 600;
@@ -366,6 +373,16 @@
 @media (hover: none) {
   .touch-reveal {
     opacity: 1 !important;
+  }
+
+  .touch-target::before {
+    content: '';
+    position: absolute;
+    min-height: 44px;
+    min-width: 44px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
   }
 }
 

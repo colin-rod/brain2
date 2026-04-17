@@ -58,7 +58,7 @@ export function Sidebar() {
               <Link
                 href={item.href}
                 className={cn(
-                  'flex items-center gap-north-md px-north-md py-north-xs rounded-none text-[13px] font-ui tracking-normal transition-[border-left-width,border-color,background-color,color] duration-200',
+                  'flex items-center gap-north-md px-north-md py-2.75 rounded-none text-metadata font-ui tracking-normal transition-[border-left-width,border-color,background-color,color] duration-200',
                   isActive
                     ? 'border-l-[3px] border-primary bg-sidebar-accent/50 text-foreground font-semibold'
                     : 'border-l-2 border-transparent text-foreground-secondary hover:border-primary/40 hover:bg-sidebar-accent/20 hover:text-foreground',

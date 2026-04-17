@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Upload, X, ImageIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -60,6 +60,12 @@ export function ImageDropzone({ file, onFileChange }: ImageDropzoneProps) {
     onFileChange(null);
   }, [preview, onFileChange]);
 
+  useEffect(() => {
+    return () => {
+      if (preview) URL.revokeObjectURL(preview);
+    };
+  }, [preview]);
+
   if (file && preview) {
     return (
       <div className="relative rounded-md border border-border bg-surface overflow-hidden">
@@ -71,7 +77,7 @@ export function ImageDropzone({ file, onFileChange }: ImageDropzoneProps) {
         >
           <X className="h-4 w-4" />
         </button>
-        <div className="flex items-center justify-center p-north-base">
+        <div className="h-64 flex items-center justify-center p-north-base">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={preview} alt="Upload preview" className="max-h-64 rounded object-contain" />
         </div>

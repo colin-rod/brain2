@@ -114,7 +114,7 @@ export function DomainsList({ domains }: DomainsListProps) {
                   handleDelete(domain.id);
                 }}
                 disabled={isPending}
-                className="text-foreground-muted hover:text-destructive h-7 w-7 p-0 shrink-0"
+                className="relative touch-target text-foreground-muted hover:text-destructive h-7 w-7 p-0 shrink-0"
               >
                 <X className="h-3 w-3" />
               </Button>
@@ -251,7 +251,7 @@ export function DomainsList({ domains }: DomainsListProps) {
                       handleDelete(domain.id);
                     }}
                     disabled={isPending}
-                    className="opacity-0 group-hover:opacity-100 touch-reveal text-foreground-muted hover:text-destructive h-6 w-6 p-0"
+                    className="relative touch-target opacity-0 group-hover:opacity-100 focus-visible:opacity-100 touch-reveal text-foreground-muted hover:text-destructive h-6 w-6 p-0"
                   >
                     <X className="h-3 w-3" />
                   </Button>

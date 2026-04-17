@@ -26,7 +26,7 @@ export function SearchBar({
   );
 
   return (
-    <div className="relative flex items-center border border-input rounded-none bg-transparent focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/30">
+    <div className="relative flex items-center border border-input rounded-none bg-transparent focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/50">
       <span className="pl-2.5 font-mono text-sm text-primary select-none shrink-0">&gt;</span>
       <Input
         value={value}

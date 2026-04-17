@@ -50,9 +50,10 @@ export function NoteDetailClient({
       <div className="flex items-center gap-north-sm">
         <Link
           href="/notes"
+          aria-label="Back to notes"
           className="text-foreground-muted hover:text-foreground transition-colors"
         >
-          <ArrowLeft className="h-5 w-5" />
+          <ArrowLeft className="h-5 w-5" aria-hidden="true" />
         </Link>
         <div className="flex-1">
           <InlineEditableText

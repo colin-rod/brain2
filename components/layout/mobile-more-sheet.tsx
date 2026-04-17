@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -33,21 +33,63 @@ const sheetItems = [
 
 interface MobileMoreSheetProps {
   onClose: () => void;
+  triggerRef: React.RefObject<HTMLButtonElement | null>;
 }
 
-export function MobileMoreSheet({ onClose }: MobileMoreSheetProps) {
+export function MobileMoreSheet({ onClose, triggerRef }: MobileMoreSheetProps) {
   const pathname = usePathname();
   const [visible, setVisible] = useState(false);
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  function handleClose() {
+    setVisible(false);
+    setTimeout(onClose, 250);
+  }
 
   useEffect(() => {
     const id = requestAnimationFrame(() => setVisible(true));
     return () => cancelAnimationFrame(id);
   }, []);
 
-  function handleClose() {
-    setVisible(false);
-    setTimeout(onClose, 250);
-  }
+  useEffect(() => {
+    if (!visible) return;
+    const panel = panelRef.current;
+    if (!panel) return;
+    const triggerEl = triggerRef.current;
+
+    const sel = 'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
+    const getFocusable = () => Array.from(panel.querySelectorAll<HTMLElement>(sel));
+
+    getFocusable()[0]?.focus();
+
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        handleClose();
+        return;
+      }
+      if (e.key !== 'Tab') return;
+      const els = getFocusable();
+      if (!els.length) return;
+      if (e.shiftKey) {
+        if (document.activeElement === els[0]) {
+          e.preventDefault();
+          els[els.length - 1].focus();
+        }
+      } else {
+        if (document.activeElement === els[els.length - 1]) {
+          e.preventDefault();
+          els[0].focus();
+        }
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      triggerEl?.focus();
+    };
+  }, [visible]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <>
@@ -63,6 +105,10 @@ export function MobileMoreSheet({ onClose }: MobileMoreSheetProps) {
 
       {/* Panel */}
       <div
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label="More navigation"
         className={cn(
           'fixed bottom-0 inset-x-0 bg-surface border-t border-border z-[70] rounded-t-lg md:hidden',
           'transform transition-transform duration-[250ms] ease-out',

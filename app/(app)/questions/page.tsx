@@ -26,8 +26,8 @@ export default async function QuestionsPage() {
       {questions.length === 0 ? (
         <EmptyState
           icon={HelpCircle}
-          title="No open questions yet"
-          description="Questions appear here after you save notes that contain them."
+          title="Nothing unresolved — or nothing captured yet."
+          description="Brain2 flags open questions from your captures so nothing slips through the cracks."
           iconColor="var(--entity-questions)"
           bgColor="var(--entity-questions-tint)"
           ctaLabel="Capture something"

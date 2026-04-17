@@ -39,8 +39,8 @@ export default async function TasksPage() {
       {tasks.length === 0 ? (
         <EmptyState
           icon={CheckSquare}
-          title="No tasks yet"
-          description="Tasks appear here after you save notes with action items."
+          title="Nothing to act on — yet."
+          description="Mention something that needs doing in any capture and Brain2 pulls it out as a task."
           iconColor="var(--entity-tasks)"
           bgColor="var(--entity-tasks-tint)"
           ctaLabel="Capture something"

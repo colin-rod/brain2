@@ -39,8 +39,8 @@ export default async function DecisionsPage() {
       {decisions.length === 0 ? (
         <EmptyState
           icon={Scale}
-          title="No decisions yet"
-          description="Decisions appear here after you save notes that contain them."
+          title="No decisions recorded yet."
+          description="Capture any meeting or discussion and Brain2 identifies the decisions made."
           iconColor="var(--entity-decisions)"
           bgColor="var(--entity-decisions-tint)"
           ctaLabel="Capture something"

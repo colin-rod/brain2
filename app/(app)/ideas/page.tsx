@@ -24,8 +24,8 @@ export default async function IdeasPage() {
       {ideas.length === 0 ? (
         <EmptyState
           icon={Lightbulb}
-          title="No ideas yet"
-          description="Ideas appear here after you save notes that contain them."
+          title="Your ideas are waiting to be captured."
+          description="Paste a brain dump, a voice note transcript, or a rough doc — Brain2 finds the ideas inside."
           iconColor="var(--entity-ideas)"
           bgColor="var(--entity-ideas-tint)"
           ctaLabel="Capture something"

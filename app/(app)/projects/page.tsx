@@ -90,8 +90,8 @@ export default async function ProjectsPage() {
       {projects.length === 0 ? (
         <EmptyState
           icon={FolderOpen}
-          title="No projects yet"
-          description="Projects appear here after you save notes that reference them."
+          title="No projects tracked yet."
+          description="Mention a project by name in any capture and Brain2 starts tracking it here."
           iconColor="var(--entity-projects)"
           bgColor="var(--entity-projects-tint)"
           ctaLabel="Capture something"

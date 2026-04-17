@@ -19,7 +19,7 @@ import {
 import { cn } from '@/lib/utils';
 import { signOut } from '@/lib/actions/auth';
 
-const navItems = [
+const coreNavItems = [
   { href: '/inbox', label: 'Inbox', icon: Inbox, iconColor: undefined },
   { href: '/notes', label: 'Notes', icon: FileText, iconColor: 'var(--entity-notes)' },
   { href: '/tasks', label: 'Tasks', icon: CheckSquare, iconColor: 'var(--entity-tasks)' },
@@ -34,6 +34,9 @@ const navItems = [
     iconColor: 'var(--entity-questions)',
   },
   { href: '/ideas', label: 'Ideas', icon: Lightbulb, iconColor: 'var(--entity-ideas)' },
+];
+
+const utilityNavItems = [
   { href: '/exports', label: 'Exports', icon: Download, iconColor: undefined },
   { href: '/settings', label: 'Settings', icon: Settings, iconColor: undefined },
 ];
@@ -44,32 +47,37 @@ export function Sidebar() {
   return (
     <aside className="hidden md:flex md:w-52 lg:w-60 md:flex-col md:fixed md:top-[calc(3.5rem+env(safe-area-inset-top,0px))] md:bottom-0 bg-sidebar border-r border-sidebar-border shadow-[2px_0_8px_rgba(0,0,0,0.03)]">
       <nav aria-label="Main navigation" className="flex-1 px-0 py-north-sm space-y-0">
-        {navItems.map((item) => {
+        {[...coreNavItems, ...utilityNavItems].map((item, index) => {
           const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+          const isDivider = index === coreNavItems.length;
           return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                'flex items-center gap-north-md px-north-md py-north-xs rounded-none text-[13px] font-mono uppercase tracking-wider transition-[border-left-width,border-color,background-color,color] duration-200',
-                isActive
-                  ? 'border-l-[3px] border-primary bg-sidebar-accent/50 text-foreground font-semibold'
-                  : 'border-l-2 border-transparent text-foreground-secondary hover:border-primary/40 hover:bg-sidebar-accent/20 hover:text-foreground',
+            <div key={item.href}>
+              {isDivider && (
+                <div className="mx-north-md my-north-xs border-t border-sidebar-border/60" />
               )}
-            >
-              <item.icon
-                aria-hidden="true"
-                className={cn('h-3.5 w-3.5 shrink-0', !item.iconColor && 'opacity-70')}
-                style={item.iconColor ? { color: item.iconColor } : undefined}
-              />
-              {item.label}
-              {isActive && (
-                <span
+              <Link
+                href={item.href}
+                className={cn(
+                  'flex items-center gap-north-md px-north-md py-north-xs rounded-none text-[13px] font-ui tracking-normal transition-[border-left-width,border-color,background-color,color] duration-200',
+                  isActive
+                    ? 'border-l-[3px] border-primary bg-sidebar-accent/50 text-foreground font-semibold'
+                    : 'border-l-2 border-transparent text-foreground-secondary hover:border-primary/40 hover:bg-sidebar-accent/20 hover:text-foreground',
+                )}
+              >
+                <item.icon
                   aria-hidden="true"
-                  className="ml-auto h-1 w-1 rounded-full bg-primary animate-scale-in"
+                  className={cn('h-4 w-4 shrink-0', !item.iconColor && 'opacity-70')}
+                  style={item.iconColor ? { color: item.iconColor } : undefined}
                 />
-              )}
-            </Link>
+                {item.label}
+                {isActive && (
+                  <span
+                    aria-hidden="true"
+                    className="ml-auto h-1 w-1 rounded-full bg-primary animate-scale-in"
+                  />
+                )}
+              </Link>
+            </div>
           );
         })}
       </nav>
@@ -78,9 +86,9 @@ export function Sidebar() {
         <form action={signOut}>
           <button
             type="submit"
-            className="flex w-full items-center gap-north-md px-north-md py-north-xs rounded-none text-[13px] font-mono uppercase tracking-wider border-l-2 border-transparent text-foreground-secondary hover:border-primary/40 hover:bg-sidebar-accent/20 hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
+            className="flex w-full items-center gap-north-md px-north-md py-north-xs rounded-none text-[13px] font-ui tracking-normal border-l-2 border-transparent text-foreground-secondary hover:border-primary/40 hover:bg-sidebar-accent/20 hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
           >
-            <LogOut aria-hidden="true" className="h-3.5 w-3.5 shrink-0 opacity-70" />
+            <LogOut aria-hidden="true" className="h-4 w-4 shrink-0 opacity-70" />
             Sign out
           </button>
         </form>

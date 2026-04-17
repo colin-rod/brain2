@@ -56,8 +56,8 @@ export default async function DomainsPage() {
       {domains.length === 0 ? (
         <EmptyState
           icon={Layers}
-          title="No domains yet"
-          description="Domains appear here after you save notes that reference them."
+          title="No areas of work mapped yet."
+          description="Domains group your work by area — they surface automatically as you capture notes."
           iconColor="var(--entity-domains)"
           bgColor="var(--entity-domains-tint)"
           ctaLabel="Capture something"

@@ -115,8 +115,8 @@ export default async function NotesPage({
       {notes.length === 0 && !showArchived ? (
         <EmptyState
           icon={FileText}
-          title="No notes yet"
-          description="Notes appear here after you save a reviewed capture."
+          title="Your first note is one paste away."
+          description="Paste anything — a meeting transcript, a message thread, a page of handwriting — and Brain2 extracts the notes for you."
           iconColor="var(--entity-notes)"
           bgColor="var(--entity-notes-tint)"
           ctaLabel="Capture something"

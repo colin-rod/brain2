@@ -87,8 +87,8 @@ export default async function PeoplePage() {
       {people.length === 0 ? (
         <EmptyState
           icon={Users}
-          title="No people yet"
-          description="People appear here after you save notes that mention them."
+          title="No one in your second brain yet."
+          description="Drop in a 1:1 recap, an intro email, or meeting notes — Brain2 recognizes the people automatically."
           iconColor="var(--entity-people)"
           bgColor="var(--entity-people-tint)"
           ctaLabel="Capture something"

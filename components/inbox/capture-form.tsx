@@ -55,7 +55,7 @@ export function CaptureForm() {
   }
 
   return (
-    <div className="rounded-lg border border-border bg-surface p-north-lg">
+    <div className="rounded-lg border border-border bg-surface p-north-lg shadow-level-2">
       <Tabs
         value={mode}
         onValueChange={(v) => setMode(v as InputMode)}

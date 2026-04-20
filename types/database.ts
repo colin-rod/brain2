@@ -162,6 +162,14 @@ export interface NoteDomain {
   domain_id: string;
 }
 
+export interface NoteNote {
+  id: string;
+  note_id: string;
+  linked_note_id: string;
+  user_id: string;
+  created_at: string;
+}
+
 export type PersonListRow = Person & {
   project_people: { projects: { id: string; name: string } }[];
   note_count: number;

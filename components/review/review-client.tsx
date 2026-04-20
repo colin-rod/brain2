@@ -14,6 +14,7 @@ import { DomainsEditor } from './domains-editor';
 import { DecisionsEditor } from './decisions-editor';
 import { QuestionsEditor } from './questions-editor';
 import { IdeasEditor } from './ideas-editor';
+import { SuggestedLinksEditor } from './suggested-links-editor';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
@@ -124,6 +125,8 @@ export function ReviewClient({ capture, imageUrl }: ReviewClientProps) {
   const decisionCount = useReviewStore((s) => s.decisions.length);
   const questionCount = useReviewStore((s) => s.open_questions.length);
   const ideaCount = useReviewStore((s) => s.ideas.length);
+  const suggestedLinkCount = useReviewStore((s) => s.suggestedNoteLinks.length);
+  const approvedLinkCount = useReviewStore((s) => s.approvedNoteLinkIds.length);
 
   const addTask = useReviewStore((s) => s.addTask);
   const addPerson = useReviewStore((s) => s.addPerson);
@@ -155,6 +158,7 @@ export function ReviewClient({ capture, imageUrl }: ReviewClientProps) {
         decisions: state.decisions,
         open_questions: state.open_questions,
         ideas: state.ideas,
+        approvedNoteLinkIds: state.approvedNoteLinkIds,
       });
 
       if (result.validationErrors) {
@@ -263,6 +267,17 @@ export function ReviewClient({ capture, imageUrl }: ReviewClientProps) {
             <div className="pt-north-sm">
               <CollapsibleSection title="Ideas" count={ideaCount} delay="325ms" onAdd={addIdea}>
                 <IdeasEditor />
+              </CollapsibleSection>
+            </div>
+
+            <div className="pt-north-sm">
+              <CollapsibleSection
+                title="Related Notes"
+                count={approvedLinkCount || suggestedLinkCount}
+                delay="375ms"
+                onAdd={() => {}}
+              >
+                <SuggestedLinksEditor />
               </CollapsibleSection>
             </div>
           </div>

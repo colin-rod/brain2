@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { NoteDetailClient } from '@/components/notes/note-detail-client';
+import { getLinkedNotes } from '@/lib/actions/note-links';
 import type { Note, Task, Person, Project, Decision, OpenQuestion } from '@/types/database';
 
 interface NoteDetailPageProps {
@@ -26,6 +27,7 @@ export default async function NoteDetailPage({ params }: NoteDetailPageProps) {
     questionsRes,
     allPeopleRes,
     allProjectsRes,
+    linkedNotes,
   ] = await Promise.all([
     supabase.from('tasks').select('*').eq('note_id', noteId).order('created_at'),
     supabase
@@ -50,6 +52,7 @@ export default async function NoteDetailPage({ params }: NoteDetailPageProps) {
     supabase.from('open_questions').select('*').eq('note_id', noteId).order('created_at'),
     supabase.from('people').select('*').order('name'),
     supabase.from('projects').select('*').order('name'),
+    getLinkedNotes(noteId),
   ]);
 
   const tasks = (tasksRes.data ?? []) as Task[];
@@ -70,6 +73,7 @@ export default async function NoteDetailPage({ params }: NoteDetailPageProps) {
       questions={questions}
       allPeople={allPeople}
       allProjects={allProjects}
+      linkedNotes={linkedNotes}
     />
   );
 }

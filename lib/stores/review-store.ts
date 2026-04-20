@@ -8,6 +8,7 @@ import type {
   DecisionDraft,
   QuestionDraft,
   IdeaDraft,
+  SuggestedNoteLink,
 } from '@/types/domain';
 import type { ParsedNoteJson } from '@/types/database';
 
@@ -23,6 +24,8 @@ interface ReviewState {
   decisions: DecisionDraft[];
   open_questions: QuestionDraft[];
   ideas: IdeaDraft[];
+  suggestedNoteLinks: SuggestedNoteLink[];
+  approvedNoteLinkIds: string[];
 
   // Actions
   initFromParsed: (captureId: string, parsed: ParsedNoteJson) => void;
@@ -66,6 +69,10 @@ interface ReviewState {
   updateIdea: (id: string, updates: Partial<IdeaDraft>) => void;
   addIdea: () => void;
   removeIdea: (id: string) => void;
+
+  // Note links
+  setSuggestedNoteLinks: (links: SuggestedNoteLink[]) => void;
+  toggleNoteLinkApproval: (noteId: string) => void;
 }
 
 function uid(): string {
@@ -84,6 +91,8 @@ const emptyState = {
   decisions: [] as DecisionDraft[],
   open_questions: [] as QuestionDraft[],
   ideas: [] as IdeaDraft[],
+  suggestedNoteLinks: [] as SuggestedNoteLink[],
+  approvedNoteLinkIds: [] as string[],
 };
 
 export const useReviewStore = create<ReviewState>()(
@@ -245,6 +254,15 @@ export const useReviewStore = create<ReviewState>()(
           ideas: [...s.ideas, { id: uid(), idea_text: '', status: 'raw' as const }],
         })),
       removeIdea: (id) => set((s) => ({ ideas: s.ideas.filter((i) => i.id !== id) })),
+
+      // Note links
+      setSuggestedNoteLinks: (links) => set({ suggestedNoteLinks: links }),
+      toggleNoteLinkApproval: (noteId) =>
+        set((s) => ({
+          approvedNoteLinkIds: s.approvedNoteLinkIds.includes(noteId)
+            ? s.approvedNoteLinkIds.filter((id) => id !== noteId)
+            : [...s.approvedNoteLinkIds, noteId],
+        })),
     }),
     {
       name: 'brain2-review-draft',

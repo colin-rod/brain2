@@ -3,6 +3,8 @@
 import { createClient } from '@/lib/supabase/server';
 import { validateReviewPayload } from '@/lib/validation/review-payload';
 import { exportNoteMarkdown } from './export';
+import { storeNoteEmbedding } from './embeddings';
+import { createNoteLinks } from './note-links';
 import type { ReviewPayload } from '@/types/domain';
 
 interface SaveResult {
@@ -250,6 +252,19 @@ export async function saveReviewedNote(payload: ReviewPayload): Promise<SaveResu
   }
   if (projectIds.length > 0) {
     await supabase.from('projects').update({ summary_generated_at: null }).in('id', projectIds);
+  }
+
+  // Create note-to-note links from review (best-effort)
+  if (payload.approvedNoteLinkIds?.length > 0) {
+    await createNoteLinks(noteId, payload.approvedNoteLinkIds).catch(() => {});
+  }
+
+  // Generate embedding for similarity search (best-effort)
+  const embeddingText = [payload.title, payload.summary, payload.cleaned_text]
+    .filter(Boolean)
+    .join('\n\n');
+  if (embeddingText.trim()) {
+    await storeNoteEmbedding(noteId, embeddingText).catch(() => {});
   }
 
   // Auto-export markdown (best-effort, don't fail the save)

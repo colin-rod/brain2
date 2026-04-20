@@ -71,6 +71,14 @@ export interface IdeaDraft {
   status: IdeaStatus;
 }
 
+/** AI-suggested note link with similarity score */
+export interface SuggestedNoteLink {
+  id: string;
+  title: string;
+  summary: string | null;
+  similarity: number;
+}
+
 /** Payload sent from review page to the save action */
 export interface ReviewPayload {
   captureId: string;
@@ -84,4 +92,6 @@ export interface ReviewPayload {
   decisions: DecisionDraft[];
   open_questions: QuestionDraft[];
   ideas: IdeaDraft[];
+  /** Note IDs approved for linking during review */
+  approvedNoteLinkIds: string[];
 }

@@ -10,6 +10,8 @@ import { NotePeopleSection } from './note-people-section';
 import { NoteProjectsSection } from './note-projects-section';
 import { NoteDecisionsSection } from './note-decisions-section';
 import { NoteQuestionsSection } from './note-questions-section';
+import { NoteLinkedNotesSection } from './note-linked-notes-section';
+import { NoteSuggestedNotesSection } from './note-suggested-notes-section';
 import { useSearchRefresh } from '@/components/search/search-provider';
 import { updateNote } from '@/lib/actions/note-mutations';
 import { formatDate } from '@/lib/format-date';
@@ -24,6 +26,7 @@ interface NoteDetailClientProps {
   questions: OpenQuestion[];
   allPeople: Person[];
   allProjects: Project[];
+  linkedNotes: Pick<Note, 'id' | 'title' | 'summary' | 'created_at'>[];
 }
 
 export function NoteDetailClient({
@@ -35,6 +38,7 @@ export function NoteDetailClient({
   questions,
   allPeople,
   allProjects,
+  linkedNotes,
 }: NoteDetailClientProps) {
   const router = useRouter();
   const refreshSearch = useSearchRefresh();
@@ -119,6 +123,10 @@ export function NoteDetailClient({
           <NoteDecisionsSection noteId={note.id} decisions={decisions} onMutate={refresh} />
 
           <NoteQuestionsSection noteId={note.id} questions={questions} onMutate={refresh} />
+
+          <NoteLinkedNotesSection noteId={note.id} linkedNotes={linkedNotes} onMutate={refresh} />
+
+          <NoteSuggestedNotesSection noteId={note.id} onMutate={refresh} />
         </div>
       </div>
     </div>

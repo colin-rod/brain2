@@ -13,6 +13,7 @@ import {
   HelpCircle,
   Lightbulb,
   Download,
+  Wrench,
   Settings,
   LogOut,
 } from 'lucide-react';
@@ -38,6 +39,7 @@ const coreNavItems = [
 
 const utilityNavItems = [
   { href: '/exports', label: 'Exports', icon: Download, iconColor: undefined },
+  { href: '/maintenance', label: 'Maintenance', icon: Wrench, iconColor: undefined },
   { href: '/settings', label: 'Settings', icon: Settings, iconColor: undefined },
 ];
 

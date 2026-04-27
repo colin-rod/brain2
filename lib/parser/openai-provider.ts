@@ -1,5 +1,12 @@
 import OpenAI from 'openai';
-import type { ParserProvider, ParseInput, ParseResult, ParseMode } from './types';
+import type {
+  ParserProvider,
+  ParseInput,
+  ParseResult,
+  ParseMode,
+  TranscribeInput,
+  TranscribeResult,
+} from './types';
 import type { ParsedNoteJson } from '@/types/database';
 
 const systemPrompts: Record<ParseMode, string> = {
@@ -30,6 +37,21 @@ Given plain text content (notes, emails, documents), extract:
 - Decisions mentioned, with rationale if available
 - Open questions or unresolved items
 - Ideas or possibilities worth capturing (e.g. "we could try X", "what if we did Y", potential improvements or opportunities)
+
+Be conservative: only extract information that is clearly present. Do not invent due dates, priorities, or decisions that aren't explicitly stated or strongly implied.`,
+
+  email: `You are an expert at extracting structured information from emails.
+Given the full text of an email (including From / To / Cc / Subject headers and body), extract:
+- A clear, concise title — prefer the email's Subject line, lightly cleaned up if needed
+- A 1-3 sentence summary of what the email is about and any outcomes
+- A cleaned-up version of the email body (preserve meaningful structure; drop signatures, legal footers, and quoted reply chains unless directly relevant)
+- Tasks or action items with due dates, priorities, and the person responsible (actionee) when mentioned
+- People involved: include the sender (From) and recipients (To, Cc) as people, plus anyone named in the body. Use their role/title from the signature when available.
+- Projects or initiatives referenced
+- Work domains or areas (e.g. Engineering, Marketing, Legal, Finance, Design, Operations)
+- Decisions mentioned, with rationale if available
+- Open questions or unresolved items
+- Ideas or possibilities worth capturing
 
 Be conservative: only extract information that is clearly present. Do not invent due dates, priorities, or decisions that aren't explicitly stated or strongly implied.`,
 
@@ -253,6 +275,30 @@ export class OpenAIParserProvider implements ParserProvider {
       return { data: parsed };
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Unknown parsing error';
+      return { error: message };
+    }
+  }
+
+  async transcribeAudio(input: TranscribeInput): Promise<TranscribeResult> {
+    try {
+      const file =
+        input.audio instanceof File
+          ? input.audio
+          : new File([input.audio], input.filename, { type: input.audio.type });
+
+      const response = await this.client.audio.transcriptions.create({
+        file,
+        model: 'whisper-1',
+        response_format: 'text',
+      });
+
+      const text = typeof response === 'string' ? response : (response as { text?: string }).text;
+      if (!text) {
+        return { error: 'Empty transcription response' };
+      }
+      return { text: text.trim() };
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Unknown transcription error';
       return { error: message };
     }
   }

@@ -97,6 +97,51 @@ export async function createImageCapture(formData: FormData): Promise<CaptureRes
   return { id: data.id };
 }
 
+export async function createVoiceCapture(formData: FormData): Promise<CaptureResult> {
+  const file = formData.get('file') as File | null;
+  if (!file || file.size === 0) {
+    return { error: 'No audio provided' };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: 'Not authenticated' };
+  }
+
+  const ext = (file.name.split('.').pop() || 'webm').toLowerCase();
+  const filePath = `${user.id}/${crypto.randomUUID()}.${ext}`;
+
+  const { error: uploadError } = await supabase.storage.from('captures').upload(filePath, file, {
+    contentType: file.type || 'audio/webm',
+    upsert: false,
+  });
+
+  if (uploadError) {
+    return { error: `Upload failed: ${uploadError.message}` };
+  }
+
+  const { data, error } = await supabase
+    .from('captures')
+    .insert({
+      user_id: user.id,
+      source_type: 'voice' as CaptureSourceType,
+      file_path: filePath,
+      status: 'new',
+    })
+    .select('id')
+    .single();
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  return { id: data.id };
+}
+
 export async function fetchCaptures() {
   const supabase = await createClient();
   const {

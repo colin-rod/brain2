@@ -18,6 +18,8 @@ const sourceShort: Record<CaptureSourceType, string> = {
   image: 'IMG',
   text: 'TXT',
   chat_transcript: 'CHT',
+  voice: 'VOX',
+  email: 'EML',
 };
 
 const statusStyles: Record<CaptureStatus, string> = {
@@ -71,6 +73,11 @@ function getPreviewText(capture: Capture): string {
   }
   if (capture.source_type === 'image') {
     return 'Image uploaded';
+  }
+  if (capture.source_type === 'voice') {
+    return capture.ocr_text
+      ? capture.ocr_text.slice(0, 120) + (capture.ocr_text.length > 120 ? '...' : '')
+      : 'Voice note recorded';
   }
   return 'No content preview';
 }

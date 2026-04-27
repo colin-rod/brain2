@@ -7,12 +7,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { ImageDropzone } from './image-dropzone';
+import { VoiceRecorder } from './voice-recorder';
 import { useSearchRefresh } from '@/components/search/search-provider';
-import { createTextCapture, createImageCapture } from '@/lib/actions/capture';
+import { createTextCapture, createImageCapture, createVoiceCapture } from '@/lib/actions/capture';
 import type { CaptureSourceType } from '@/types/database';
-import { ImageIcon, FileText, MessageSquare, Loader2 } from 'lucide-react';
+import { ImageIcon, FileText, MessageSquare, Mic, Mail, Loader2 } from 'lucide-react';
 
-type InputMode = 'image' | 'text' | 'chat_transcript';
+type InputMode = 'image' | 'text' | 'chat_transcript' | 'voice' | 'email';
 
 export function CaptureForm() {
   const router = useRouter();
@@ -23,8 +24,9 @@ export function CaptureForm() {
   const [text, setText] = useState('');
   const [file, setFile] = useState<File | null>(null);
 
+  const isFileMode = mode === 'image' || mode === 'voice';
   const canSubmit =
-    !isPending && !showCheck && (mode === 'image' ? file !== null : text.trim().length > 0);
+    !isPending && !showCheck && (isFileMode ? file !== null : text.trim().length > 0);
 
   function handleSubmit() {
     startTransition(async () => {
@@ -35,6 +37,11 @@ export function CaptureForm() {
         const formData = new FormData();
         formData.append('file', file);
         result = await createImageCapture(formData);
+      } else if (mode === 'voice') {
+        if (!file) return;
+        const formData = new FormData();
+        formData.append('file', file);
+        result = await createVoiceCapture(formData);
       } else {
         result = await createTextCapture(text, mode as CaptureSourceType);
       }
@@ -61,14 +68,22 @@ export function CaptureForm() {
         onValueChange={(v) => setMode(v as InputMode)}
         className="space-y-north-base"
       >
-        <TabsList className="grid w-full grid-cols-3" aria-label="Capture input method">
+        <TabsList className="grid w-full grid-cols-5" aria-label="Capture input method">
           <TabsTrigger value="image" className="gap-1.5">
             <ImageIcon className="h-4 w-4" />
             <span>Image</span>
           </TabsTrigger>
+          <TabsTrigger value="voice" className="gap-1.5">
+            <Mic className="h-4 w-4" />
+            <span>Voice</span>
+          </TabsTrigger>
           <TabsTrigger value="text" className="gap-1.5">
             <FileText className="h-4 w-4" />
             <span>Text</span>
+          </TabsTrigger>
+          <TabsTrigger value="email" className="gap-1.5">
+            <Mail className="h-4 w-4" />
+            <span>Email</span>
           </TabsTrigger>
           <TabsTrigger value="chat_transcript" className="gap-1.5">
             <MessageSquare className="h-4 w-4" />
@@ -80,9 +95,24 @@ export function CaptureForm() {
           <ImageDropzone file={file} onFileChange={setFile} />
         </TabsContent>
 
+        <TabsContent value="voice">
+          <VoiceRecorder file={file} onFileChange={setFile} />
+        </TabsContent>
+
         <TabsContent value="text">
           <Textarea
-            placeholder="Paste your notes, email content, or any text here..."
+            placeholder="Paste your notes or any text here..."
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            rows={6}
+            maxLength={50000}
+            className="resize-y"
+          />
+        </TabsContent>
+
+        <TabsContent value="email">
+          <Textarea
+            placeholder="Paste a full email — include From / To / Subject lines and the body."
             value={text}
             onChange={(e) => setText(e.target.value)}
             rows={6}

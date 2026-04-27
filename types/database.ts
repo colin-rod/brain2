@@ -2,7 +2,7 @@
    Database row types — match Supabase schema exactly
    ============================================================ */
 
-export type CaptureSourceType = 'image' | 'text' | 'chat_transcript';
+export type CaptureSourceType = 'image' | 'text' | 'chat_transcript' | 'voice' | 'email';
 
 export type CaptureStatus =
   | 'new'

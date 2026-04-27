@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { ImageIcon, FileText, MessageSquare, ChevronDown } from 'lucide-react';
+import { ImageIcon, FileText, MessageSquare, ChevronDown, Mic, Mail } from 'lucide-react';
 import type { Capture, CaptureSourceType } from '@/types/database';
 import { cn } from '@/lib/utils';
 
@@ -11,6 +11,8 @@ const sourceIcons: Record<CaptureSourceType, typeof ImageIcon> = {
   image: ImageIcon,
   text: FileText,
   chat_transcript: MessageSquare,
+  voice: Mic,
+  email: Mail,
 };
 
 interface SourcePreviewProps {
@@ -58,8 +60,20 @@ export function SourcePreview({ capture, imageUrl }: SourcePreviewProps) {
               </pre>
             )}
 
+            {capture.source_type === 'voice' && capture.ocr_text && (
+              <pre className="whitespace-pre-wrap text-body text-foreground-secondary font-ui leading-relaxed max-h-80 overflow-y-auto">
+                {capture.ocr_text}
+              </pre>
+            )}
+
             {capture.source_type === 'image' && !imageUrl && !capture.raw_text && (
               <p className="text-metadata text-foreground-muted">No preview available</p>
+            )}
+
+            {capture.source_type === 'voice' && !capture.ocr_text && (
+              <p className="text-metadata text-foreground-muted">
+                Audio recorded — transcript will appear after parsing.
+              </p>
             )}
           </div>
         </CollapsibleContent>

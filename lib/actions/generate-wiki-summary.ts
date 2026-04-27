@@ -3,6 +3,11 @@
 import OpenAI from 'openai';
 import { createClient } from '@/lib/supabase/server';
 import { fetchPersonWikiData, fetchProjectWikiData, fetchDomainWikiData } from './wiki';
+import {
+  buildEntityEmbeddingText,
+  storePersonEmbedding,
+  storeProjectEmbedding,
+} from './embeddings';
 
 export interface GenerateSummaryResult {
   summary: string;
@@ -105,6 +110,33 @@ export async function generateWikiSummary(
         summary_generated_at: new Date().toISOString(),
       })
       .eq('id', entityId);
+
+    // Refresh embedding for semantic search (people + projects only).
+    // Best-effort: never let embedding failure break the summary write.
+    if (entityType === 'person' || entityType === 'project') {
+      try {
+        const { data: row } = await supabase
+          .from(table)
+          .select(entityType === 'person' ? 'name, role' : 'name, status')
+          .eq('id', entityId)
+          .single();
+        if (row) {
+          const r = row as { name: string; role?: string | null; status?: string | null };
+          const text = buildEntityEmbeddingText({
+            name: r.name,
+            roleOrStatus: entityType === 'person' ? r.role : r.status,
+            summary,
+          });
+          if (entityType === 'person') {
+            await storePersonEmbedding(entityId, text);
+          } else {
+            await storeProjectEmbedding(entityId, text);
+          }
+        }
+      } catch {
+        // swallow — embedding is best-effort
+      }
+    }
 
     return { summary, fromCache: false };
   } catch (err) {

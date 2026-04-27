@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { exportNoteMarkdown } from './export';
+import { storeNoteEmbedding } from './embeddings';
 import type { TaskPriority, TaskStatus, QuestionStatus } from '@/types/database';
 
 interface MutationResult {
@@ -61,6 +62,29 @@ export async function updateNote(
     .eq('user_id', user.id);
 
   if (error) return { error: error.message };
+
+  // Refresh embedding when any indexed field changed (best-effort, don't block).
+  const indexedFieldChanged =
+    updates.title !== undefined ||
+    updates.summary !== undefined ||
+    updates.cleaned_text !== undefined;
+  if (indexedFieldChanged) {
+    void (async () => {
+      try {
+        const { data: row } = await supabase
+          .from('notes')
+          .select('title, summary, cleaned_text')
+          .eq('id', noteId)
+          .single();
+        if (row) {
+          const text = [row.title, row.summary, row.cleaned_text].filter(Boolean).join('\n\n');
+          if (text.trim()) await storeNoteEmbedding(noteId, text);
+        }
+      } catch {
+        // best-effort
+      }
+    })();
+  }
 
   await exportNoteMarkdown(noteId).catch(() => {});
   return {};

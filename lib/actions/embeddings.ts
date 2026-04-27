@@ -115,6 +115,137 @@ export async function findSimilarNotesForText(
 }
 
 /**
+ * Build the canonical text used to embed a person or project.
+ * Mirrors the fields the keyword search already weights:
+ * primary (name), secondary (role/status), tertiary (compiled_summary).
+ */
+export function buildEntityEmbeddingText(input: {
+  name: string;
+  roleOrStatus?: string | null;
+  summary?: string | null;
+}): string {
+  return [input.name, input.roleOrStatus ?? '', input.summary ?? '']
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .join('\n');
+}
+
+/**
+ * Generate and store an embedding for a person.
+ * Best-effort — does not throw on failure.
+ */
+export async function storePersonEmbedding(personId: string, text: string): Promise<void> {
+  if (!text.trim()) return;
+  const embedding = await generateEmbedding(text);
+  const supabase = await createClient();
+  const vectorString = `[${embedding.join(',')}]`;
+  await supabase
+    .from('people')
+    .update({ embedding: vectorString } as Record<string, unknown>)
+    .eq('id', personId);
+}
+
+/**
+ * Generate and store an embedding for a project.
+ * Best-effort — does not throw on failure.
+ */
+export async function storeProjectEmbedding(projectId: string, text: string): Promise<void> {
+  if (!text.trim()) return;
+  const embedding = await generateEmbedding(text);
+  const supabase = await createClient();
+  const vectorString = `[${embedding.join(',')}]`;
+  await supabase
+    .from('projects')
+    .update({ embedding: vectorString } as Record<string, unknown>)
+    .eq('id', projectId);
+}
+
+export type SimilarPerson = {
+  id: string;
+  name: string;
+  role: string | null;
+  similarity: number;
+};
+
+export type SimilarProject = {
+  id: string;
+  name: string;
+  status: string | null;
+  similarity: number;
+};
+
+/**
+ * Find people semantically similar to the given query embedding.
+ */
+export async function findSimilarPeople(
+  queryEmbedding: number[],
+  matchCount: number = 5,
+): Promise<SimilarPerson[]> {
+  const supabase = await createClient();
+  const vectorString = `[${queryEmbedding.join(',')}]`;
+  const { data } = await supabase.rpc('find_similar_people', {
+    query_embedding: vectorString,
+    match_count: matchCount,
+  });
+  if (!data) return [];
+  return data.map((row: { id: string; name: string; role: string | null; similarity: number }) => ({
+    id: row.id,
+    name: row.name,
+    role: row.role,
+    similarity: row.similarity,
+  }));
+}
+
+/**
+ * Find projects semantically similar to the given query embedding.
+ */
+export async function findSimilarProjects(
+  queryEmbedding: number[],
+  matchCount: number = 5,
+): Promise<SimilarProject[]> {
+  const supabase = await createClient();
+  const vectorString = `[${queryEmbedding.join(',')}]`;
+  const { data } = await supabase.rpc('find_similar_projects', {
+    query_embedding: vectorString,
+    match_count: matchCount,
+  });
+  if (!data) return [];
+  return data.map(
+    (row: { id: string; name: string; status: string | null; similarity: number }) => ({
+      id: row.id,
+      name: row.name,
+      status: row.status,
+      similarity: row.similarity,
+    }),
+  );
+}
+
+/**
+ * Find notes semantically similar to a raw query embedding (for search, not link suggestions).
+ */
+export async function findSimilarNotesForEmbedding(
+  queryEmbedding: number[],
+  matchCount: number = 5,
+): Promise<SuggestedNoteLink[]> {
+  const supabase = await createClient();
+  const vectorString = `[${queryEmbedding.join(',')}]`;
+  const { data } = await supabase.rpc('find_similar_notes', {
+    query_embedding: vectorString,
+    match_count: matchCount,
+    note_id: '00000000-0000-0000-0000-000000000000',
+  });
+  if (!data) return [];
+  return data.map(
+    (row: { id: string; title: string; summary: string | null; similarity: number }) => ({
+      id: row.id,
+      title: row.title,
+      summary: row.summary,
+      similarity: row.similarity,
+    }),
+  );
+}
+
+/**
  * Backfill embeddings for all notes that don't have one yet.
  */
 export async function backfillEmbeddings(): Promise<{ processed: number; errors: number }> {

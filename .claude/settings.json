@@ -99,7 +99,9 @@
       "Bash(find /Users/colinrodrigues/Brain2/app/\\\\\\(app\\\\\\)/domains -name \"page.tsx\" -exec cat {} \\\\;)",
       "Bash(find /Users/colinrodrigues/Brain2/app/\\\\\\(app\\\\\\)/people -name \"page.tsx\" -exec cat {} \\\\;)",
       "Bash(grep -E \"\\\\.\\(tsx?|jsx?\\)$\")",
-      "Bash(node -e \"require\\('@base-ui/react/tooltip'\\); console.log\\('ok'\\)\")"
+      "Bash(node -e \"require\\('@base-ui/react/tooltip'\\); console.log\\('ok'\\)\")",
+      "Bash(find /Users/colinrodrigues/Brain2/app/\\\\\\(app\\\\\\) -type f -name \"page.tsx\" -exec basename {} \\\\;)",
+      "WebFetch(domain:atomicapp.ai)"
     ],
     "additionalDirectories": [
       "/Users/colinrodrigues/Brain2/app/(app)/review",

@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { useSearchData } from './search-provider';
 import { SearchResultItem } from './search-result-item';
 import { groupResultsByType, getEntityMeta, type SearchableItem } from '@/lib/search-utils';
+import { semanticSearch } from '@/lib/actions/search';
 
 export function GlobalSearch() {
   const { fuse, isLoading } = useSearchData();
@@ -22,7 +23,45 @@ export function GlobalSearch() {
     [query, fuse],
   );
   const groups = useMemo(() => groupResultsByType(results), [results]);
-  const flatResults = useMemo(() => groups.flatMap((g) => g.items), [groups]);
+
+  // ── Semantic search (debounced, runs alongside Fuse) ──────────────
+  const [semanticItems, setSemanticItems] = useState<SearchableItem[]>([]);
+  const [isSemanticLoading, setIsSemanticLoading] = useState(false);
+
+  useEffect(() => {
+    if (query.trim().length < 3) {
+      setSemanticItems([]);
+      setIsSemanticLoading(false);
+      return;
+    }
+    let cancelled = false;
+    setIsSemanticLoading(true);
+    const t = setTimeout(async () => {
+      try {
+        const res = await semanticSearch(query);
+        if (!cancelled) setSemanticItems(res.items);
+      } catch {
+        if (!cancelled) setSemanticItems([]);
+      } finally {
+        if (!cancelled) setIsSemanticLoading(false);
+      }
+    }, 250);
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+    };
+  }, [query]);
+
+  // Dedupe semantic results against keyword matches (by `${type}:${id}`).
+  const dedupedSemantic = useMemo(() => {
+    const seen = new Set(results.map((r) => `${r.type}:${r.id}`));
+    return semanticItems.filter((s) => !seen.has(`${s.type}:${s.id}`));
+  }, [semanticItems, results]);
+
+  const flatResults = useMemo(
+    () => [...groups.flatMap((g) => g.items), ...dedupedSemantic],
+    [groups, dedupedSemantic],
+  );
 
   const navigate = useCallback(
     (item: SearchableItem) => {
@@ -129,7 +168,7 @@ export function GlobalSearch() {
           aria-label="Search results"
           className="absolute top-full left-0 right-0 z-50 mt-0.5 max-h-96 overflow-y-auto rounded-none border border-border bg-surface shadow-lg"
         >
-          {flatResults.length === 0 ? (
+          {flatResults.length === 0 && !isSemanticLoading ? (
             <>
               <span className="sr-only">No results for {query}</span>
               <div className="px-north-base py-north-lg text-center text-metadata text-foreground-muted">
@@ -140,29 +179,62 @@ export function GlobalSearch() {
             <>
               <span className="sr-only">{flatResults.length} results</span>
               <div className="py-north-xs">
-                {groups.map((group) => {
-                  const meta = getEntityMeta(group.type);
-                  return (
-                    <div key={group.type}>
-                      <p className="px-north-base py-north-xs text-metadata font-mono uppercase tracking-widest text-foreground-muted border-b border-border">
-                        {meta.pluralLabel}
-                      </p>
-                      {group.items.map((item) => {
-                        const idx = flatIndex++;
-                        return (
-                          <SearchResultItem
-                            key={item.id}
-                            id={`search-option-${idx}`}
-                            item={item}
-                            isActive={idx === activeIndex}
-                            onClick={() => navigate(item)}
-                            onMouseEnter={() => setActiveIndex(idx)}
-                          />
-                        );
-                      })}
-                    </div>
-                  );
-                })}
+                {groups.length > 0 && (
+                  <div>
+                    <p className="px-north-base py-north-xs text-metadata font-mono uppercase tracking-widest text-foreground-muted border-b border-border">
+                      Matches
+                    </p>
+                    {groups.map((group) => {
+                      const meta = getEntityMeta(group.type);
+                      return (
+                        <div key={group.type}>
+                          <p className="px-north-base py-north-xs text-metadata font-mono uppercase tracking-widest text-foreground-muted/70">
+                            {meta.pluralLabel}
+                          </p>
+                          {group.items.map((item) => {
+                            const idx = flatIndex++;
+                            return (
+                              <SearchResultItem
+                                key={item.id}
+                                id={`search-option-${idx}`}
+                                item={item}
+                                isActive={idx === activeIndex}
+                                onClick={() => navigate(item)}
+                                onMouseEnter={() => setActiveIndex(idx)}
+                              />
+                            );
+                          })}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {(dedupedSemantic.length > 0 || isSemanticLoading) && (
+                  <div>
+                    <p className="px-north-base py-north-xs text-metadata font-mono uppercase tracking-widest text-foreground-muted border-b border-border">
+                      Related by meaning
+                      {isSemanticLoading && (
+                        <span className="ml-2 normal-case tracking-normal text-foreground-muted/60">
+                          searching…
+                        </span>
+                      )}
+                    </p>
+                    {dedupedSemantic.map((item) => {
+                      const idx = flatIndex++;
+                      return (
+                        <SearchResultItem
+                          key={`semantic-${item.type}-${item.id}`}
+                          id={`search-option-${idx}`}
+                          item={item}
+                          isActive={idx === activeIndex}
+                          onClick={() => navigate(item)}
+                          onMouseEnter={() => setActiveIndex(idx)}
+                        />
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             </>
           )}

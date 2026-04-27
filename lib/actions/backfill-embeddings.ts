@@ -1,11 +1,8 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
-import {
-  buildEntityEmbeddingText,
-  storePersonEmbedding,
-  storeProjectEmbedding,
-} from './embeddings';
+import { storePersonEmbedding, storeProjectEmbedding } from './embeddings';
+import { buildEntityEmbeddingText } from '@/lib/embeddings/build-entity-text';
 import { generateWikiSummary } from './generate-wiki-summary';
 
 export interface EntityBackfillResult {

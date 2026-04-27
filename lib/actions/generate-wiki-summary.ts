@@ -3,11 +3,8 @@
 import OpenAI from 'openai';
 import { createClient } from '@/lib/supabase/server';
 import { fetchPersonWikiData, fetchProjectWikiData, fetchDomainWikiData } from './wiki';
-import {
-  buildEntityEmbeddingText,
-  storePersonEmbedding,
-  storeProjectEmbedding,
-} from './embeddings';
+import { storePersonEmbedding, storeProjectEmbedding } from './embeddings';
+import { buildEntityEmbeddingText } from '@/lib/embeddings/build-entity-text';
 
 export interface GenerateSummaryResult {
   summary: string;

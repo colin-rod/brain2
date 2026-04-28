@@ -88,6 +88,7 @@ export interface Person {
   notes: string | null;
   compiled_summary: string | null;
   summary_generated_at: string | null;
+  pinned: boolean;
   created_at: string;
   updated_at: string;
 }

@@ -137,6 +137,40 @@ export async function deletePerson(personId: string): Promise<MutationResult> {
   return {};
 }
 
+export async function setPersonPinned(personId: string, pinned: boolean): Promise<MutationResult> {
+  const { supabase, user } = await getUser();
+  if (!user) return { error: 'Not authenticated' };
+
+  const { error } = await supabase
+    .from('people')
+    .update({ pinned })
+    .eq('id', personId)
+    .eq('user_id', user.id);
+
+  if (error) return { error: error.message };
+  return {};
+}
+
+export async function mergePeople(targetId: string, sourceIds: string[]): Promise<MutationResult> {
+  const { supabase, user } = await getUser();
+  if (!user) return { error: 'Not authenticated' };
+
+  if (!targetId || sourceIds.length === 0) {
+    return { error: 'Target and at least one source are required' };
+  }
+  if (sourceIds.includes(targetId)) {
+    return { error: 'Target cannot also be a source' };
+  }
+
+  const { error } = await supabase.rpc('merge_people', {
+    target_id: targetId,
+    source_ids: sourceIds,
+  });
+
+  if (error) return { error: error.message };
+  return {};
+}
+
 // ── Projects CRUD ────────────────────────────────────────────
 
 export async function createProject(data: {

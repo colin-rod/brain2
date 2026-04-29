@@ -34,7 +34,7 @@ export function IdeasEditor() {
                 size="sm"
                 aria-label="Remove idea"
                 onClick={() => removeIdea(idea.id)}
-                className="shrink-0 text-foreground-muted hover:text-destructive mt-north-xs"
+                className="shrink-0 h-11 w-11 lg:h-8 lg:w-8 text-foreground-muted hover:text-destructive mt-north-xs"
               >
                 <X className="h-4 w-4" aria-hidden="true" />
               </Button>

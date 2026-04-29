@@ -33,7 +33,7 @@ export function ProjectsEditor() {
                 size="sm"
                 aria-label="Remove project"
                 onClick={() => removeProject(project.id)}
-                className="shrink-0 text-foreground-muted hover:text-destructive"
+                className="shrink-0 h-11 w-11 lg:h-8 lg:w-8 text-foreground-muted hover:text-destructive"
               >
                 <X className="h-4 w-4" aria-hidden="true" />
               </Button>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useTransition } from 'react';
+import { useEffect, useState, useSyncExternalStore, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { useReviewStore } from '@/lib/stores/review-store';
@@ -72,12 +72,41 @@ function SaveCelebration({ active }: { active: boolean }) {
   );
 }
 
+const LG_MEDIA_QUERY = '(min-width: 1024px)';
+
+function subscribeLgMediaQuery(onStoreChange: () => void) {
+  if (typeof window === 'undefined') return () => {};
+  const mql = window.matchMedia(LG_MEDIA_QUERY);
+  mql.addEventListener('change', onStoreChange);
+  return () => mql.removeEventListener('change', onStoreChange);
+}
+
+function getLgMediaQuerySnapshot() {
+  return window.matchMedia(LG_MEDIA_QUERY).matches;
+}
+
+function getLgMediaQueryServerSnapshot() {
+  return false;
+}
+
 function CollapsibleSection({ title, count, children, delay, onAdd }: CollapsibleSectionProps) {
-  const [open, setOpen] = useState(count > 0);
+  const isLg = useSyncExternalStore(
+    subscribeLgMediaQuery,
+    getLgMediaQuerySnapshot,
+    getLgMediaQueryServerSnapshot,
+  );
+  const [userToggled, setUserToggled] = useState(false);
+  const [openOverride, setOpenOverride] = useState(false);
+  const open = userToggled ? openOverride : isLg && count > 0;
+
+  function handleOpenChange(next: boolean) {
+    setUserToggled(true);
+    setOpenOverride(next);
+  }
 
   return (
     <div className="animate-slide-in-up" style={{ animationDelay: delay }}>
-      <Collapsible open={open} onOpenChange={setOpen}>
+      <Collapsible open={open} onOpenChange={handleOpenChange}>
         <div className="flex items-center justify-between">
           <CollapsibleTrigger className="flex items-center gap-north-xs py-north-xs min-h-11 hover:text-foreground transition-colors duration-200">
             <span className="text-section-header">
@@ -95,7 +124,12 @@ function CollapsibleSection({ title, count, children, delay, onAdd }: Collapsibl
               )}
             />
           </CollapsibleTrigger>
-          <Button variant="ghost" size="sm" onClick={onAdd} className="gap-1">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onAdd}
+            className="gap-1 h-11 lg:h-9 px-3 lg:px-2"
+          >
             <Plus className="h-3.5 w-3.5" aria-hidden="true" />
             Add
           </Button>
@@ -186,7 +220,7 @@ export function ReviewClient({ capture, imageUrl }: ReviewClientProps) {
   return (
     <>
       <SaveCelebration active={saveSuccess} />
-      <div className="space-y-north-lg pb-20 lg:pb-0">
+      <div className="space-y-north-lg pb-[calc(8.5rem+env(safe-area-inset-bottom,0px))] lg:pb-0">
         {/* Title, Summary, Full Text — full width above the grid */}
         <div className="animate-slide-in-up" style={{ animationDelay: '0ms' }}>
           <NoteFields />
@@ -198,7 +232,7 @@ export function ReviewClient({ capture, imageUrl }: ReviewClientProps) {
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-north-lg">
           {/* Left column: source preview */}
           <div className="lg:col-span-2">
-            <div className="lg:sticky lg:top-north-lg">
+            <div className="sticky top-14 z-20 bg-background lg:top-north-lg lg:z-auto">
               <SourcePreview capture={capture} imageUrl={imageUrl} />
             </div>
           </div>

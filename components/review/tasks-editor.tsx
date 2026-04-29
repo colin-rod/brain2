@@ -44,14 +44,14 @@ export function TasksEditor() {
                 onChange={(e) => updateTask(task.id, { title: e.target.value })}
                 placeholder="Task title"
                 maxLength={500}
-                className="flex-1 min-w-40"
+                className="flex-1 min-w-0 sm:min-w-40"
               />
               <Button
                 variant="ghost"
                 size="sm"
                 aria-label="Remove task"
                 onClick={() => removeTask(task.id)}
-                className="shrink-0 text-foreground-muted hover:text-destructive"
+                className="shrink-0 h-11 w-11 lg:h-8 lg:w-8 text-foreground-muted hover:text-destructive"
               >
                 <X className="h-4 w-4" aria-hidden="true" />
               </Button>

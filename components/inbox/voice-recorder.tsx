@@ -8,6 +8,7 @@ interface VoiceRecorderProps {
   file: File | null;
   onFileChange: (file: File | null) => void;
   compact?: boolean;
+  autoStartToken?: number;
 }
 
 const MAX_SECONDS = 90;
@@ -27,7 +28,12 @@ function formatTime(s: number): string {
   return `${m}:${r.toString().padStart(2, '0')}`;
 }
 
-export function VoiceRecorder({ file, onFileChange, compact = false }: VoiceRecorderProps) {
+export function VoiceRecorder({
+  file,
+  onFileChange,
+  compact = false,
+  autoStartToken,
+}: VoiceRecorderProps) {
   const [isRecording, setIsRecording] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -130,6 +136,14 @@ export function VoiceRecorder({ file, onFileChange, compact = false }: VoiceReco
     };
   }, [cleanupStream, previewUrl]);
 
+  useEffect(() => {
+    if (autoStartToken === undefined || autoStartToken === 0) return;
+    if (file || isRecording) return;
+    startRecording();
+    // Intentionally only react to token changes, not record state.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoStartToken]);
+
   if (compact) {
     if (file) return null;
     return (
@@ -139,7 +153,7 @@ export function VoiceRecorder({ file, onFileChange, compact = false }: VoiceReco
           onClick={isRecording ? stopRecording : startRecording}
           aria-label={isRecording ? 'Stop recording' : 'Start recording'}
           className={cn(
-            'rounded-full p-2 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+            'inline-flex items-center justify-center rounded-full h-11 w-11 sm:h-9 sm:w-9 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
             isRecording
               ? 'bg-status-failed text-white animate-pulse'
               : 'bg-surface-subtle text-foreground hover:bg-surface',
@@ -148,7 +162,9 @@ export function VoiceRecorder({ file, onFileChange, compact = false }: VoiceReco
           {isRecording ? <Square className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
         </button>
         {isRecording ? (
-          <span className="text-metadata text-foreground-muted">{formatTime(elapsed)}</span>
+          <span className="text-metadata text-foreground-muted">
+            Recording {formatTime(elapsed)} · tap to stop
+          </span>
         ) : null}
         {error ? <span className="text-metadata text-status-failed">{error}</span> : null}
       </div>
@@ -175,7 +191,7 @@ export function VoiceRecorder({ file, onFileChange, compact = false }: VoiceReco
             type="button"
             onClick={handleClear}
             aria-label="Discard recording"
-            className="rounded-full p-1.5 hover:bg-surface-subtle transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="inline-flex items-center justify-center rounded-full h-11 w-11 sm:h-8 sm:w-8 hover:bg-surface-subtle transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <X className="h-4 w-4" />
           </button>

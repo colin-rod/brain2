@@ -12,9 +12,7 @@ export default async function InboxPage() {
     <div className="space-y-north-lg">
       <PageHeader title="Inbox" />
 
-      <div className="bg-surface rounded-lg shadow-level-2 p-north-lg">
-        <CaptureForm />
-      </div>
+      <CaptureForm />
 
       <div>
         <div className="flex items-center gap-north-sm mb-north-md">

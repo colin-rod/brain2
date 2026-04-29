@@ -10,7 +10,16 @@ import { useSearchRefresh } from '@/components/search/search-provider';
 import { createTextCapture, createImageCapture, createVoiceCapture } from '@/lib/actions/capture';
 import type { CaptureSourceType } from '@/types/database';
 import { detectTextType, type DetectedTextType } from '@/lib/inbox/heuristics';
-import { Loader2, Mail, MessageSquare, Paperclip, X } from 'lucide-react';
+import {
+  Camera,
+  Image as ImageIcon,
+  Loader2,
+  Mail,
+  MessageSquare,
+  Mic,
+  Paperclip,
+  X,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export function CaptureForm() {
@@ -23,7 +32,9 @@ export function CaptureForm() {
   const [detectedTextType, setDetectedTextType] = useState<DetectedTextType>('text');
   const [userOverrodeType, setUserOverrodeType] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
+  const [voiceStartToken, setVoiceStartToken] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
 
   const filePreviewUrl = useMemo(
     () => (attachedFile ? URL.createObjectURL(attachedFile) : null),
@@ -67,6 +78,14 @@ export function CaptureForm() {
 
   function handlePaperclipClick() {
     fileInputRef.current?.click();
+  }
+
+  function handleCameraClick() {
+    cameraInputRef.current?.click();
+  }
+
+  function handleVoiceToolbarClick() {
+    setVoiceStartToken((t) => t + 1);
   }
 
   function handleFileInputChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -132,7 +151,7 @@ export function CaptureForm() {
   const isAudio = attachedFile?.type.startsWith('audio/') ?? false;
 
   return (
-    <div className="rounded-lg border border-border bg-surface p-north-lg shadow-level-2">
+    <div className="rounded-lg border border-border bg-surface p-north-base sm:p-north-lg shadow-level-2">
       <div
         onDragOver={(e) => {
           e.preventDefault();
@@ -170,16 +189,47 @@ export function CaptureForm() {
               type="button"
               onClick={clearAttachedFile}
               aria-label="Remove attachment"
-              className="rounded-full p-1.5 hover:bg-surface-subtle transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="inline-flex items-center justify-center rounded-full h-11 w-11 sm:h-8 sm:w-8 hover:bg-surface-subtle transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <X className="h-4 w-4" />
             </button>
           </div>
         ) : null}
 
+        {!attachedFile ? (
+          <div className="flex sm:hidden gap-north-sm border-b border-border p-north-sm">
+            <button
+              type="button"
+              onClick={handleCameraClick}
+              className="flex flex-1 min-h-11 flex-col items-center justify-center gap-1 rounded-md bg-surface-subtle text-foreground hover:bg-surface transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <Camera className="h-4 w-4" aria-hidden="true" />
+              <span className="text-metadata">Camera</span>
+            </button>
+            <button
+              type="button"
+              onClick={handlePaperclipClick}
+              className="flex flex-1 min-h-11 flex-col items-center justify-center gap-1 rounded-md bg-surface-subtle text-foreground hover:bg-surface transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <ImageIcon className="h-4 w-4" aria-hidden="true" />
+              <span className="text-metadata">Photo</span>
+            </button>
+            <button
+              type="button"
+              onClick={handleVoiceToolbarClick}
+              className="flex flex-1 min-h-11 flex-col items-center justify-center gap-1 rounded-md bg-surface-subtle text-foreground hover:bg-surface transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <Mic className="h-4 w-4" aria-hidden="true" />
+              <span className="text-metadata">Voice</span>
+            </button>
+          </div>
+        ) : null}
+
         <Textarea
           placeholder={
-            attachedFile ? 'Add a note or context (optional)…' : 'Drop a file, paste, or type…'
+            attachedFile
+              ? 'Add a note or context (optional)…'
+              : 'Type, paste, or tap a button above…'
           }
           value={text}
           onChange={(e) => setText(e.target.value)}
@@ -189,13 +239,13 @@ export function CaptureForm() {
         />
 
         {isDragOver ? (
-          <div className="pointer-events-none absolute inset-0 flex items-center justify-center rounded-md bg-primary-tint/80 text-body font-medium text-foreground">
+          <div className="pointer-events-none absolute inset-0 hidden sm:flex items-center justify-center rounded-md bg-primary-tint/80 text-body font-medium text-foreground">
             Drop image or audio here
           </div>
         ) : null}
       </div>
 
-      <div className="mt-north-base flex items-center justify-between gap-north-sm">
+      <div className="mt-north-base flex flex-col gap-north-sm sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-north-sm">
           <input
             ref={fileInputRef}
@@ -204,34 +254,60 @@ export function CaptureForm() {
             onChange={handleFileInputChange}
             className="hidden"
           />
+          <input
+            ref={cameraInputRef}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            onChange={handleFileInputChange}
+            className="hidden"
+          />
           <button
             type="button"
             onClick={handlePaperclipClick}
             aria-label="Attach file"
             disabled={attachedFile !== null}
-            className="rounded-full p-2 text-foreground-secondary hover:bg-surface-subtle transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-40 disabled:hover:bg-transparent"
+            className="inline-flex items-center justify-center rounded-full h-11 w-11 sm:h-9 sm:w-9 text-foreground-secondary hover:bg-surface-subtle transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-40 disabled:hover:bg-transparent"
           >
             <Paperclip className="h-4 w-4" />
           </button>
-          <VoiceRecorder file={attachedFile} onFileChange={setAttachedFile} compact />
-          {!attachedFile && detectedTextType !== 'text' ? (
+          <VoiceRecorder
+            file={attachedFile}
+            onFileChange={setAttachedFile}
+            compact
+            autoStartToken={voiceStartToken}
+          />
+          {!attachedFile && text.trim().length > 0 ? (
             <button
               type="button"
               onClick={cycleType}
-              aria-label="Detected type, click to change"
-              className="inline-flex items-center gap-1 rounded-full border border-border bg-surface-subtle px-2 py-0.5 text-metadata hover:bg-surface transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              aria-label="Detected type, tap to change"
+              className={cn(
+                'inline-flex items-center gap-1 rounded-full border border-border bg-surface-subtle px-3 py-2 sm:px-2 sm:py-0.5 text-metadata hover:bg-surface transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                detectedTextType === 'text' && 'hidden sm:inline-flex',
+              )}
             >
               {detectedTextType === 'email' ? (
-                <Mail className="h-3 w-3" />
+                <Mail className="h-4 w-4 sm:h-3 sm:w-3" />
+              ) : detectedTextType === 'chat_transcript' ? (
+                <MessageSquare className="h-4 w-4 sm:h-3 sm:w-3" />
               ) : (
-                <MessageSquare className="h-3 w-3" />
+                <MessageSquare className="h-4 w-4 sm:h-3 sm:w-3 opacity-60" />
               )}
-              {detectedTextType === 'email' ? 'Email' : 'Chat'}
+              {detectedTextType === 'email'
+                ? 'Email'
+                : detectedTextType === 'chat_transcript'
+                  ? 'Chat'
+                  : 'Plain text'}
             </button>
           ) : null}
         </div>
 
-        <Button onClick={handleSubmit} disabled={!canSubmit}>
+        <Button
+          onClick={handleSubmit}
+          disabled={!canSubmit}
+          className="w-full sm:w-auto h-11 sm:h-9"
+        >
           {isPending ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
           ) : showCheck ? (

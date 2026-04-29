@@ -103,11 +103,24 @@ export async function parseCapture(captureId: string): Promise<ParseCaptureResul
       await supabase.from('captures').update({ ocr_text: transcribedText }).eq('id', captureId);
     }
 
+    const isFileCapture = capture.source_type === 'image' || capture.source_type === 'voice';
+    const userContext = isFileCapture && capture.raw_text ? capture.raw_text : undefined;
+
+    let textForParser: string | undefined;
+    if (capture.source_type === 'image') {
+      textForParser = undefined;
+    } else if (capture.source_type === 'voice') {
+      textForParser = transcribedText || undefined;
+    } else {
+      textForParser = capture.raw_text || undefined;
+    }
+
     const result = await parser.parse({
       mode,
-      text: capture.raw_text || transcribedText || undefined,
+      text: textForParser,
       imageBase64,
       imageMimeType,
+      userContext,
     });
 
     if (result.error || !result.data) {

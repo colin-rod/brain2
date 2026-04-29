@@ -56,6 +56,8 @@ export async function createImageCapture(formData: FormData): Promise<CaptureRes
     return { error: 'No file provided' };
   }
 
+  const rawText = (formData.get('rawText') as string | null)?.trim() || null;
+
   const supabase = await createClient();
   const {
     data: { user },
@@ -85,6 +87,7 @@ export async function createImageCapture(formData: FormData): Promise<CaptureRes
       user_id: user.id,
       source_type: 'image' as CaptureSourceType,
       file_path: filePath,
+      raw_text: rawText,
       status: 'new',
     })
     .select('id')
@@ -102,6 +105,8 @@ export async function createVoiceCapture(formData: FormData): Promise<CaptureRes
   if (!file || file.size === 0) {
     return { error: 'No audio provided' };
   }
+
+  const rawText = (formData.get('rawText') as string | null)?.trim() || null;
 
   const supabase = await createClient();
   const {
@@ -130,6 +135,7 @@ export async function createVoiceCapture(formData: FormData): Promise<CaptureRes
       user_id: user.id,
       source_type: 'voice' as CaptureSourceType,
       file_path: filePath,
+      raw_text: rawText,
       status: 'new',
     })
     .select('id')

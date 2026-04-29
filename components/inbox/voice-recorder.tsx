@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 interface VoiceRecorderProps {
   file: File | null;
   onFileChange: (file: File | null) => void;
+  compact?: boolean;
 }
 
 const MAX_SECONDS = 90;
@@ -26,7 +27,7 @@ function formatTime(s: number): string {
   return `${m}:${r.toString().padStart(2, '0')}`;
 }
 
-export function VoiceRecorder({ file, onFileChange }: VoiceRecorderProps) {
+export function VoiceRecorder({ file, onFileChange, compact = false }: VoiceRecorderProps) {
   const [isRecording, setIsRecording] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -76,7 +77,9 @@ export function VoiceRecorder({ file, onFileChange }: VoiceRecorderProps) {
         const blob = new Blob(chunksRef.current, { type: blobType });
         const audioFile = new File([blob], `voice-${Date.now()}.${ext}`, { type: blobType });
         onFileChange(audioFile);
-        setPreviewUrl(URL.createObjectURL(blob));
+        if (!compact) {
+          setPreviewUrl(URL.createObjectURL(blob));
+        }
         setIsRecording(false);
         cleanupStream();
       };
@@ -98,7 +101,7 @@ export function VoiceRecorder({ file, onFileChange }: VoiceRecorderProps) {
       setError(message);
       cleanupStream();
     }
-  }, [cleanupStream, onFileChange, stopRecording]);
+  }, [cleanupStream, onFileChange, stopRecording, compact]);
 
   const handleClear = useCallback(() => {
     if (previewUrl) URL.revokeObjectURL(previewUrl);
@@ -126,6 +129,31 @@ export function VoiceRecorder({ file, onFileChange }: VoiceRecorderProps) {
       if (previewUrl) URL.revokeObjectURL(previewUrl);
     };
   }, [cleanupStream, previewUrl]);
+
+  if (compact) {
+    if (file) return null;
+    return (
+      <div className="inline-flex items-center gap-north-sm">
+        <button
+          type="button"
+          onClick={isRecording ? stopRecording : startRecording}
+          aria-label={isRecording ? 'Stop recording' : 'Start recording'}
+          className={cn(
+            'rounded-full p-2 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+            isRecording
+              ? 'bg-status-failed text-white animate-pulse'
+              : 'bg-surface-subtle text-foreground hover:bg-surface',
+          )}
+        >
+          {isRecording ? <Square className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+        </button>
+        {isRecording ? (
+          <span className="text-metadata text-foreground-muted">{formatTime(elapsed)}</span>
+        ) : null}
+        {error ? <span className="text-metadata text-status-failed">{error}</span> : null}
+      </div>
+    );
+  }
 
   if (file && previewUrl) {
     return (

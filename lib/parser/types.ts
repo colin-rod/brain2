@@ -10,6 +10,8 @@ export interface ParseInput {
   imageBase64?: string;
   /** MIME type of the image */
   imageMimeType?: string;
+  /** Optional user-provided note that accompanies a file capture. */
+  userContext?: string;
 }
 
 export interface ParseResult {

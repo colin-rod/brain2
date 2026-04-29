@@ -231,10 +231,10 @@ export class OpenAIParserProvider implements ParserProvider {
           detail: 'high',
         },
       });
-      if (input.text) {
+      if (input.userContext) {
         userContent.push({
           type: 'text',
-          text: `Additional context or OCR text:\n${input.text}`,
+          text: `Additional user-provided context:\n${input.userContext}`,
         });
       } else {
         userContent.push({
@@ -243,9 +243,12 @@ export class OpenAIParserProvider implements ParserProvider {
         });
       }
     } else if (input.text) {
+      const payload = input.userContext
+        ? `${input.text}\n\nAdditional user-provided context:\n${input.userContext}`
+        : input.text;
       userContent.push({
         type: 'text',
-        text: input.text,
+        text: payload,
       });
     } else {
       return { error: 'No input provided (neither text nor image)' };

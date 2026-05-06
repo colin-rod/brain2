@@ -2,7 +2,6 @@
 
 import { useCallback, useState } from 'react';
 import { Input } from '@/components/ui/input';
-import { Search } from 'lucide-react';
 
 interface SearchBarProps {
   placeholder?: string;
@@ -27,9 +26,14 @@ export function SearchBar({
   );
 
   return (
-    <div className="relative">
-      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground-muted" />
-      <Input value={value} onChange={handleChange} placeholder={placeholder} className="pl-9" />
+    <div className="relative flex items-center border border-input rounded-none bg-transparent focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/50">
+      <span className="pl-2.5 font-mono text-sm text-primary select-none shrink-0">&gt;</span>
+      <Input
+        value={value}
+        onChange={handleChange}
+        placeholder={placeholder}
+        className="border-0 rounded-none pl-1.5 focus-visible:border-0 focus-visible:ring-0 placeholder:uppercase placeholder:tracking-wider placeholder:font-mono placeholder:text-[12px] bg-transparent"
+      />
     </div>
   );
 }

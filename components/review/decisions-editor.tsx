@@ -1,61 +1,56 @@
 'use client';
 
 import { Input } from '@/components/ui/input';
+import { DateInputWithShortcuts } from '@/components/ui/date-input-with-shortcuts';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Plus, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { useReviewStore } from '@/lib/stores/review-store';
+import { EditorEmptyMessage } from '@/components/shared/editor-empty-message';
+import { EditorItemCard } from '@/components/shared/editor-item-card';
 
 export function DecisionsEditor() {
   const decisions = useReviewStore((s) => s.decisions);
   const updateDecision = useReviewStore((s) => s.updateDecision);
-  const addDecision = useReviewStore((s) => s.addDecision);
   const removeDecision = useReviewStore((s) => s.removeDecision);
 
   return (
     <div className="space-y-north-sm">
-      <div className="flex items-center justify-between">
-        <h3 className="text-section-header">Decisions</h3>
-        <Button variant="ghost" size="sm" onClick={addDecision} className="gap-1">
-          <Plus className="h-3.5 w-3.5" />
-          Add
-        </Button>
-      </div>
-
       {decisions.length === 0 && (
-        <p className="text-metadata text-foreground-muted py-north-sm">No decisions extracted.</p>
+        <EditorEmptyMessage message="No decisions found — add one if needed." />
       )}
 
       <div className="space-y-north-sm">
         {decisions.map((decision) => (
-          <div
-            key={decision.id}
-            className="rounded-md border border-border bg-surface-subtle p-north-md space-y-north-sm"
-          >
+          <EditorItemCard key={decision.id} variant="subtle" className="animate-scale-in">
             <div className="flex items-start gap-north-sm">
               <Textarea
+                aria-label="Decision"
                 value={decision.decision_text}
                 onChange={(e) => updateDecision(decision.id, { decision_text: e.target.value })}
                 placeholder="What was decided?"
+                maxLength={2000}
                 rows={2}
                 className="flex-1 resize-y"
               />
               <Button
                 variant="ghost"
                 size="sm"
+                aria-label="Remove decision"
                 onClick={() => removeDecision(decision.id)}
-                className="shrink-0 text-foreground-muted hover:text-destructive"
+                className="shrink-0 h-11 w-11 lg:h-8 lg:w-8 text-foreground-muted hover:text-destructive"
               >
-                <X className="h-4 w-4" />
+                <X className="h-4 w-4" aria-hidden="true" />
               </Button>
             </div>
 
             <div className="flex gap-north-sm">
               <div className="flex-1">
-                <label className="text-metadata text-foreground-muted block mb-1">
+                <p className="text-metadata text-foreground-muted mb-north-xs">
                   Rationale (optional)
-                </label>
+                </p>
                 <Input
+                  aria-label="Rationale"
                   value={decision.rationale || ''}
                   onChange={(e) =>
                     updateDecision(decision.id, {
@@ -63,22 +58,23 @@ export function DecisionsEditor() {
                     })
                   }
                   placeholder="Why was this decided?"
+                  maxLength={1000}
                 />
               </div>
-              <div className="w-40">
-                <label className="text-metadata text-foreground-muted block mb-1">Date</label>
-                <Input
-                  type="date"
+              <div className="w-48">
+                <p className="text-metadata text-foreground-muted mb-north-xs">Date</p>
+                <DateInputWithShortcuts
+                  aria-label="Decision date"
                   value={decision.decision_date || ''}
-                  onChange={(e) =>
+                  onChange={(v) =>
                     updateDecision(decision.id, {
-                      decision_date: e.target.value || null,
+                      decision_date: v || null,
                     })
                   }
                 />
               </div>
             </div>
-          </div>
+          </EditorItemCard>
         ))}
       </div>
     </div>

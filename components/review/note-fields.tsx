@@ -26,8 +26,17 @@ export function NoteFields() {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Note title"
+          maxLength={200}
           className="text-issue-title"
         />
+        {title.length > 160 && (
+          <p
+            className={`text-metadata mt-1 text-right ${title.length >= 200 ? 'text-destructive' : 'text-foreground-muted'}`}
+            aria-live="polite"
+          >
+            {title.length}/200
+          </p>
+        )}
       </div>
 
       <div>
@@ -41,10 +50,19 @@ export function NoteFields() {
           id="summary"
           value={summary}
           onChange={(e) => setSummary(e.target.value)}
-          placeholder="Brief summary of the note..."
+          placeholder="One-sentence takeaway"
+          maxLength={2000}
           rows={3}
           className="resize-y"
         />
+        {summary.length > 1600 && (
+          <p
+            className={`text-metadata mt-1 text-right ${summary.length >= 2000 ? 'text-destructive' : 'text-foreground-muted'}`}
+            aria-live="polite"
+          >
+            {summary.length}/2000
+          </p>
+        )}
       </div>
 
       <div>
@@ -52,13 +70,17 @@ export function NoteFields() {
           htmlFor="cleaned-text"
           className="text-metadata text-foreground-secondary block mb-north-xs"
         >
-          Cleaned Text
+          Full Text
         </label>
+        <p className="text-metadata text-foreground-muted mb-north-xs">
+          The cleaned-up version of your input. Edit anything that was missed or wrong.
+        </p>
         <Textarea
           id="cleaned-text"
           value={cleaned_text}
           onChange={(e) => setCleanedText(e.target.value)}
-          placeholder="Cleaned-up version of the full content..."
+          placeholder="Full content of the note"
+          maxLength={50000}
           rows={8}
           className="resize-y"
         />

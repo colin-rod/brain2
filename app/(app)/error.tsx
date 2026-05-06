@@ -16,9 +16,11 @@ export default function AppError({
   }, [error]);
 
   return (
-    <div className="flex flex-col items-center justify-center py-north-2xl text-center">
-      <AlertCircle className="h-12 w-12 text-destructive mb-north-base" />
-      <h2 className="text-section-header mb-north-xs">Something went wrong</h2>
+    <div className="animate-slide-in-up flex flex-col items-center justify-center py-north-2xl text-center">
+      <div className="mb-north-base rounded-full border-2 border-dashed border-destructive/30 p-3">
+        <AlertCircle className="h-10 w-10 text-destructive" />
+      </div>
+      <h2 className="text-section-header mb-north-xs">Something stumbled.</h2>
       <p className="text-body text-foreground-secondary mb-north-lg max-w-md">
         {error.message || 'An unexpected error occurred. Please try again.'}
       </p>

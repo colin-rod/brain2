@@ -4,8 +4,11 @@ import type {
   TaskDraft,
   PersonDraft,
   ProjectDraft,
+  DomainDraft,
   DecisionDraft,
   QuestionDraft,
+  IdeaDraft,
+  SuggestedNoteLink,
 } from '@/types/domain';
 import type { ParsedNoteJson } from '@/types/database';
 
@@ -17,8 +20,12 @@ interface ReviewState {
   tasks: TaskDraft[];
   people: PersonDraft[];
   projects: ProjectDraft[];
+  domains: DomainDraft[];
   decisions: DecisionDraft[];
   open_questions: QuestionDraft[];
+  ideas: IdeaDraft[];
+  suggestedNoteLinks: SuggestedNoteLink[];
+  approvedNoteLinkIds: string[];
 
   // Actions
   initFromParsed: (captureId: string, parsed: ParsedNoteJson) => void;
@@ -43,6 +50,11 @@ interface ReviewState {
   addProject: () => void;
   removeProject: (id: string) => void;
 
+  // Domains
+  updateDomain: (id: string, updates: Partial<DomainDraft>) => void;
+  addDomain: () => void;
+  removeDomain: (id: string) => void;
+
   // Decisions
   updateDecision: (id: string, updates: Partial<DecisionDraft>) => void;
   addDecision: () => void;
@@ -52,6 +64,15 @@ interface ReviewState {
   updateQuestion: (id: string, updates: Partial<QuestionDraft>) => void;
   addQuestion: () => void;
   removeQuestion: (id: string) => void;
+
+  // Ideas
+  updateIdea: (id: string, updates: Partial<IdeaDraft>) => void;
+  addIdea: () => void;
+  removeIdea: (id: string) => void;
+
+  // Note links
+  setSuggestedNoteLinks: (links: SuggestedNoteLink[]) => void;
+  toggleNoteLinkApproval: (noteId: string) => void;
 }
 
 function uid(): string {
@@ -66,8 +87,12 @@ const emptyState = {
   tasks: [] as TaskDraft[],
   people: [] as PersonDraft[],
   projects: [] as ProjectDraft[],
+  domains: [] as DomainDraft[],
   decisions: [] as DecisionDraft[],
   open_questions: [] as QuestionDraft[],
+  ideas: [] as IdeaDraft[],
+  suggestedNoteLinks: [] as SuggestedNoteLink[],
+  approvedNoteLinkIds: [] as string[],
 };
 
 export const useReviewStore = create<ReviewState>()(
@@ -75,18 +100,49 @@ export const useReviewStore = create<ReviewState>()(
     (set) => ({
       ...emptyState,
 
-      initFromParsed: (captureId, parsed) =>
+      initFromParsed: (captureId, parsed) => {
+        const people = parsed.people.map((p) => ({
+          ...p,
+          id: uid(),
+          matchedPersonId: null,
+        }));
+
+        const tasks = parsed.tasks.map((t) => {
+          const actioneeName = t.actionee_name ?? null;
+          // Auto-match actionee to a person draft by case-insensitive name
+          const matched = actioneeName
+            ? people.find((p) => p.name.toLowerCase() === actioneeName.toLowerCase())
+            : null;
+          return {
+            ...t,
+            id: uid(),
+            actionee_name: actioneeName,
+            actionee_person_id: matched?.id ?? null,
+          };
+        });
+
         set({
           captureId,
           title: parsed.title,
           summary: parsed.summary,
           cleaned_text: parsed.cleaned_text,
-          tasks: parsed.tasks.map((t) => ({ ...t, id: uid() })),
-          people: parsed.people.map((p) => ({ ...p, id: uid(), matchedPersonId: null })),
-          projects: parsed.projects.map((p) => ({ ...p, id: uid(), matchedProjectId: null })),
+          tasks,
+          people,
+          projects: parsed.projects.map((p) => ({
+            ...p,
+            id: uid(),
+            matchedProjectId: null,
+          })),
+          domains: (parsed.domains ?? []).map((d) => ({
+            ...d,
+            id: uid(),
+            matchedDomainId: null,
+          })),
           decisions: parsed.decisions.map((d) => ({ ...d, id: uid() })),
           open_questions: parsed.open_questions.map((q) => ({ ...q, id: uid() })),
-        }),
+          ideas: (parsed.ideas ?? []).map((i) => ({ ...i, id: uid(), status: 'raw' as const })),
+        });
+      },
 
       reset: () => set(emptyState),
 
@@ -101,7 +157,17 @@ export const useReviewStore = create<ReviewState>()(
         })),
       addTask: () =>
         set((s) => ({
-          tasks: [...s.tasks, { id: uid(), title: '', due_date: null, priority: null }],
+          tasks: [
+            ...s.tasks,
+            {
+              id: uid(),
+              title: '',
+              due_date: null,
+              priority: null,
+              actionee_name: null,
+              actionee_person_id: null,
+            },
+          ],
         })),
       removeTask: (id) => set((s) => ({ tasks: s.tasks.filter((t) => t.id !== id) })),
 
@@ -114,7 +180,16 @@ export const useReviewStore = create<ReviewState>()(
         set((s) => ({
           people: [...s.people, { id: uid(), name: '', role: null, matchedPersonId: null }],
         })),
-      removePerson: (id) => set((s) => ({ people: s.people.filter((p) => p.id !== id) })),
+      removePerson: (id) =>
+        set((s) => ({
+          people: s.people.filter((p) => p.id !== id),
+          // Clear actionee on any task referencing the removed person
+          tasks: s.tasks.map((t) =>
+            t.actionee_person_id === id
+              ? { ...t, actionee_person_id: null, actionee_name: null }
+              : t,
+          ),
+        })),
 
       // Projects
       updateProject: (id, updates) =>
@@ -126,6 +201,20 @@ export const useReviewStore = create<ReviewState>()(
           projects: [...s.projects, { id: uid(), name: '', matchedProjectId: null }],
         })),
       removeProject: (id) => set((s) => ({ projects: s.projects.filter((p) => p.id !== id) })),
+
+      // Domains
+      updateDomain: (id, updates) =>
+        set((s) => ({
+          domains: s.domains.map((d) => (d.id === id ? { ...d, ...updates } : d)),
+        })),
+      addDomain: () =>
+        set((s) => ({
+          domains: [
+            ...s.domains,
+            { id: uid(), name: '', description: null, matchedDomainId: null },
+          ],
+        })),
+      removeDomain: (id) => set((s) => ({ domains: s.domains.filter((d) => d.id !== id) })),
 
       // Decisions
       updateDecision: (id, updates) =>
@@ -153,6 +242,26 @@ export const useReviewStore = create<ReviewState>()(
       removeQuestion: (id) =>
         set((s) => ({
           open_questions: s.open_questions.filter((q) => q.id !== id),
+        })),
+
+      // Ideas
+      updateIdea: (id, updates) =>
+        set((s) => ({
+          ideas: s.ideas.map((i) => (i.id === id ? { ...i, ...updates } : i)),
+        })),
+      addIdea: () =>
+        set((s) => ({
+          ideas: [...s.ideas, { id: uid(), idea_text: '', status: 'raw' as const }],
+        })),
+      removeIdea: (id) => set((s) => ({ ideas: s.ideas.filter((i) => i.id !== id) })),
+
+      // Note links
+      setSuggestedNoteLinks: (links) => set({ suggestedNoteLinks: links }),
+      toggleNoteLinkApproval: (noteId) =>
+        set((s) => ({
+          approvedNoteLinkIds: s.approvedNoteLinkIds.includes(noteId)
+            ? s.approvedNoteLinkIds.filter((id) => id !== noteId)
+            : [...s.approvedNoteLinkIds, noteId],
         })),
     }),
     {

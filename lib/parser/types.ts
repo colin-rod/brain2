@@ -1,6 +1,6 @@
 import type { ParsedNoteJson } from '@/types/database';
 
-export type ParseMode = 'meeting_note' | 'plain_text_note' | 'chat_transcript';
+export type ParseMode = 'meeting_note' | 'plain_text_note' | 'chat_transcript' | 'email';
 
 export interface ParseInput {
   mode: ParseMode;
@@ -10,6 +10,8 @@ export interface ParseInput {
   imageBase64?: string;
   /** MIME type of the image */
   imageMimeType?: string;
+  /** Optional user-provided note that accompanies a file capture. */
+  userContext?: string;
 }
 
 export interface ParseResult {
@@ -17,10 +19,17 @@ export interface ParseResult {
   error?: string;
 }
 
-/**
- * Provider interface — swap OpenAI for a local LLM later
- * by implementing this interface.
- */
+export interface TranscribeInput {
+  audio: Blob | File;
+  filename: string;
+}
+
+export interface TranscribeResult {
+  text?: string;
+  error?: string;
+}
+
 export interface ParserProvider {
   parse(input: ParseInput): Promise<ParseResult>;
+  transcribeAudio(input: TranscribeInput): Promise<TranscribeResult>;
 }

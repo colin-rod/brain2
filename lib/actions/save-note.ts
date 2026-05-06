@@ -3,6 +3,8 @@
 import { createClient } from '@/lib/supabase/server';
 import { validateReviewPayload } from '@/lib/validation/review-payload';
 import { exportNoteMarkdown } from './export';
+import { storeNoteEmbedding } from './embeddings';
+import { createNoteLinks } from './note-links';
 import type { ReviewPayload } from '@/types/domain';
 
 interface SaveResult {
@@ -58,30 +60,13 @@ export async function saveReviewedNote(payload: ReviewPayload): Promise<SaveResu
 
   const noteId = note.id;
 
-  // Insert tasks
-  if (payload.tasks.length > 0) {
-    const { error: tasksError } = await supabase.from('tasks').insert(
-      payload.tasks.map((t) => ({
-        user_id: user.id,
-        note_id: noteId,
-        title: t.title.trim(),
-        due_date: t.due_date || null,
-        priority: t.priority || null,
-        status: 'todo',
-      })),
-    );
-    if (tasksError) {
-      return { error: `Failed to save tasks: ${tasksError.message}` };
-    }
-  }
-
-  // Insert people (new ones) and collect IDs for junction table
-  const personIds: string[] = [];
+  // Insert people FIRST (tasks may reference them as actionees)
+  const personIdMap = new Map<string, string>(); // draft ID → real DB ID
 
   for (const p of payload.people) {
     if (p.matchedPersonId) {
       // Link to existing person
-      personIds.push(p.matchedPersonId);
+      personIdMap.set(p.id, p.matchedPersonId);
     } else {
       // Create new person
       const { data: newPerson, error: personError } = await supabase
@@ -97,11 +82,12 @@ export async function saveReviewedNote(payload: ReviewPayload): Promise<SaveResu
       if (personError || !newPerson) {
         return { error: `Failed to save person "${p.name}": ${personError?.message}` };
       }
-      personIds.push(newPerson.id);
+      personIdMap.set(p.id, newPerson.id);
     }
   }
 
   // Insert note_people junction rows
+  const personIds = Array.from(personIdMap.values());
   if (personIds.length > 0) {
     const { error: npError } = await supabase.from('note_people').insert(
       personIds.map((personId) => ({
@@ -115,6 +101,7 @@ export async function saveReviewedNote(payload: ReviewPayload): Promise<SaveResu
   }
 
   // Insert projects (new ones) and collect IDs for junction table
+  // Must run before tasks so we can inherit project_id on tasks
   const projectIds: string[] = [];
 
   for (const p of payload.projects) {
@@ -150,6 +137,65 @@ export async function saveReviewedNote(payload: ReviewPayload): Promise<SaveResu
     }
   }
 
+  // When note links to exactly one project, inherit it on all tasks
+  const inferredProjectId = projectIds.length === 1 ? projectIds[0] : null;
+
+  // Insert tasks (with resolved actionee_id and inferred project_id)
+  if (payload.tasks.length > 0) {
+    const { error: tasksError } = await supabase.from('tasks').insert(
+      payload.tasks.map((t) => ({
+        user_id: user.id,
+        note_id: noteId,
+        title: t.title.trim(),
+        due_date: t.due_date || null,
+        priority: t.priority || null,
+        status: 'todo',
+        actionee_id: t.actionee_person_id ? (personIdMap.get(t.actionee_person_id) ?? null) : null,
+        project_id: inferredProjectId,
+      })),
+    );
+    if (tasksError) {
+      return { error: `Failed to save tasks: ${tasksError.message}` };
+    }
+  }
+
+  // Insert domains (new ones) and collect IDs for junction table
+  const domainIds: string[] = [];
+
+  for (const d of payload.domains) {
+    if (d.matchedDomainId) {
+      domainIds.push(d.matchedDomainId);
+    } else {
+      const { data: newDomain, error: domainError } = await supabase
+        .from('domains')
+        .insert({
+          user_id: user.id,
+          name: d.name.trim(),
+          description: d.description?.trim() || null,
+        })
+        .select('id')
+        .single();
+
+      if (domainError || !newDomain) {
+        return { error: `Failed to save domain "${d.name}": ${domainError?.message}` };
+      }
+      domainIds.push(newDomain.id);
+    }
+  }
+
+  // Insert note_domains junction rows
+  if (domainIds.length > 0) {
+    const { error: ndError } = await supabase.from('note_domains').insert(
+      domainIds.map((domainId) => ({
+        note_id: noteId,
+        domain_id: domainId,
+      })),
+    );
+    if (ndError) {
+      return { error: `Failed to link domains: ${ndError.message}` };
+    }
+  }
+
   // Insert decisions
   if (payload.decisions.length > 0) {
     const { error: decisionsError } = await supabase.from('decisions').insert(
@@ -181,8 +227,45 @@ export async function saveReviewedNote(payload: ReviewPayload): Promise<SaveResu
     }
   }
 
+  // Insert ideas
+  if (payload.ideas.length > 0) {
+    const { error: ideasError } = await supabase.from('ideas').insert(
+      payload.ideas.map((i) => ({
+        user_id: user.id,
+        note_id: noteId,
+        idea_text: i.idea_text.trim(),
+        status: 'raw',
+      })),
+    );
+    if (ideasError) {
+      return { error: `Failed to save ideas: ${ideasError.message}` };
+    }
+  }
+
   // Update capture status to saved
   await supabase.from('captures').update({ status: 'saved' }).eq('id', payload.captureId);
+
+  // Invalidate wiki summaries for linked people and projects
+  const linkedPersonIds = Array.from(personIdMap.values());
+  if (linkedPersonIds.length > 0) {
+    await supabase.from('people').update({ summary_generated_at: null }).in('id', linkedPersonIds);
+  }
+  if (projectIds.length > 0) {
+    await supabase.from('projects').update({ summary_generated_at: null }).in('id', projectIds);
+  }
+
+  // Create note-to-note links from review (best-effort)
+  if (payload.approvedNoteLinkIds?.length > 0) {
+    await createNoteLinks(noteId, payload.approvedNoteLinkIds).catch(() => {});
+  }
+
+  // Generate embedding for similarity search (best-effort)
+  const embeddingText = [payload.title, payload.summary, payload.cleaned_text]
+    .filter(Boolean)
+    .join('\n\n');
+  if (embeddingText.trim()) {
+    await storeNoteEmbedding(noteId, embeddingText).catch(() => {});
+  }
 
   // Auto-export markdown (best-effort, don't fail the save)
   await exportNoteMarkdown(noteId).catch(() => {});

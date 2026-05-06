@@ -1,35 +1,25 @@
 'use client';
 
-import { useTransition } from 'react';
+import React, { useEffect, useState, useTransition } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-  ImageIcon,
-  FileText,
-  MessageSquare,
-  ChevronRight,
-  Sparkles,
-  RotateCcw,
-  Loader2,
-  AlertCircle,
-} from 'lucide-react';
+import { formatDate } from '@/lib/format-date';
+import { Inbox as InboxIcon, Sparkles, RotateCcw, Loader2, AlertCircle } from 'lucide-react';
+import { EmptyState } from '@/components/shared/empty-state';
+import { useSearchRefresh } from '@/components/search/search-provider';
 import { parseCapture } from '@/lib/actions/parse';
 import type { Capture, CaptureSourceType, CaptureStatus } from '@/types/database';
 import { cn } from '@/lib/utils';
 
-const sourceIcons: Record<CaptureSourceType, typeof ImageIcon> = {
-  image: ImageIcon,
-  text: FileText,
-  chat_transcript: MessageSquare,
-};
-
-const sourceLabels: Record<CaptureSourceType, string> = {
-  image: 'Image',
-  text: 'Text',
-  chat_transcript: 'Chat',
+const sourceShort: Record<CaptureSourceType, string> = {
+  image: 'IMG',
+  text: 'TXT',
+  chat_transcript: 'CHT',
+  voice: 'VOX',
+  email: 'EML',
 };
 
 const statusStyles: Record<CaptureStatus, string> = {
@@ -45,11 +35,21 @@ const statusStyles: Record<CaptureStatus, string> = {
 const statusLabels: Record<CaptureStatus, string> = {
   new: 'New',
   processing: 'Processing',
-  ocr_complete: 'OCR Done',
-  parsed: 'Parsed',
-  in_review: 'In Review',
+  ocr_complete: 'Extracted',
+  parsed: 'Ready to review',
+  in_review: 'In review',
   saved: 'Saved',
   failed: 'Failed',
+};
+
+const statusDotColor: Record<CaptureStatus, string> = {
+  new: 'var(--color-status-new)',
+  processing: 'var(--color-status-processing)',
+  ocr_complete: 'var(--color-status-parsed)',
+  parsed: 'var(--color-status-parsed)',
+  in_review: 'var(--color-status-in-review)',
+  saved: 'var(--color-status-saved)',
+  failed: 'var(--color-status-failed)',
 };
 
 function formatRelativeTime(dateStr: string): string {
@@ -64,7 +64,7 @@ function formatRelativeTime(dateStr: string): string {
   if (diffMin < 60) return `${diffMin}m ago`;
   if (diffHr < 24) return `${diffHr}h ago`;
   if (diffDay < 7) return `${diffDay}d ago`;
-  return date.toLocaleDateString();
+  return formatDate(date);
 }
 
 function getPreviewText(capture: Capture): string {
@@ -72,9 +72,14 @@ function getPreviewText(capture: Capture): string {
     return capture.raw_text.slice(0, 120) + (capture.raw_text.length > 120 ? '...' : '');
   }
   if (capture.source_type === 'image') {
-    return 'Image capture';
+    return 'Image uploaded';
   }
-  return 'No preview';
+  if (capture.source_type === 'voice') {
+    return capture.ocr_text
+      ? capture.ocr_text.slice(0, 120) + (capture.ocr_text.length > 120 ? '...' : '')
+      : 'Voice note recorded';
+  }
+  return 'No content preview';
 }
 
 interface CaptureListProps {
@@ -84,29 +89,57 @@ interface CaptureListProps {
 export function CaptureList({ captures }: CaptureListProps) {
   if (captures.length === 0) {
     return (
-      <div className="rounded-lg border border-border bg-surface p-north-xl text-center">
-        <FileText className="mx-auto h-10 w-10 text-foreground-muted mb-north-sm" />
-        <p className="text-body text-foreground-secondary">No captures yet</p>
-        <p className="text-metadata text-foreground-muted mt-1">
-          Upload an image or paste text above to get started.
-        </p>
-      </div>
+      <EmptyState
+        icon={InboxIcon}
+        title="Nothing pending"
+        description="Drop an image or paste text above — Brain2 will find what matters."
+      />
     );
   }
 
   return (
-    <div className="space-y-north-xs">
-      {captures.map((capture) => (
-        <CaptureCard key={capture.id} capture={capture} />
+    <div className="divide-y divide-border">
+      {captures.map((capture, index) => (
+        <CaptureCard key={capture.id} capture={capture} index={index} />
       ))}
     </div>
   );
 }
 
-function CaptureCard({ capture }: { capture: Capture }) {
+const PROCESSING_MESSAGES = [
+  'Extracting tasks...',
+  'Identifying people...',
+  'Reading between the lines...',
+  'Connecting the dots...',
+  'Finding what matters...',
+];
+
+const ProcessingIndicator = React.memo(function ProcessingIndicator() {
+  const [index, setIndex] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setIndex((i) => (i + 1) % PROCESSING_MESSAGES.length), 2500);
+    return () => clearInterval(id);
+  }, []);
+  return (
+    <div className="flex items-center gap-north-sm shrink-0">
+      <Loader2 className="h-4 w-4 text-status-processing animate-spin" />
+      <span key={index} className="text-metadata text-status-processing animate-fade-in">
+        {PROCESSING_MESSAGES[index]}
+      </span>
+    </div>
+  );
+});
+
+const CaptureCard = React.memo(function CaptureCard({
+  capture,
+  index,
+}: {
+  capture: Capture;
+  index: number;
+}) {
   const router = useRouter();
+  const refreshSearch = useSearchRefresh();
   const [isParsing, startTransition] = useTransition();
-  const Icon = sourceIcons[capture.source_type];
   const isClickable = capture.status === 'parsed' || capture.status === 'in_review';
   const canParse = capture.status === 'new' || capture.status === 'failed';
 
@@ -118,8 +151,9 @@ function CaptureCard({ capture }: { capture: Capture }) {
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success('Parsed successfully');
+        toast.success('Ready for you.');
         router.refresh();
+        refreshSearch();
       }
     });
   }
@@ -127,34 +161,49 @@ function CaptureCard({ capture }: { capture: Capture }) {
   const content = (
     <div
       className={cn(
-        'flex items-center gap-north-md rounded-lg border border-border bg-surface px-north-base py-north-md transition-colors',
-        isClickable && 'hover:bg-surface-subtle cursor-pointer',
+        'flex items-center gap-north-md px-north-sm py-north-xs rounded-none border-l-2 border-transparent transition-all duration-150',
+        isClickable &&
+          'hover:border-primary hover:bg-surface-subtle hover:shadow-level-1 cursor-pointer',
+        isParsing && 'bg-surface-subtle/50',
       )}
     >
-      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-surface-subtle">
-        <Icon className="h-5 w-5 text-foreground-secondary" />
+      <div className="flex flex-col items-center shrink-0 w-8 gap-0.5">
+        <span className="font-mono text-label tabular-nums text-foreground-muted">
+          {String(index + 1).padStart(2, '0')}
+        </span>
+        <span
+          className={cn(
+            'h-1.5 w-1.5 rounded-full',
+            capture.status === 'processing' && 'animate-pulse-dot',
+          )}
+          style={{ backgroundColor: statusDotColor[capture.status] }}
+        />
+        <span className="font-mono text-label uppercase text-foreground-muted opacity-60">
+          {sourceShort[capture.source_type]}
+        </span>
       </div>
 
       <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-north-sm mb-0.5">
-          <span className="text-metadata text-foreground-secondary">
-            {sourceLabels[capture.source_type]}
-          </span>
+        <div className="flex items-center gap-north-sm mb-north-xs">
           <Badge
+            key={capture.status}
             variant="outline"
-            className={cn('text-[11px] px-1.5 py-0', statusStyles[capture.status])}
+            className={cn(
+              'text-label px-north-xs py-px rounded-none uppercase font-mono tracking-wider animate-scale-in transition-colors duration-300',
+              statusStyles[capture.status],
+            )}
           >
             {statusLabels[capture.status]}
           </Badge>
         </div>
-        <p className="text-body text-foreground truncate">{getPreviewText(capture)}</p>
+        <p className="text-body text-foreground font-medium truncate">{getPreviewText(capture)}</p>
         {capture.status === 'failed' && capture.error_message && (
-          <p className="text-metadata text-status-failed mt-0.5 flex items-center gap-1">
-            <AlertCircle className="h-3 w-3 shrink-0" />
+          <p className="text-metadata text-status-failed mt-north-xs flex items-center gap-1">
+            <AlertCircle className="h-3 w-3 shrink-0" aria-hidden="true" />
             {capture.error_message.slice(0, 80)}
           </p>
         )}
-        <p className="text-metadata text-foreground-muted mt-0.5">
+        <p className="font-mono text-label tabular-nums text-foreground-muted/70 mt-north-xs">
           {formatRelativeTime(capture.created_at)}
         </p>
       </div>
@@ -165,35 +214,36 @@ function CaptureCard({ capture }: { capture: Capture }) {
           variant={capture.status === 'failed' ? 'outline' : 'default'}
           onClick={handleParse}
           disabled={isParsing}
-          className="shrink-0"
+          className="shrink-0 active:scale-[0.97] transition-all duration-150"
         >
           {isParsing ? (
             <Loader2 className="h-4 w-4 animate-spin" />
           ) : capture.status === 'failed' ? (
             <>
-              <RotateCcw className="h-3.5 w-3.5 mr-1.5" />
+              <RotateCcw className="h-3.5 w-3.5 mr-north-xs" />
               Retry
             </>
           ) : (
             <>
-              <Sparkles className="h-3.5 w-3.5 mr-1.5" />
-              Parse
+              <Sparkles className="h-3.5 w-3.5 mr-north-xs" />
+              Analyze
             </>
           )}
         </Button>
       )}
 
-      {capture.status === 'processing' && (
-        <Loader2 className="h-4 w-4 shrink-0 text-status-processing animate-spin" />
-      )}
-
-      {isClickable && <ChevronRight className="h-4 w-4 shrink-0 text-foreground-muted" />}
+      {capture.status === 'processing' && <ProcessingIndicator />}
     </div>
   );
 
-  if (isClickable) {
-    return <Link href={`/review/${capture.id}`}>{content}</Link>;
-  }
+  const wrapped = isClickable ? <Link href={`/review/${capture.id}`}>{content}</Link> : content;
 
-  return content;
-}
+  return (
+    <div
+      className="animate-slide-in-up"
+      style={{ animationDelay: `${Math.min(index * 40, 300)}ms` }}
+    >
+      {wrapped}
+    </div>
+  );
+});

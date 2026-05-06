@@ -7,6 +7,7 @@ import type {
   Task,
   Person,
   Project,
+  Domain,
   Decision,
   OpenQuestion,
   Capture,
@@ -47,36 +48,51 @@ export async function exportNoteMarkdown(noteId: string): Promise<ExportResult> 
     .single();
 
   // Load related entities
-  const [tasksRes, peopleRes, projectsRes, decisionsRes, questionsRes] = await Promise.all([
-    supabase.from('tasks').select('*').eq('note_id', noteId).order('created_at'),
-    supabase
-      .from('note_people')
-      .select('person_id')
-      .eq('note_id', noteId)
-      .then(async ({ data: junctions }) => {
-        if (!junctions || junctions.length === 0) return { data: [] };
-        const ids = junctions.map((j) => j.person_id);
-        return supabase.from('people').select('*').in('id', ids);
-      }),
-    supabase
-      .from('note_projects')
-      .select('project_id')
-      .eq('note_id', noteId)
-      .then(async ({ data: junctions }) => {
-        if (!junctions || junctions.length === 0) return { data: [] };
-        const ids = junctions.map((j) => j.project_id);
-        return supabase.from('projects').select('*').in('id', ids);
-      }),
-    supabase.from('decisions').select('*').eq('note_id', noteId).order('created_at'),
-    supabase.from('open_questions').select('*').eq('note_id', noteId).order('created_at'),
-  ]);
+  const [tasksRes, peopleRes, projectsRes, domainsRes, decisionsRes, questionsRes] =
+    await Promise.all([
+      supabase
+        .from('tasks')
+        .select('*, actionee:people!actionee_id(name)')
+        .eq('note_id', noteId)
+        .order('created_at'),
+      supabase
+        .from('note_people')
+        .select('person_id')
+        .eq('note_id', noteId)
+        .then(async ({ data: junctions }) => {
+          if (!junctions || junctions.length === 0) return { data: [] };
+          const ids = junctions.map((j) => j.person_id);
+          return supabase.from('people').select('*').in('id', ids);
+        }),
+      supabase
+        .from('note_projects')
+        .select('project_id')
+        .eq('note_id', noteId)
+        .then(async ({ data: junctions }) => {
+          if (!junctions || junctions.length === 0) return { data: [] };
+          const ids = junctions.map((j) => j.project_id);
+          return supabase.from('projects').select('*').in('id', ids);
+        }),
+      supabase
+        .from('note_domains')
+        .select('domain_id')
+        .eq('note_id', noteId)
+        .then(async ({ data: junctions }) => {
+          if (!junctions || junctions.length === 0) return { data: [] };
+          const ids = junctions.map((j) => j.domain_id);
+          return supabase.from('domains').select('*').in('id', ids);
+        }),
+      supabase.from('decisions').select('*').eq('note_id', noteId).order('created_at'),
+      supabase.from('open_questions').select('*').eq('note_id', noteId).order('created_at'),
+    ]);
 
   const markdown = renderNoteMarkdown({
     note: note as Note,
     capture: (capture ?? { source_type: 'text' }) as Capture,
-    tasks: (tasksRes.data ?? []) as Task[],
+    tasks: (tasksRes.data ?? []) as (Task & { actionee: { name: string } | null })[],
     people: (peopleRes.data ?? []) as Person[],
     projects: (projectsRes.data ?? []) as Project[],
+    domains: (domainsRes.data ?? []) as Domain[],
     decisions: (decisionsRes.data ?? []) as Decision[],
     openQuestions: (questionsRes.data ?? []) as OpenQuestion[],
   });

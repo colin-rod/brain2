@@ -1,0 +1,325 @@
+'use server';
+
+import OpenAI from 'openai';
+import { createClient } from '@/lib/supabase/server';
+import { fetchPersonWikiData, fetchProjectWikiData, fetchDomainWikiData } from './wiki';
+import { storePersonEmbedding, storeProjectEmbedding } from './embeddings';
+import { buildEntityEmbeddingText } from '@/lib/embeddings/build-entity-text';
+
+export interface GenerateSummaryResult {
+  summary: string;
+  fromCache: boolean;
+  error?: string;
+}
+
+const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+export async function generateWikiSummary(
+  entityType: 'person' | 'project' | 'domain',
+  entityId: string,
+  force = false,
+): Promise<GenerateSummaryResult> {
+  const supabase = await createClient();
+  const table =
+    entityType === 'person' ? 'people' : entityType === 'project' ? 'projects' : 'domains';
+
+  // Check cache unless forced
+  if (!force) {
+    const { data: entity } = await supabase
+      .from(table)
+      .select('compiled_summary, summary_generated_at')
+      .eq('id', entityId)
+      .single();
+
+    if (entity?.compiled_summary && entity.summary_generated_at) {
+      // Check if any linked notes are newer than the summary
+      const junctionTable =
+        entityType === 'person'
+          ? 'note_people'
+          : entityType === 'project'
+            ? 'note_projects'
+            : 'note_domains';
+      const fkColumn =
+        entityType === 'person'
+          ? 'person_id'
+          : entityType === 'project'
+            ? 'project_id'
+            : 'domain_id';
+
+      const { data: latestNote } = await supabase
+        .from(junctionTable)
+        .select('notes(created_at)')
+        .eq(fkColumn, entityId)
+        .order('notes(created_at)', { ascending: false })
+        .limit(1);
+
+      const latestNoteDate = (
+        latestNote?.[0] as unknown as { notes: { created_at: string } } | undefined
+      )?.notes?.created_at;
+
+      if (!latestNoteDate || new Date(entity.summary_generated_at) >= new Date(latestNoteDate)) {
+        return { summary: entity.compiled_summary, fromCache: true };
+      }
+    }
+  }
+
+  // Assemble context
+  const contextText =
+    entityType === 'person'
+      ? await assemblePersonContext(entityId)
+      : entityType === 'project'
+        ? await assembleProjectContext(entityId)
+        : await assembleDomainContext(entityId);
+
+  if (!contextText) {
+    return { summary: '', fromCache: false, error: 'No data found for this entity' };
+  }
+
+  // Generate summary via OpenAI
+  try {
+    const systemPrompt =
+      entityType === 'person'
+        ? `You are a knowledge assistant that compiles concise wiki-style summaries about people from work notes. Write a 2-4 paragraph summary that is factual and based only on the information provided. Cover: who they are and their role, what they're currently working on, key decisions they've been part of, and any open threads or unresolved questions.`
+        : entityType === 'project'
+          ? `You are a knowledge assistant that compiles concise wiki-style summaries about projects from work notes. Write a 2-4 paragraph summary that is factual and based only on the information provided. Cover: what the project is and its current status, who's involved, key decisions made, and any open threads or unresolved questions.`
+          : `You are a knowledge assistant that compiles concise wiki-style summaries about work domains from notes. Write a 2-4 paragraph summary that is factual and based only on the information provided. Cover: what this domain encompasses, key ongoing work and themes, important decisions made, and any open questions or unresolved threads.`;
+
+    const response = await client.chat.completions.create({
+      model: 'gpt-4o',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: contextText },
+      ],
+      temperature: 0.3,
+      max_tokens: 1024,
+    });
+
+    const summary = response.choices[0]?.message?.content;
+    if (!summary) {
+      return { summary: '', fromCache: false, error: 'Empty response from OpenAI' };
+    }
+
+    // Cache the result
+    await supabase
+      .from(table)
+      .update({
+        compiled_summary: summary,
+        summary_generated_at: new Date().toISOString(),
+      })
+      .eq('id', entityId);
+
+    // Refresh embedding for semantic search (people + projects only).
+    // Best-effort: never let embedding failure break the summary write.
+    if (entityType === 'person' || entityType === 'project') {
+      try {
+        const { data: row } = await supabase
+          .from(table)
+          .select(entityType === 'person' ? 'name, role' : 'name, status')
+          .eq('id', entityId)
+          .single();
+        if (row) {
+          const r = row as { name: string; role?: string | null; status?: string | null };
+          const text = buildEntityEmbeddingText({
+            name: r.name,
+            roleOrStatus: entityType === 'person' ? r.role : r.status,
+            summary,
+          });
+          if (entityType === 'person') {
+            await storePersonEmbedding(entityId, text);
+          } else {
+            await storeProjectEmbedding(entityId, text);
+          }
+        }
+      } catch {
+        // swallow — embedding is best-effort
+      }
+    }
+
+    return { summary, fromCache: false };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error generating summary';
+    return { summary: '', fromCache: false, error: message };
+  }
+}
+
+async function assemblePersonContext(personId: string): Promise<string | null> {
+  const data = await fetchPersonWikiData(personId);
+  if (!data) return null;
+
+  const lines: string[] = [];
+  lines.push(`# ${data.person.name}`);
+  if (data.person.role) lines.push(`Role: ${data.person.role}`);
+  lines.push('');
+
+  if (data.notes.length > 0) {
+    lines.push(`## Linked Notes (${data.notes.length})`);
+    for (const note of data.notes) {
+      lines.push(`- **${note.title}** (${note.created_at.slice(0, 10)})`);
+      if (note.summary) lines.push(`  ${note.summary}`);
+    }
+    lines.push('');
+  }
+
+  if (data.assignedTasks.length > 0) {
+    lines.push(`## Assigned Tasks (${data.assignedTasks.length})`);
+    for (const task of data.assignedTasks) {
+      const parts = [task.title, `status: ${task.status}`];
+      if (task.priority) parts.push(`priority: ${task.priority}`);
+      if (task.due_date) parts.push(`due: ${task.due_date}`);
+      lines.push(`- ${parts.join(' | ')}`);
+    }
+    lines.push('');
+  }
+
+  if (data.linkedDecisions.length > 0) {
+    lines.push(`## Decisions Involved In (${data.linkedDecisions.length})`);
+    for (const d of data.linkedDecisions) {
+      lines.push(`- ${d.decision_text}`);
+      if (d.rationale) lines.push(`  Rationale: ${d.rationale}`);
+      if (d.decision_date) lines.push(`  Date: ${d.decision_date}`);
+    }
+    lines.push('');
+  }
+
+  if (data.openQuestions.length > 0) {
+    lines.push(`## Open Questions (${data.openQuestions.length})`);
+    for (const q of data.openQuestions) {
+      lines.push(`- ${q.question_text} (${q.status})`);
+    }
+    lines.push('');
+  }
+
+  if (data.linkedProjects.length > 0) {
+    lines.push(`## Related Projects (${data.linkedProjects.length})`);
+    for (const p of data.linkedProjects) {
+      lines.push(`- ${p.name}${p.status ? ` (${p.status})` : ''}`);
+    }
+    lines.push('');
+  }
+
+  return lines.join('\n');
+}
+
+async function assembleDomainContext(domainId: string): Promise<string | null> {
+  const data = await fetchDomainWikiData(domainId);
+  if (!data) return null;
+
+  const lines: string[] = [];
+  lines.push(`# ${data.domain.name}`);
+  if (data.domain.description) lines.push(`Description: ${data.domain.description}`);
+  lines.push('');
+
+  if (data.linkedPeople.length > 0) {
+    lines.push(`## People Involved (${data.linkedPeople.length})`);
+    for (const p of data.linkedPeople) {
+      lines.push(`- ${p.name}${p.role ? ` (${p.role})` : ''}`);
+    }
+    lines.push('');
+  }
+
+  if (data.linkedProjects.length > 0) {
+    lines.push(`## Related Projects (${data.linkedProjects.length})`);
+    for (const p of data.linkedProjects) {
+      lines.push(`- ${p.name}${p.status ? ` (${p.status})` : ''}`);
+    }
+    lines.push('');
+  }
+
+  if (data.notes.length > 0) {
+    lines.push(`## Linked Notes (${data.notes.length})`);
+    for (const note of data.notes) {
+      lines.push(`- **${note.title}** (${note.created_at.slice(0, 10)})`);
+      if (note.summary) lines.push(`  ${note.summary}`);
+    }
+    lines.push('');
+  }
+
+  if (data.tasks.length > 0) {
+    lines.push(`## Tasks (${data.tasks.length})`);
+    for (const task of data.tasks) {
+      const parts = [task.title, `status: ${task.status}`];
+      if (task.priority) parts.push(`priority: ${task.priority}`);
+      if (task.due_date) parts.push(`due: ${task.due_date}`);
+      lines.push(`- ${parts.join(' | ')}`);
+    }
+    lines.push('');
+  }
+
+  if (data.decisions.length > 0) {
+    lines.push(`## Decisions (${data.decisions.length})`);
+    for (const d of data.decisions) {
+      lines.push(`- ${d.decision_text}`);
+      if (d.rationale) lines.push(`  Rationale: ${d.rationale}`);
+      if (d.decision_date) lines.push(`  Date: ${d.decision_date}`);
+    }
+    lines.push('');
+  }
+
+  if (data.openQuestions.length > 0) {
+    lines.push(`## Open Questions (${data.openQuestions.length})`);
+    for (const q of data.openQuestions) {
+      lines.push(`- ${q.question_text} (${q.status})`);
+    }
+    lines.push('');
+  }
+
+  return lines.join('\n');
+}
+
+async function assembleProjectContext(projectId: string): Promise<string | null> {
+  const data = await fetchProjectWikiData(projectId);
+  if (!data) return null;
+
+  const lines: string[] = [];
+  lines.push(`# ${data.project.name}`);
+  if (data.project.status) lines.push(`Status: ${data.project.status}`);
+  lines.push('');
+
+  if (data.linkedPeople.length > 0) {
+    lines.push(`## People Involved (${data.linkedPeople.length})`);
+    for (const p of data.linkedPeople) {
+      lines.push(`- ${p.name}${p.role ? ` (${p.role})` : ''}`);
+    }
+    lines.push('');
+  }
+
+  if (data.notes.length > 0) {
+    lines.push(`## Linked Notes (${data.notes.length})`);
+    for (const note of data.notes) {
+      lines.push(`- **${note.title}** (${note.created_at.slice(0, 10)})`);
+      if (note.summary) lines.push(`  ${note.summary}`);
+    }
+    lines.push('');
+  }
+
+  if (data.tasks.length > 0) {
+    lines.push(`## Tasks (${data.tasks.length})`);
+    for (const task of data.tasks) {
+      const parts = [task.title, `status: ${task.status}`];
+      if (task.priority) parts.push(`priority: ${task.priority}`);
+      if (task.due_date) parts.push(`due: ${task.due_date}`);
+      lines.push(`- ${parts.join(' | ')}`);
+    }
+    lines.push('');
+  }
+
+  if (data.decisions.length > 0) {
+    lines.push(`## Decisions (${data.decisions.length})`);
+    for (const d of data.decisions) {
+      lines.push(`- ${d.decision_text}`);
+      if (d.rationale) lines.push(`  Rationale: ${d.rationale}`);
+      if (d.decision_date) lines.push(`  Date: ${d.decision_date}`);
+    }
+    lines.push('');
+  }
+
+  if (data.openQuestions.length > 0) {
+    lines.push(`## Open Questions (${data.openQuestions.length})`);
+    for (const q of data.openQuestions) {
+      lines.push(`- ${q.question_text} (${q.status})`);
+    }
+    lines.push('');
+  }
+
+  return lines.join('\n');
+}

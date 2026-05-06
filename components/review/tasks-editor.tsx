@@ -1,6 +1,7 @@
 'use client';
 
 import { Input } from '@/components/ui/input';
+import { DateInputWithShortcuts } from '@/components/ui/date-input-with-shortcuts';
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -9,64 +10,94 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Plus, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { useReviewStore } from '@/lib/stores/review-store';
+import { EditorEmptyMessage } from '@/components/shared/editor-empty-message';
+import { EditorItemCard } from '@/components/shared/editor-item-card';
 import type { TaskPriority } from '@/types/database';
+import type { TaskDraft, PersonDraft } from '@/types/domain';
+
+function getActioneeDisplayName(task: TaskDraft, people: PersonDraft[]): string | undefined {
+  if (!task.actionee_person_id) return undefined;
+  const person = people.find((p) => p.id === task.actionee_person_id);
+  return person?.name || task.actionee_name || undefined;
+}
 
 export function TasksEditor() {
   const tasks = useReviewStore((s) => s.tasks);
+  const people = useReviewStore((s) => s.people);
   const updateTask = useReviewStore((s) => s.updateTask);
-  const addTask = useReviewStore((s) => s.addTask);
   const removeTask = useReviewStore((s) => s.removeTask);
 
   return (
     <div className="space-y-north-sm">
-      <div className="flex items-center justify-between">
-        <h3 className="text-section-header">Tasks</h3>
-        <Button variant="ghost" size="sm" onClick={addTask} className="gap-1">
-          <Plus className="h-3.5 w-3.5" />
-          Add
-        </Button>
-      </div>
-
-      {tasks.length === 0 && (
-        <p className="text-metadata text-foreground-muted py-north-sm">No tasks extracted.</p>
-      )}
+      {tasks.length === 0 && <EditorEmptyMessage message="No tasks found — add one if needed." />}
 
       <div className="space-y-north-sm">
         {tasks.map((task) => (
-          <div
-            key={task.id}
-            className="rounded-md border border-border bg-surface-subtle p-north-md space-y-north-sm"
-          >
-            <div className="flex items-start gap-north-sm">
+          <EditorItemCard key={task.id} variant="subtle" className="animate-scale-in">
+            {/* Row 1: title + remove */}
+            <div className="flex items-center gap-north-sm">
               <Input
+                aria-label="Task title"
                 value={task.title}
                 onChange={(e) => updateTask(task.id, { title: e.target.value })}
                 placeholder="Task title"
-                className="flex-1"
+                maxLength={500}
+                className="flex-1 min-w-0 sm:min-w-40"
               />
               <Button
                 variant="ghost"
                 size="sm"
+                aria-label="Remove task"
                 onClick={() => removeTask(task.id)}
-                className="shrink-0 text-foreground-muted hover:text-destructive"
+                className="shrink-0 h-11 w-11 lg:h-8 lg:w-8 text-foreground-muted hover:text-destructive"
               >
-                <X className="h-4 w-4" />
+                <X className="h-4 w-4" aria-hidden="true" />
               </Button>
             </div>
 
-            <div className="flex gap-north-sm">
+            {/* Row 2: date + shortcuts */}
+            <DateInputWithShortcuts
+              aria-label="Due date"
+              value={task.due_date || ''}
+              onChange={(v) => updateTask(task.id, { due_date: v || null })}
+              inline
+            />
+
+            {/* Row 2: actionee + priority */}
+            <div className="flex flex-col gap-north-sm sm:flex-row">
               <div className="flex-1">
-                <label className="text-metadata text-foreground-muted block mb-1">Due date</label>
-                <Input
-                  type="date"
-                  value={task.due_date || ''}
-                  onChange={(e) => updateTask(task.id, { due_date: e.target.value || null })}
-                />
+                <p className="text-metadata text-foreground-muted mb-north-xs">Assigned to</p>
+                <Select
+                  value={task.actionee_person_id || 'none'}
+                  onValueChange={(v) =>
+                    updateTask(task.id, {
+                      actionee_person_id: v === 'none' ? null : v,
+                      actionee_name:
+                        v === 'none' ? null : (people.find((p) => p.id === v)?.name ?? null),
+                    })
+                  }
+                >
+                  <SelectTrigger aria-label="Assignee">
+                    {task.actionee_person_id ? (
+                      <span>{getActioneeDisplayName(task, people) ?? 'Unassigned'}</span>
+                    ) : (
+                      <SelectValue placeholder="Unassigned" />
+                    )}
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Unassigned</SelectItem>
+                    {people.map((p) => (
+                      <SelectItem key={p.id} value={p.id}>
+                        {p.name || '(unnamed)'}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
-              <div className="w-32">
-                <label className="text-metadata text-foreground-muted block mb-1">Priority</label>
+              <div className="sm:w-32">
+                <p className="text-metadata text-foreground-muted mb-north-xs">Priority</p>
                 <Select
                   value={task.priority || 'none'}
                   onValueChange={(v) =>
@@ -75,19 +106,20 @@ export function TasksEditor() {
                     })
                   }
                 >
-                  <SelectTrigger>
+                  <SelectTrigger aria-label="Priority">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">None</SelectItem>
-                    <SelectItem value="high">High</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="low">Low</SelectItem>
+                    <SelectItem value="P0">P0 — Critical</SelectItem>
+                    <SelectItem value="P1">P1 — High</SelectItem>
+                    <SelectItem value="P2">P2 — Medium</SelectItem>
+                    <SelectItem value="P3">P3 — Low</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
-          </div>
+          </EditorItemCard>
         ))}
       </div>
     </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Upload, X, ImageIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -60,17 +60,24 @@ export function ImageDropzone({ file, onFileChange }: ImageDropzoneProps) {
     onFileChange(null);
   }, [preview, onFileChange]);
 
+  useEffect(() => {
+    return () => {
+      if (preview) URL.revokeObjectURL(preview);
+    };
+  }, [preview]);
+
   if (file && preview) {
     return (
       <div className="relative rounded-md border border-border bg-surface overflow-hidden">
         <button
           type="button"
           onClick={handleClear}
-          className="absolute top-2 right-2 z-10 rounded-full bg-background/80 p-1.5 hover:bg-background transition-colors"
+          aria-label="Clear image"
+          className="absolute top-2 right-2 z-10 rounded-full bg-background/80 p-1.5 hover:bg-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <X className="h-4 w-4" />
         </button>
-        <div className="flex items-center justify-center p-north-base">
+        <div className="h-64 flex items-center justify-center p-north-base">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={preview} alt="Upload preview" className="max-h-64 rounded object-contain" />
         </div>
@@ -88,13 +95,18 @@ export function ImageDropzone({ file, onFileChange }: ImageDropzoneProps) {
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       className={cn(
-        'flex flex-col items-center justify-center gap-north-sm rounded-md border-2 border-dashed p-north-xl cursor-pointer transition-colors',
+        'flex flex-col items-center justify-center gap-north-sm rounded-md border-2 border-dashed p-north-xl cursor-pointer transition-all duration-200 ease-out',
         isDragging
-          ? 'border-primary bg-primary-tint'
-          : 'border-border hover:border-foreground-muted hover:bg-surface-subtle',
+          ? 'border-primary bg-primary-tint scale-[1.015] shadow-md'
+          : 'border-border hover:border-foreground-muted hover:bg-surface-subtle scale-100 shadow-none',
       )}
     >
-      <Upload className="h-8 w-8 text-foreground-muted" />
+      <Upload
+        className={cn(
+          'h-8 w-8 transition-all duration-200',
+          isDragging ? 'text-primary -translate-y-0.5' : 'text-foreground-muted translate-y-0',
+        )}
+      />
       <div className="text-center">
         <p className="text-body font-medium">Drop an image here or click to browse</p>
         <p className="text-metadata text-foreground-muted mt-1">PNG, JPG, HEIC up to 10MB</p>

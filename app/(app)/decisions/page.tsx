@@ -1,58 +1,59 @@
-import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { PageHeader } from '@/components/shared/page-header';
 import { EmptyState } from '@/components/shared/empty-state';
+import { DecisionsList } from '@/components/decisions/decisions-list';
 import { Scale } from 'lucide-react';
 import type { Decision } from '@/types/database';
 
 export default async function DecisionsPage() {
   const supabase = await createClient();
-  const { data } = await supabase
-    .from('decisions')
-    .select('*, notes(id, title)')
-    .order('created_at', { ascending: false });
 
-  const decisions = (data ?? []) as (Decision & { notes: { id: string; title: string } | null })[];
+  const [decisionsRes, projectsRes, peopleRes, domainsRes, noteDomainsRes] = await Promise.all([
+    supabase
+      .from('decisions')
+      .select(
+        '*, notes(id, title), project:projects!project_id(id, name), decision_people(people(id, name))',
+      )
+      .order('created_at', { ascending: false }),
+    supabase.from('projects').select('id, name').order('name'),
+    supabase.from('people').select('id, name').order('name'),
+    supabase.from('domains').select('id, name').order('name'),
+    supabase.from('note_domains').select('note_id, domain_id'),
+  ]);
+
+  const decisions = (decisionsRes.data ?? []) as (Decision & {
+    notes: { id: string; title: string } | null;
+    project: { id: string; name: string } | null;
+    decision_people: { people: { id: string; name: string } }[];
+  })[];
+
+  const allProjects = (projectsRes.data ?? []) as { id: string; name: string }[];
+  const allPeople = (peopleRes.data ?? []) as { id: string; name: string }[];
+  const allDomains = (domainsRes.data ?? []) as { id: string; name: string }[];
+  const noteDomains = (noteDomainsRes.data ?? []) as { note_id: string; domain_id: string }[];
 
   return (
     <div className="space-y-north-lg">
-      <PageHeader title="Decisions" description="All decisions extracted from your notes." />
+      <PageHeader title="Decisions" icon={Scale} iconColor="var(--entity-decisions)" />
 
       {decisions.length === 0 ? (
         <EmptyState
           icon={Scale}
-          title="No decisions yet"
-          description="Decisions appear here after you save notes that contain them."
+          title="No decisions recorded yet."
+          description="Capture any meeting or discussion and Brain2 identifies the decisions made."
+          iconColor="var(--entity-decisions)"
+          bgColor="var(--entity-decisions-tint)"
+          ctaLabel="Capture something"
+          ctaHref="/inbox"
         />
       ) : (
-        <div className="space-y-north-sm">
-          {decisions.map((d) => (
-            <div
-              key={d.id}
-              className="rounded-lg border border-border bg-surface px-north-base py-north-md"
-            >
-              <p className="text-body">{d.decision_text}</p>
-              {d.rationale && (
-                <p className="text-metadata text-foreground-secondary mt-north-xs">
-                  Rationale: {d.rationale}
-                </p>
-              )}
-              <div className="flex items-center gap-north-md mt-north-xs">
-                {d.decision_date && (
-                  <span className="text-metadata text-foreground-muted">{d.decision_date}</span>
-                )}
-                {d.notes && (
-                  <Link
-                    href={`/notes/${d.notes.id}`}
-                    className="text-metadata text-primary hover:underline"
-                  >
-                    {d.notes.title}
-                  </Link>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
+        <DecisionsList
+          decisions={decisions}
+          allProjects={allProjects}
+          allPeople={allPeople}
+          allDomains={allDomains}
+          noteDomains={noteDomains}
+        />
       )}
     </div>
   );

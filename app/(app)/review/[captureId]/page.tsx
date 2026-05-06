@@ -36,9 +36,6 @@ export default async function ReviewPage({ params }: ReviewPageProps) {
     <div className="space-y-north-lg">
       <div>
         <h1 className="text-page-title">Review</h1>
-        <p className="text-foreground-secondary mt-north-xs">
-          Review and edit extracted content before saving.
-        </p>
       </div>
 
       <ReviewClient capture={typedCapture} imageUrl={imageUrl} />

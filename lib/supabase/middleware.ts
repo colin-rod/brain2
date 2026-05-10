@@ -31,11 +31,12 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Redirect unauthenticated users to login (except for auth routes)
+  // Redirect unauthenticated users to login (except for auth routes and webhooks)
   if (
     !user &&
     !request.nextUrl.pathname.startsWith('/login') &&
-    !request.nextUrl.pathname.startsWith('/auth/callback')
+    !request.nextUrl.pathname.startsWith('/auth/callback') &&
+    !request.nextUrl.pathname.startsWith('/api/webhook/')
   ) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';

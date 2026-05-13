@@ -11,6 +11,7 @@ const sourceToParseModeMap: Record<CaptureSourceType, ParseMode> = {
   chat_transcript: 'chat_transcript',
   voice: 'plain_text_note',
   email: 'email',
+  pdf: 'plain_text_note',
 };
 
 interface ParseCaptureResult {
@@ -103,7 +104,50 @@ export async function parseCapture(captureId: string): Promise<ParseCaptureResul
       await supabase.from('captures').update({ ocr_text: transcribedText }).eq('id', captureId);
     }
 
-    const isFileCapture = capture.source_type === 'image' || capture.source_type === 'voice';
+    let pdfExtractedText: string | undefined;
+
+    if (capture.source_type === 'pdf' && capture.file_path) {
+      const { data: pdfData, error: downloadError } = await supabase.storage
+        .from('captures')
+        .download(capture.file_path);
+
+      if (downloadError || !pdfData) {
+        await supabase
+          .from('captures')
+          .update({ status: 'failed', error_message: `Download failed: ${downloadError?.message}` })
+          .eq('id', captureId);
+        return { success: false, error: 'Failed to download PDF' };
+      }
+
+      const { PDFParse } = await import('pdf-parse');
+      const buffer = Buffer.from(await pdfData.arrayBuffer());
+      const pdfParser = new PDFParse({ data: buffer, verbosity: 0 });
+      const textResult = await pdfParser.getText();
+      await pdfParser.destroy();
+      const extractedText = textResult.text?.trim();
+
+      if (!extractedText) {
+        await supabase
+          .from('captures')
+          .update({
+            status: 'failed',
+            error_message: 'No extractable text found. Scanned PDFs are not supported.',
+          })
+          .eq('id', captureId);
+        return {
+          success: false,
+          error: 'No extractable text found. Scanned PDFs are not supported.',
+        };
+      }
+
+      pdfExtractedText = extractedText.slice(0, 60000);
+      await supabase.from('captures').update({ ocr_text: pdfExtractedText }).eq('id', captureId);
+    }
+
+    const isFileCapture =
+      capture.source_type === 'image' ||
+      capture.source_type === 'voice' ||
+      capture.source_type === 'pdf';
     const userContext = isFileCapture && capture.raw_text ? capture.raw_text : undefined;
 
     let textForParser: string | undefined;
@@ -111,6 +155,8 @@ export async function parseCapture(captureId: string): Promise<ParseCaptureResul
       textForParser = undefined;
     } else if (capture.source_type === 'voice') {
       textForParser = transcribedText || undefined;
+    } else if (capture.source_type === 'pdf') {
+      textForParser = pdfExtractedText;
     } else {
       textForParser = capture.raw_text || undefined;
     }

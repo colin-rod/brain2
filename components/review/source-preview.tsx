@@ -13,6 +13,7 @@ const sourceIcons: Record<CaptureSourceType, typeof ImageIcon> = {
   chat_transcript: MessageSquare,
   voice: Mic,
   email: Mail,
+  pdf: FileText,
 };
 
 interface SourcePreviewProps {
@@ -73,6 +74,18 @@ export function SourcePreview({ capture, imageUrl }: SourcePreviewProps) {
             {capture.source_type === 'voice' && !capture.ocr_text && (
               <p className="text-metadata text-foreground-muted">
                 Audio recorded — transcript will appear after parsing.
+              </p>
+            )}
+
+            {capture.source_type === 'pdf' && capture.ocr_text && (
+              <pre className="whitespace-pre-wrap text-body text-foreground-secondary font-ui leading-relaxed max-h-80 overflow-y-auto">
+                {capture.ocr_text}
+              </pre>
+            )}
+
+            {capture.source_type === 'pdf' && !capture.ocr_text && (
+              <p className="text-metadata text-foreground-muted">
+                PDF uploaded — extracted text will appear after parsing.
               </p>
             )}
           </div>

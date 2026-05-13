@@ -85,6 +85,7 @@ export interface Person {
   user_id: string;
   name: string;
   role: string | null;
+  organization: string | null;
   notes: string | null;
   compiled_summary: string | null;
   summary_generated_at: string | null;
@@ -217,6 +218,7 @@ export interface ParsedNoteJson {
   people: {
     name: string;
     role: string | null;
+    organization: string | null;
   }[];
   projects: {
     name: string;

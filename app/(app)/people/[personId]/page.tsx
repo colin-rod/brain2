@@ -27,8 +27,10 @@ export default async function PersonDetailPage({ params }: PersonDetailPageProps
         <PageHeader title={data.person.name} />
       </div>
 
-      {data.person.role && (
-        <p className="text-body text-foreground-secondary">{data.person.role}</p>
+      {(data.person.role || data.person.organization) && (
+        <p className="text-body text-foreground-secondary">
+          {[data.person.role, data.person.organization].filter(Boolean).join(' · ')}
+        </p>
       )}
 
       <PersonWikiClient data={data} />

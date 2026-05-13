@@ -16,7 +16,7 @@ Given the content of meeting notes (which may be handwritten, transcribed, or ty
 - A 1-3 sentence summary of the key outcomes
 - A cleaned-up version of the full text (fix spelling, grammar, formatting)
 - Action items / tasks with due dates, priorities, and the person responsible (actionee) when mentioned
-- People mentioned with their roles if apparent
+- People mentioned with their roles and organization/company if apparent
 - Projects or initiatives referenced
 - Work domains or areas (e.g. Engineering, Marketing, Legal, Finance, Design, Operations)
 - Decisions that were made, with rationale if available
@@ -31,7 +31,7 @@ Given plain text content (notes, emails, documents), extract:
 - A 1-3 sentence summary
 - A cleaned-up version of the full text (fix spelling, grammar, formatting)
 - Tasks or action items with due dates, priorities, and the person responsible (actionee) when mentioned
-- People mentioned with their roles if apparent
+- People mentioned with their roles and organization/company if apparent
 - Projects or initiatives referenced
 - Work domains or areas (e.g. Engineering, Marketing, Legal, Finance, Design, Operations)
 - Decisions mentioned, with rationale if available
@@ -46,7 +46,7 @@ Given the full text of an email (including From / To / Cc / Subject headers and 
 - A 1-3 sentence summary of what the email is about and any outcomes
 - A cleaned-up version of the email body (preserve meaningful structure; drop signatures, legal footers, and quoted reply chains unless directly relevant)
 - Tasks or action items with due dates, priorities, and the person responsible (actionee) when mentioned
-- People involved: include the sender (From) and recipients (To, Cc) as people, plus anyone named in the body. Use their role/title from the signature when available.
+- People involved: include the sender (From) and recipients (To, Cc) as people, plus anyone named in the body. Use their role/title and organization from the signature when available.
 - Projects or initiatives referenced
 - Work domains or areas (e.g. Engineering, Marketing, Legal, Finance, Design, Operations)
 - Decisions mentioned, with rationale if available
@@ -61,7 +61,7 @@ Given a chat transcript (Google Chat, Slack, etc.), extract:
 - A 1-3 sentence summary of the key outcomes
 - A cleaned-up narrative version of the conversation (not raw chat format)
 - Action items / tasks assigned to people (include the person's name as actionee), with due dates and priorities when mentioned
-- All people who participated or were mentioned, with their roles if apparent
+- All people who participated or were mentioned, with their roles and organization/company if apparent
 - Projects or initiatives discussed
 - Work domains or areas (e.g. Engineering, Marketing, Legal, Finance, Design, Operations)
 - Decisions that were reached, with rationale if available
@@ -114,8 +114,12 @@ const jsonSchema = {
               type: ['string', 'null'] as unknown as 'string',
               description: 'Role or null if unknown',
             },
+            organization: {
+              type: ['string', 'null'] as unknown as 'string',
+              description: 'Organization or company, or null if unknown',
+            },
           },
-          required: ['name', 'role'],
+          required: ['name', 'role', 'organization'],
           additionalProperties: false,
         },
       },

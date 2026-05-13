@@ -11,11 +11,13 @@ export default async function ReviewPage({ params }: ReviewPageProps) {
   const { captureId } = await params;
   const supabase = await createClient();
 
-  const { data: capture, error } = await supabase
-    .from('captures')
-    .select('*')
-    .eq('id', captureId)
-    .single();
+  const [{ data: capture, error }, { data: existingPeople }, { data: existingProjects }, { data: existingDomains }] =
+    await Promise.all([
+      supabase.from('captures').select('*').eq('id', captureId).single(),
+      supabase.from('people').select('id, name, role').order('name'),
+      supabase.from('projects').select('id, name').order('name'),
+      supabase.from('domains').select('id, name, description').order('name'),
+    ]);
 
   if (error || !capture) {
     notFound();
@@ -38,7 +40,13 @@ export default async function ReviewPage({ params }: ReviewPageProps) {
         <h1 className="text-page-title">Review</h1>
       </div>
 
-      <ReviewClient capture={typedCapture} imageUrl={imageUrl} />
+      <ReviewClient
+        capture={typedCapture}
+        imageUrl={imageUrl}
+        existingPeople={existingPeople ?? []}
+        existingProjects={existingProjects ?? []}
+        existingDomains={existingDomains ?? []}
+      />
     </div>
   );
 }

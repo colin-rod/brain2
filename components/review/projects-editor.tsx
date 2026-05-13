@@ -2,12 +2,24 @@
 
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { X } from 'lucide-react';
 import { useReviewStore } from '@/lib/stores/review-store';
 import { EditorEmptyMessage } from '@/components/shared/editor-empty-message';
 import { EditorItemCard } from '@/components/shared/editor-item-card';
+import type { Project } from '@/types/database';
 
-export function ProjectsEditor() {
+interface ProjectsEditorProps {
+  existingProjects: Pick<Project, 'id' | 'name'>[];
+}
+
+export function ProjectsEditor({ existingProjects }: ProjectsEditorProps) {
   const projects = useReviewStore((s) => s.projects);
   const updateProject = useReviewStore((s) => s.updateProject);
   const removeProject = useReviewStore((s) => s.removeProject);
@@ -27,6 +39,7 @@ export function ProjectsEditor() {
                 placeholder="Project name"
                 maxLength={200}
                 className="flex-1"
+                disabled={!!project.matchedProjectId}
               />
               <Button
                 variant="ghost"
@@ -38,6 +51,30 @@ export function ProjectsEditor() {
                 <X className="h-4 w-4" aria-hidden="true" />
               </Button>
             </div>
+
+            {existingProjects.length > 0 && (
+              <div className="flex items-center gap-north-sm">
+                <p className="text-metadata text-foreground-muted shrink-0">Link to existing</p>
+                <Select
+                  value={project.matchedProjectId ?? 'new'}
+                  onValueChange={(v) =>
+                    updateProject(project.id, { matchedProjectId: v === 'new' ? null : v })
+                  }
+                >
+                  <SelectTrigger size="sm" aria-label="Link to existing project">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="new">Create new</SelectItem>
+                    {existingProjects.map((p) => (
+                      <SelectItem key={p.id} value={p.id}>
+                        {p.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
           </EditorItemCard>
         ))}
       </div>

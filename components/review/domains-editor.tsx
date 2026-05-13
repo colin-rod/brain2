@@ -2,12 +2,24 @@
 
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { X } from 'lucide-react';
 import { useReviewStore } from '@/lib/stores/review-store';
 import { EditorEmptyMessage } from '@/components/shared/editor-empty-message';
 import { EditorItemCard } from '@/components/shared/editor-item-card';
+import type { Domain } from '@/types/database';
 
-export function DomainsEditor() {
+interface DomainsEditorProps {
+  existingDomains: Pick<Domain, 'id' | 'name' | 'description'>[];
+}
+
+export function DomainsEditor({ existingDomains }: DomainsEditorProps) {
   const domains = useReviewStore((s) => s.domains);
   const updateDomain = useReviewStore((s) => s.updateDomain);
   const removeDomain = useReviewStore((s) => s.removeDomain);
@@ -27,6 +39,7 @@ export function DomainsEditor() {
                 placeholder="Domain name"
                 maxLength={200}
                 className="flex-1"
+                disabled={!!domain.matchedDomainId}
               />
               <Input
                 aria-label="Domain description"
@@ -35,6 +48,7 @@ export function DomainsEditor() {
                 placeholder="Description (optional)"
                 maxLength={500}
                 className="flex-1"
+                disabled={!!domain.matchedDomainId}
               />
               <Button
                 variant="ghost"
@@ -45,6 +59,30 @@ export function DomainsEditor() {
                 <X className="h-4 w-4" />
               </Button>
             </div>
+
+            {existingDomains.length > 0 && (
+              <div className="flex items-center gap-north-sm">
+                <p className="text-metadata text-foreground-muted shrink-0">Link to existing</p>
+                <Select
+                  value={domain.matchedDomainId ?? 'new'}
+                  onValueChange={(v) =>
+                    updateDomain(domain.id, { matchedDomainId: v === 'new' ? null : v })
+                  }
+                >
+                  <SelectTrigger size="sm" aria-label="Link to existing domain">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="new">Create new</SelectItem>
+                    {existingDomains.map((d) => (
+                      <SelectItem key={d.id} value={d.id}>
+                        {d.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
           </EditorItemCard>
         ))}
       </div>

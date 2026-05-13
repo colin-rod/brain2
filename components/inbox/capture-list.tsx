@@ -20,6 +20,7 @@ const sourceShort: Record<CaptureSourceType, string> = {
   chat_transcript: 'CHT',
   voice: 'VOX',
   email: 'EML',
+  pdf: 'PDF',
 };
 
 const statusStyles: Record<CaptureStatus, string> = {
@@ -78,6 +79,11 @@ function getPreviewText(capture: Capture): string {
     return capture.ocr_text
       ? capture.ocr_text.slice(0, 120) + (capture.ocr_text.length > 120 ? '...' : '')
       : 'Voice note recorded';
+  }
+  if (capture.source_type === 'pdf') {
+    return capture.ocr_text
+      ? capture.ocr_text.slice(0, 120) + (capture.ocr_text.length > 120 ? '...' : '')
+      : 'PDF uploaded';
   }
   return 'No content preview';
 }

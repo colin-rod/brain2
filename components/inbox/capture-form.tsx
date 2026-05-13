@@ -7,11 +7,17 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { VoiceRecorder } from './voice-recorder';
 import { useSearchRefresh } from '@/components/search/search-provider';
-import { createTextCapture, createImageCapture, createVoiceCapture } from '@/lib/actions/capture';
+import {
+  createTextCapture,
+  createImageCapture,
+  createVoiceCapture,
+  createPdfCapture,
+} from '@/lib/actions/capture';
 import type { CaptureSourceType } from '@/types/database';
 import { detectTextType, type DetectedTextType } from '@/lib/inbox/heuristics';
 import {
   Camera,
+  FileText,
   Image as ImageIcon,
   Loader2,
   Mail,
@@ -58,12 +64,17 @@ export function CaptureForm() {
   function effectiveSourceType(): CaptureSourceType {
     if (attachedFile?.type.startsWith('image/')) return 'image';
     if (attachedFile?.type.startsWith('audio/')) return 'voice';
+    if (attachedFile?.type === 'application/pdf') return 'pdf';
     return detectedTextType;
   }
 
   function acceptFile(f: File) {
-    if (!f.type.startsWith('image/') && !f.type.startsWith('audio/')) {
-      toast.error('Only image or audio files supported');
+    if (
+      !f.type.startsWith('image/') &&
+      !f.type.startsWith('audio/') &&
+      f.type !== 'application/pdf'
+    ) {
+      toast.error('Only image, audio, or PDF files supported');
       return;
     }
     setAttachedFile(f);
@@ -129,6 +140,11 @@ export function CaptureForm() {
         formData.append('file', attachedFile);
         if (text.trim()) formData.append('rawText', text.trim());
         result = await createVoiceCapture(formData);
+      } else if (type === 'pdf' && attachedFile) {
+        const formData = new FormData();
+        formData.append('file', attachedFile);
+        if (text.trim()) formData.append('rawText', text.trim());
+        result = await createPdfCapture(formData);
       } else {
         result = await createTextCapture(text, type);
       }
@@ -149,6 +165,7 @@ export function CaptureForm() {
 
   const isImage = attachedFile?.type.startsWith('image/') ?? false;
   const isAudio = attachedFile?.type.startsWith('audio/') ?? false;
+  const isPdf = attachedFile?.type === 'application/pdf';
 
   return (
     <div className="rounded-lg border border-border bg-surface p-north-base sm:p-north-lg shadow-level-2">
@@ -178,11 +195,15 @@ export function CaptureForm() {
               />
             ) : isAudio ? (
               <audio src={filePreviewUrl} controls className="h-10 flex-1" />
+            ) : isPdf ? (
+              <div className="flex h-16 w-16 items-center justify-center rounded bg-surface-subtle text-foreground-muted">
+                <FileText className="h-8 w-8" />
+              </div>
             ) : null}
             <div className="flex-1 min-w-0">
               <div className="text-body font-medium truncate">{attachedFile.name}</div>
               <div className="text-metadata text-foreground-muted">
-                {isImage ? 'Image' : isAudio ? 'Audio' : 'File'}
+                {isImage ? 'Image' : isAudio ? 'Audio' : isPdf ? 'PDF' : 'File'}
               </div>
             </div>
             <button
@@ -240,7 +261,7 @@ export function CaptureForm() {
 
         {isDragOver ? (
           <div className="pointer-events-none absolute inset-0 hidden sm:flex items-center justify-center rounded-md bg-primary-tint/80 text-body font-medium text-foreground">
-            Drop image or audio here
+            Drop image, audio, or PDF here
           </div>
         ) : null}
       </div>
@@ -250,7 +271,7 @@ export function CaptureForm() {
           <input
             ref={fileInputRef}
             type="file"
-            accept="image/*,audio/*"
+            accept="image/*,audio/*,application/pdf"
             onChange={handleFileInputChange}
             className="hidden"
           />

@@ -20,11 +20,14 @@ import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Check, ChevronDown, Loader2, Plus, Save } from 'lucide-react';
-import type { Capture, ParsedNoteJson } from '@/types/database';
+import type { Capture, ParsedNoteJson, Person, Project, Domain } from '@/types/database';
 
 interface ReviewClientProps {
   capture: Capture;
   imageUrl: string | null;
+  existingPeople: Pick<Person, 'id' | 'name' | 'role'>[];
+  existingProjects: Pick<Project, 'id' | 'name'>[];
+  existingDomains: Pick<Domain, 'id' | 'name' | 'description'>[];
 }
 
 interface CollapsibleSectionProps {
@@ -142,7 +145,7 @@ function CollapsibleSection({ title, count, children, delay, onAdd }: Collapsibl
   );
 }
 
-export function ReviewClient({ capture, imageUrl }: ReviewClientProps) {
+export function ReviewClient({ capture, imageUrl, existingPeople, existingProjects, existingDomains }: ReviewClientProps) {
   const router = useRouter();
   const [isSaving, startTransition] = useTransition();
   const [isSaved, setIsSaved] = useState(false);
@@ -250,7 +253,7 @@ export function ReviewClient({ capture, imageUrl }: ReviewClientProps) {
                 delay="100ms"
                 onAdd={addPerson}
               >
-                <PeopleEditor />
+                <PeopleEditor existingPeople={existingPeople} />
               </CollapsibleSection>
             </div>
 
@@ -261,7 +264,7 @@ export function ReviewClient({ capture, imageUrl }: ReviewClientProps) {
                 delay="150ms"
                 onAdd={addProject}
               >
-                <ProjectsEditor />
+                <ProjectsEditor existingProjects={existingProjects} />
               </CollapsibleSection>
             </div>
 
@@ -272,7 +275,7 @@ export function ReviewClient({ capture, imageUrl }: ReviewClientProps) {
                 delay="175ms"
                 onAdd={addDomain}
               >
-                <DomainsEditor />
+                <DomainsEditor existingDomains={existingDomains} />
               </CollapsibleSection>
             </div>
 

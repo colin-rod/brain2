@@ -528,7 +528,11 @@ export function PeopleList({
             <label className="text-metadata text-foreground-muted">Keep as target</label>
             <Select value={mergeTargetId ?? ''} onValueChange={(v) => setMergeTargetId(v)}>
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Choose target person…" />
+                <SelectValue placeholder="Choose target person…">
+                  {mergeTargetId
+                    ? selectedPeople.find((p) => p.id === mergeTargetId)?.name
+                    : null}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 {selectedPeople.map((p) => (

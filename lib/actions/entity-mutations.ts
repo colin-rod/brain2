@@ -233,6 +233,29 @@ export async function deleteProject(projectId: string): Promise<MutationResult> 
   return {};
 }
 
+export async function mergeProjects(
+  targetId: string,
+  sourceIds: string[],
+): Promise<MutationResult> {
+  const { supabase, user } = await getUser();
+  if (!user) return { error: 'Not authenticated' };
+
+  if (!targetId || sourceIds.length === 0) {
+    return { error: 'Target and at least one source are required' };
+  }
+  if (sourceIds.includes(targetId)) {
+    return { error: 'Target cannot also be a source' };
+  }
+
+  const { error } = await supabase.rpc('merge_projects', {
+    target_id: targetId,
+    source_ids: sourceIds,
+  });
+
+  if (error) return { error: error.message };
+  return {};
+}
+
 // ── Domains CRUD ────────────────────────────────────────────
 
 export async function createDomain(data: {
@@ -286,6 +309,29 @@ export async function deleteDomain(domainId: string): Promise<MutationResult> {
     .delete()
     .eq('id', domainId)
     .eq('user_id', user.id);
+
+  if (error) return { error: error.message };
+  return {};
+}
+
+export async function mergeDomains(
+  targetId: string,
+  sourceIds: string[],
+): Promise<MutationResult> {
+  const { supabase, user } = await getUser();
+  if (!user) return { error: 'Not authenticated' };
+
+  if (!targetId || sourceIds.length === 0) {
+    return { error: 'Target and at least one source are required' };
+  }
+  if (sourceIds.includes(targetId)) {
+    return { error: 'Target cannot also be a source' };
+  }
+
+  const { error } = await supabase.rpc('merge_domains', {
+    target_id: targetId,
+    source_ids: sourceIds,
+  });
 
   if (error) return { error: error.message };
   return {};

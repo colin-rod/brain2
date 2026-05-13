@@ -12,7 +12,7 @@ import { Plus, X } from 'lucide-react';
 
 interface ProjectPeopleSectionProps {
   projectId: string;
-  linkedPeople: { id: string; name: string; role: string | null }[];
+  linkedPeople: { id: string; name: string; role: string | null; organization?: string | null }[];
   allPeople: { id: string; name: string }[];
 }
 
@@ -62,7 +62,11 @@ export function ProjectPeopleSection({
             <Link href={`/people/${person.id}`} className="text-body text-primary hover:underline">
               {person.name}
             </Link>
-            {person.role && <p className="text-metadata text-foreground-muted">{person.role}</p>}
+            {(person.role || person.organization) && (
+              <p className="text-metadata text-foreground-muted">
+                {[person.role, person.organization].filter(Boolean).join(' · ')}
+              </p>
+            )}
           </div>
           <Button
             variant="ghost"

@@ -17,7 +17,7 @@ interface EntitySectionsProps {
         decision_date: string | null;
       }[];
   openQuestions?: OpenQuestion[];
-  linkedPeople?: { id: string; name: string; role: string | null }[];
+  linkedPeople?: { id: string; name: string; role: string | null; organization?: string | null }[];
   linkedProjects?: { id: string; name: string; status: string | null }[];
   linkedDomains?: { id: string; name: string }[];
   notes?: { id: string; title: string; created_at: string }[];
@@ -62,8 +62,10 @@ export function EntitySections({
                 className="block rounded-md border border-border bg-surface px-north-md py-north-sm hover:bg-surface-subtle transition-colors"
               >
                 <p className="text-body font-medium">{person.name}</p>
-                {person.role && (
-                  <p className="text-metadata text-foreground-muted">{person.role}</p>
+                {(person.role || person.organization) && (
+                  <p className="text-metadata text-foreground-muted">
+                    {[person.role, person.organization].filter(Boolean).join(' · ')}
+                  </p>
                 )}
               </Link>
             ))}

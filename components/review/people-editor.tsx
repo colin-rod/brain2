@@ -50,6 +50,16 @@ export function PeopleEditor({ existingPeople }: PeopleEditorProps) {
                 className="flex-1"
                 disabled={!!person.matchedPersonId}
               />
+              <Input
+                aria-label="Person organization"
+                value={person.organization || ''}
+                onChange={(e) =>
+                  updatePerson(person.id, { organization: e.target.value || null })
+                }
+                placeholder="Organization (optional)"
+                maxLength={200}
+                className="flex-1"
+              />
               <Button
                 variant="ghost"
                 size="sm"

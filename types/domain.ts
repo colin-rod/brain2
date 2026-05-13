@@ -34,6 +34,7 @@ export interface PersonDraft {
   id: string;
   name: string;
   role: string | null;
+  organization: string | null;
   /** If set, link to this existing person instead of creating new */
   matchedPersonId: string | null;
 }

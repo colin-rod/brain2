@@ -32,7 +32,7 @@ export default function AppLayout({
         id="main-content"
         className="md:ml-52 lg:ml-60 flex-1 pb-[calc(4rem+env(safe-area-inset-bottom,0px))] md:pb-0"
       >
-        <div className="mx-auto max-w-3xl px-north-base py-north-md md:px-north-md md:py-north-lg lg:px-north-lg">
+        <div className="w-full px-north-base py-north-md md:px-north-md md:py-north-lg lg:px-north-lg">
           {children}
         </div>
       </main>

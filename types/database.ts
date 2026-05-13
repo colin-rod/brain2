@@ -2,7 +2,7 @@
    Database row types — match Supabase schema exactly
    ============================================================ */
 
-export type CaptureSourceType = 'image' | 'text' | 'chat_transcript' | 'voice' | 'email';
+export type CaptureSourceType = 'image' | 'text' | 'chat_transcript' | 'voice' | 'email' | 'pdf';
 
 export type CaptureStatus =
   | 'new'
@@ -85,6 +85,7 @@ export interface Person {
   user_id: string;
   name: string;
   role: string | null;
+  organization: string | null;
   notes: string | null;
   compiled_summary: string | null;
   summary_generated_at: string | null;
@@ -217,6 +218,7 @@ export interface ParsedNoteJson {
   people: {
     name: string;
     role: string | null;
+    organization: string | null;
   }[];
   projects: {
     name: string;

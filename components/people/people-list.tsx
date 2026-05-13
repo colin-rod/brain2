@@ -114,7 +114,7 @@ export function PeopleList({
   const { filters, sort, search, setFilter, clearFilters, toggleSort, setSearch, searched } =
     useListState<PersonListRow>({
       items: people,
-      searchKeys: ['name', 'role'],
+      searchKeys: ['name', 'role', 'organization'],
     });
 
   // Snapshot now on mount so activity buckets are stable across re-renders.
@@ -350,6 +350,21 @@ export function PeopleList({
             className="text-metadata text-foreground-muted"
           />
         </td>
+        <td onClick={(e) => e.stopPropagation()} className="px-north-sm py-north-sm min-w-25">
+          <InlineEditableText
+            value={person.organization || ''}
+            onSave={async (v) => {
+              const r = await updatePerson(person.id, { organization: v || null });
+              if (!r.error) {
+                router.refresh();
+                refreshSearch();
+              }
+              return r;
+            }}
+            placeholder="Add org..."
+            className="text-metadata text-foreground-muted"
+          />
+        </td>
         <td className="px-north-sm py-north-sm text-center text-metadata w-16">
           {person.note_count > 0 ? (
             person.note_count
@@ -412,8 +427,10 @@ export function PeopleList({
               <p className="text-body font-medium truncate">{person.name}</p>
               {person.pinned && <Star className="h-3 w-3 fill-primary text-primary shrink-0" />}
             </div>
-            {person.role && (
-              <p className="text-metadata text-foreground-muted truncate">{person.role}</p>
+            {(person.role || person.organization) && (
+              <p className="text-metadata text-foreground-muted truncate">
+                {[person.role, person.organization].filter(Boolean).join(' · ')}
+              </p>
             )}
           </div>
           <Button
@@ -464,7 +481,7 @@ export function PeopleList({
     );
   }
 
-  const desktopColCount = 10;
+  const desktopColCount = 11;
 
   return (
     <div className="space-y-north-md">
@@ -528,13 +545,19 @@ export function PeopleList({
             <label className="text-metadata text-foreground-muted">Keep as target</label>
             <Select value={mergeTargetId ?? ''} onValueChange={(v) => setMergeTargetId(v)}>
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Choose target person…" />
+                <SelectValue placeholder="Choose target person…">
+                  {mergeTargetId
+                    ? selectedPeople.find((p) => p.id === mergeTargetId)?.name
+                    : null}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 {selectedPeople.map((p) => (
                   <SelectItem key={p.id} value={p.id}>
                     {p.name}
-                    {p.role ? ` — ${p.role}` : ''}
+                    {[p.role, p.organization].filter(Boolean).join(', ')
+                      ? ` — ${[p.role, p.organization].filter(Boolean).join(', ')}`
+                      : ''}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -617,6 +640,14 @@ export function PeopleList({
               </th>
               <th className={thClass}>
                 <SortableHeader label="Role" field="role" currentSort={sort} onSort={toggleSort} />
+              </th>
+              <th className={thClass}>
+                <SortableHeader
+                  label="Organization"
+                  field="organization"
+                  currentSort={sort}
+                  onSort={toggleSort}
+                />
               </th>
               <th className={`${thClass} text-center`}>
                 <SortableHeader

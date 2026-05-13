@@ -75,6 +75,7 @@ export async function saveReviewedNote(payload: ReviewPayload): Promise<SaveResu
           user_id: user.id,
           name: p.name.trim(),
           role: p.role?.trim() || null,
+          organization: p.organization?.trim() || null,
         })
         .select('id')
         .single();

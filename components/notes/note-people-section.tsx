@@ -76,8 +76,10 @@ export function NotePeopleSection({ noteId, people, allPeople, onMutate }: NoteP
             >
               <div className="min-w-0">
                 <p className="text-body font-medium truncate">{person.name}</p>
-                {person.role && (
-                  <p className="text-metadata text-foreground-muted truncate">{person.role}</p>
+                {(person.role || person.organization) && (
+                  <p className="text-metadata text-foreground-muted truncate">
+                    {[person.role, person.organization].filter(Boolean).join(' · ')}
+                  </p>
                 )}
               </div>
               <button

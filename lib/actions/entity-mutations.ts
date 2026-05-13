@@ -84,6 +84,7 @@ export async function createStandaloneDecision(data: {
 export async function createPerson(data: {
   name: string;
   role?: string | null;
+  organization?: string | null;
 }): Promise<CreateResult> {
   const { supabase, user } = await getUser();
   if (!user) return { error: 'Not authenticated' };
@@ -94,6 +95,7 @@ export async function createPerson(data: {
       user_id: user.id,
       name: data.name.trim(),
       role: data.role?.trim() || null,
+      organization: data.organization?.trim() || null,
     })
     .select('id')
     .single();
@@ -104,7 +106,7 @@ export async function createPerson(data: {
 
 export async function updatePerson(
   personId: string,
-  updates: { name?: string; role?: string | null },
+  updates: { name?: string; role?: string | null; organization?: string | null },
 ): Promise<MutationResult> {
   const { supabase, user } = await getUser();
   if (!user) return { error: 'Not authenticated' };
@@ -112,6 +114,8 @@ export async function updatePerson(
   const clean: Record<string, string | null> = {};
   if (updates.name !== undefined) clean.name = updates.name.trim();
   if (updates.role !== undefined) clean.role = updates.role?.trim() || null;
+  if (updates.organization !== undefined)
+    clean.organization = updates.organization?.trim() || null;
 
   const { error } = await supabase
     .from('people')

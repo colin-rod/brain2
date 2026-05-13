@@ -2,12 +2,24 @@
 
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { X } from 'lucide-react';
 import { useReviewStore } from '@/lib/stores/review-store';
 import { EditorEmptyMessage } from '@/components/shared/editor-empty-message';
 import { EditorItemCard } from '@/components/shared/editor-item-card';
+import type { Person } from '@/types/database';
 
-export function PeopleEditor() {
+interface PeopleEditorProps {
+  existingPeople: Pick<Person, 'id' | 'name' | 'role'>[];
+}
+
+export function PeopleEditor({ existingPeople }: PeopleEditorProps) {
   const people = useReviewStore((s) => s.people);
   const updatePerson = useReviewStore((s) => s.updatePerson);
   const removePerson = useReviewStore((s) => s.removePerson);
@@ -27,12 +39,24 @@ export function PeopleEditor() {
                 placeholder="Name"
                 maxLength={200}
                 className="flex-1"
+                disabled={!!person.matchedPersonId}
               />
               <Input
                 aria-label="Person role"
                 value={person.role || ''}
                 onChange={(e) => updatePerson(person.id, { role: e.target.value || null })}
                 placeholder="Role (optional)"
+                maxLength={200}
+                className="flex-1"
+                disabled={!!person.matchedPersonId}
+              />
+              <Input
+                aria-label="Person organization"
+                value={person.organization || ''}
+                onChange={(e) =>
+                  updatePerson(person.id, { organization: e.target.value || null })
+                }
+                placeholder="Organization (optional)"
                 maxLength={200}
                 className="flex-1"
               />
@@ -46,6 +70,31 @@ export function PeopleEditor() {
                 <X className="h-4 w-4" aria-hidden="true" />
               </Button>
             </div>
+
+            {existingPeople.length > 0 && (
+              <div className="flex items-center gap-north-sm">
+                <p className="text-metadata text-foreground-muted shrink-0">Link to existing</p>
+                <Select
+                  value={person.matchedPersonId ?? 'new'}
+                  onValueChange={(v) =>
+                    updatePerson(person.id, { matchedPersonId: v === 'new' ? null : v })
+                  }
+                >
+                  <SelectTrigger size="sm" aria-label="Link to existing person">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="new">Create new</SelectItem>
+                    {existingPeople.map((p) => (
+                      <SelectItem key={p.id} value={p.id}>
+                        {p.name}
+                        {p.role ? ` · ${p.role}` : ''}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
           </EditorItemCard>
         ))}
       </div>

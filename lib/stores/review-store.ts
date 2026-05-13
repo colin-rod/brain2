@@ -178,7 +178,10 @@ export const useReviewStore = create<ReviewState>()(
         })),
       addPerson: () =>
         set((s) => ({
-          people: [...s.people, { id: uid(), name: '', role: null, matchedPersonId: null }],
+          people: [
+            ...s.people,
+            { id: uid(), name: '', role: null, organization: null, matchedPersonId: null },
+          ],
         })),
       removePerson: (id) =>
         set((s) => ({

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { useReviewStore } from '@/lib/stores/review-store';
 import { saveReviewedNote } from '@/lib/actions/save-note';
+import { deleteCapture } from '@/lib/actions/capture';
 import { SourcePreview } from './source-preview';
 import { NoteFields } from './note-fields';
 import { TasksEditor } from './tasks-editor';
@@ -18,8 +19,17 @@ import { SuggestedLinksEditor } from './suggested-links-editor';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogBackdrop,
+  DialogClose,
+  DialogDescription,
+  DialogPopup,
+  DialogPortal,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
-import { Check, ChevronDown, Loader2, Plus, Save } from 'lucide-react';
+import { Check, ChevronDown, Loader2, Plus, Save, Trash2 } from 'lucide-react';
 import type { Capture, ParsedNoteJson, Person, Project, Domain } from '@/types/database';
 
 interface ReviewClientProps {
@@ -150,6 +160,8 @@ export function ReviewClient({ capture, imageUrl, existingPeople, existingProjec
   const [isSaving, startTransition] = useTransition();
   const [isSaved, setIsSaved] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [isDeleting, startDeleteTransition] = useTransition();
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const captureId = useReviewStore((s) => s.captureId);
   const initFromParsed = useReviewStore((s) => s.initFromParsed);
@@ -220,9 +232,51 @@ export function ReviewClient({ capture, imageUrl, existingPeople, existingProjec
     });
   }
 
+  function handleDelete() {
+    startDeleteTransition(async () => {
+      const result = await deleteCapture(capture.id);
+      if (result.error) {
+        toast.error(result.error);
+        return;
+      }
+      toast.success('Capture deleted.');
+      reset();
+      router.push('/inbox');
+    });
+  }
+
   return (
     <>
       <SaveCelebration active={saveSuccess} />
+
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogPortal>
+          <DialogBackdrop />
+          <DialogPopup>
+            <DialogTitle>Discard this capture?</DialogTitle>
+            <DialogDescription>
+              This will permanently delete the capture and cannot be undone.
+            </DialogDescription>
+            <div className="flex justify-end gap-north-sm">
+              <DialogClose
+                render={
+                  <Button variant="ghost" disabled={isDeleting}>
+                    Cancel
+                  </Button>
+                }
+              />
+              <Button
+                onClick={handleDelete}
+                disabled={isDeleting}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                {isDeleting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
+                {isDeleting ? 'Deleting…' : 'Delete'}
+              </Button>
+            </div>
+          </DialogPopup>
+        </DialogPortal>
+      </Dialog>
       <div className="space-y-north-lg pb-[calc(8.5rem+env(safe-area-inset-bottom,0px))] lg:pb-0">
         {/* Title, Summary, Full Text — full width above the grid */}
         <div className="animate-slide-in-up" style={{ animationDelay: '0ms' }}>
@@ -321,10 +375,20 @@ export function ReviewClient({ capture, imageUrl, existingPeople, existingProjec
         </div>
 
         {/* Desktop save button */}
-        <div className="hidden lg:flex justify-end">
+        <div className="hidden lg:flex justify-between items-center">
+          <Button
+            variant="ghost"
+            size="sm"
+            disabled={isSaving || isSaved || isDeleting}
+            onClick={() => setIsDeleteDialogOpen(true)}
+            className="text-destructive hover:text-destructive hover:bg-destructive/10"
+          >
+            <Trash2 className="h-4 w-4 mr-2" />
+            Delete capture
+          </Button>
           <Button
             onClick={handleSave}
-            disabled={isSaving || isSaved}
+            disabled={isSaving || isSaved || isDeleting}
             size="lg"
             className={cn(
               'transition-[transform,box-shadow] duration-200',
@@ -350,10 +414,10 @@ export function ReviewClient({ capture, imageUrl, existingPeople, existingProjec
       </div>
 
       {/* Mobile fixed save bar */}
-      <div className="lg:hidden fixed bottom-[calc(3.5rem+env(safe-area-inset-bottom,0px))] inset-x-0 bg-surface border-t border-border p-north-sm z-40">
+      <div className="lg:hidden fixed bottom-[calc(3.5rem+env(safe-area-inset-bottom,0px))] inset-x-0 bg-surface border-t border-border p-north-sm z-40 flex flex-col gap-north-xs">
         <Button
           onClick={handleSave}
-          disabled={isSaving || isSaved}
+          disabled={isSaving || isSaved || isDeleting}
           className={cn(
             'w-full transition-[transform,box-shadow] duration-200',
             saveSuccess && 'scale-105 ring-2 ring-primary/25',
@@ -374,6 +438,16 @@ export function ReviewClient({ capture, imageUrl, existingPeople, existingProjec
             <Save className="h-4 w-4 mr-2" />
           )}
           {isSaving ? 'Saving…' : isSaved ? 'Saved' : 'Save to Notes'}
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          disabled={isSaving || isSaved || isDeleting}
+          onClick={() => setIsDeleteDialogOpen(true)}
+          className="w-full text-destructive hover:text-destructive hover:bg-destructive/10"
+        >
+          <Trash2 className="h-3.5 w-3.5 mr-1.5" />
+          Delete capture
         </Button>
       </div>
     </>

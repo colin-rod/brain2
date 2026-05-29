@@ -146,7 +146,7 @@ export function GlobalSearch() {
           onFocus={() => setIsOpen(true)}
           onKeyDown={handleKeyDown}
           placeholder={isLoading ? 'Loading...' : 'Search everything...'}
-          className="border-0 rounded-none pl-1.5 pr-16 focus-visible:border-0 focus-visible:ring-0 placeholder:uppercase placeholder:tracking-wider placeholder:font-mono placeholder:text-label bg-transparent"
+          className="border-0 rounded-none pl-1.5 pr-2 sm:pr-16 focus-visible:border-0 focus-visible:ring-0 placeholder:uppercase placeholder:tracking-normal sm:placeholder:tracking-wider placeholder:font-mono placeholder:text-label bg-transparent"
           disabled={isLoading}
           role="combobox"
           aria-expanded={isOpen && query.length >= 2}

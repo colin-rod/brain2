@@ -36,6 +36,40 @@ const GROUP_OPTIONS: { value: string; label: string }[] = [
 
 type NoteSort = 'newest' | 'oldest' | 'title-az';
 
+/**
+ * Condensed, single-line relationship summary for narrow screens. Shows the first
+ * two linked entities (projects → people → domains) plus a "+N" overflow, and folds
+ * task/decision/question counts into one muted "· N linked" indicator. The full chip
+ * breakdown lives on the note detail page; here we optimize for glanceable scanning.
+ */
+function NoteRowSummary({ note }: { note: NoteWithMeta }) {
+  const entities = [
+    ...note.projects.map((p) => p.name),
+    ...note.people.map((p) => p.name),
+    ...note.domains.map((d) => d.name),
+  ];
+  const shown = entities.slice(0, 2);
+  const overflow = entities.length - shown.length;
+  const linkedCount = note.tasks.length + note.decisions.length + note.questions.length;
+
+  if (entities.length === 0 && linkedCount === 0) return null;
+
+  return (
+    <div className="flex sm:hidden items-center gap-north-xs mt-north-xs text-metadata text-foreground-muted min-w-0">
+      {shown.map((name, i) => (
+        <span
+          key={i}
+          className="max-w-32 truncate rounded-full bg-surface-subtle px-2 py-0.5 text-label text-foreground-secondary"
+        >
+          {name}
+        </span>
+      ))}
+      {overflow > 0 && <span className="shrink-0 text-label">+{overflow}</span>}
+      {linkedCount > 0 && <span className="shrink-0 text-label">· {linkedCount} linked</span>}
+    </div>
+  );
+}
+
 interface NotesListProps {
   notes: NoteWithMeta[];
   allProjects: { id: string; name: string }[];
@@ -250,14 +284,17 @@ export function NotesList({
                       </p>
                     )}
                   </Link>
-                  {/* Chips */}
+                  {/* Mobile: condensed single-line summary */}
+                  <NoteRowSummary note={note} />
+
+                  {/* Desktop chips (sm+) */}
                   {(note.projects.length > 0 ||
                     note.people.length > 0 ||
                     note.domains.length > 0 ||
                     note.tasks.length > 0 ||
                     note.decisions.length > 0 ||
                     note.questions.length > 0) && (
-                    <div className="flex flex-wrap gap-north-xs mt-north-xs">
+                    <div className="hidden sm:flex flex-wrap gap-north-xs mt-north-xs">
                       {note.projects.map((p) => (
                         <Link
                           key={p.id}

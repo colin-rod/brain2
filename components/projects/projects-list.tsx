@@ -198,9 +198,10 @@ export function ProjectsList({
           size="sm"
           onClick={() => setIsAdding(true)}
           className="gap-1 shrink-0"
+          aria-label="New project"
         >
           <Plus className="h-3.5 w-3.5" />
-          New Project
+          <span className="hidden sm:inline">New Project</span>
         </Button>
       </div>
 
@@ -326,7 +327,7 @@ export function ProjectsList({
                   <X className="h-3 w-3" />
                 </Button>
               </div>
-              <div className="flex flex-wrap items-center gap-x-north-md gap-y-0.5 mt-north-xs">
+              <div className="flex flex-wrap items-center gap-x-north-sm gap-y-0.5 mt-north-xs">
                 {project.note_count > 0 && (
                   <span className="text-metadata text-foreground-muted">
                     {project.note_count} notes

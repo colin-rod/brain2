@@ -240,9 +240,10 @@ export function TasksList({
           size="sm"
           onClick={() => setIsAdding(true)}
           className="gap-1 shrink-0"
+          aria-label="New task"
         >
           <Plus className="h-3.5 w-3.5" />
-          New Task
+          <span className="hidden sm:inline">New Task</span>
         </Button>
       </div>
 
@@ -478,7 +479,7 @@ export function TasksList({
                       <X className="h-3.5 w-3.5" />
                     </Button>
                   </div>
-                  <div className="flex flex-wrap items-center gap-north-sm">
+                  <div className="flex flex-wrap items-center gap-x-north-sm gap-y-north-xs">
                     <TaskStatusBadge status={task.status} />
                     {task.priority && (
                       <span className="text-metadata text-foreground-muted">{task.priority}</span>
@@ -488,10 +489,14 @@ export function TasksList({
                         Due: {formatDate(task.due_date)}
                       </span>
                     )}
+                    {/* Cap the primary inline nav-aways to the two most useful
+                        (assignee + project); the source note moves to its own muted
+                        line below. Extra vertical padding lifts these small links
+                        toward a comfortable touch size. */}
                     {task.actionee && (
                       <Link
                         href={`/people/${task.actionee.id}`}
-                        className="text-metadata text-primary hover:underline"
+                        className="text-metadata text-primary hover:underline py-1"
                       >
                         @{task.actionee.name}
                       </Link>
@@ -499,20 +504,20 @@ export function TasksList({
                     {task.project && (
                       <Link
                         href={`/projects/${task.project.id}`}
-                        className="text-metadata text-primary hover:underline"
+                        className="text-metadata text-primary hover:underline py-1"
                       >
                         {task.project.name}
                       </Link>
                     )}
-                    {task.notes && (
-                      <Link
-                        href={`/notes/${task.notes.id}`}
-                        className="text-metadata text-primary hover:underline"
-                      >
-                        {task.notes.title}
-                      </Link>
-                    )}
                   </div>
+                  {task.notes && (
+                    <Link
+                      href={`/notes/${task.notes.id}`}
+                      className="block text-metadata text-foreground-muted hover:text-foreground truncate py-1"
+                    >
+                      ↳ {task.notes.title}
+                    </Link>
+                  )}
                 </div>
               </div>
             ))}

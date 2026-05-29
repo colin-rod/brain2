@@ -19,6 +19,10 @@ export function MobileNav() {
   const [showMore, setShowMore] = useState(false);
   const moreButtonRef = useRef<HTMLButtonElement>(null);
 
+  // The review route is a focused editing task with its own fixed Save bar; the
+  // global nav adds a competing bottom bar and isn't useful mid-review.
+  if (pathname.startsWith('/review/')) return null;
+
   return (
     <>
       <nav

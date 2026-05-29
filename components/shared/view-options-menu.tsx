@@ -67,9 +67,9 @@ export function ViewOptionsMenu({
     <Popover.Root>
       <Popover.Trigger
         render={
-          <Button variant="ghost" size="sm" className="gap-1.5 shrink-0">
+          <Button variant="ghost" size="sm" className="gap-1.5 shrink-0" aria-label="View options">
             <SlidersHorizontal className="h-3.5 w-3.5" />
-            View
+            <span className="hidden sm:inline">View</span>
             {activeCount > 0 && (
               <span className="flex items-center justify-center h-4 min-w-4 rounded-full bg-primary text-primary-foreground text-caption font-semibold px-1 leading-none">
                 {activeCount}

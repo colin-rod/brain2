@@ -459,7 +459,7 @@ export function PeopleList({
             <X className="h-3 w-3" />
           </Button>
         </div>
-        <div className="flex flex-wrap items-center gap-x-north-md gap-y-0.5 mt-north-xs">
+        <div className="flex flex-wrap items-center gap-x-north-sm gap-y-0.5 mt-north-xs">
           {person.note_count > 0 && (
             <span className="text-metadata text-foreground-muted">{person.note_count} notes</span>
           )}
@@ -503,9 +503,10 @@ export function PeopleList({
           size="sm"
           onClick={() => setIsAdding(true)}
           className="gap-1 shrink-0"
+          aria-label="New person"
         >
           <Plus className="h-3.5 w-3.5" />
-          New Person
+          <span className="hidden sm:inline">New Person</span>
         </Button>
       </div>
 

@@ -1,5 +1,6 @@
 import { Sidebar } from '@/components/layout/sidebar';
 import { MobileNav } from '@/components/layout/mobile-nav';
+import { CaptureFab } from '@/components/layout/capture-fab';
 import { SearchProvider } from '@/components/search/search-provider';
 import { GlobalSearch } from '@/components/search/global-search';
 import { Toaster } from 'sonner';
@@ -36,6 +37,7 @@ export default function AppLayout({
           {children}
         </div>
       </main>
+      <CaptureFab />
       <MobileNav />
       <Toaster position="bottom-right" />
     </SearchProvider>

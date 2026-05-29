@@ -61,7 +61,7 @@ export function FilterBar({ filters, values, onChange, onClear }: FilterBarProps
 
         if (filter.type === 'date-range') {
           return (
-            <div key={filter.key} className="flex items-center gap-north-xs">
+            <div key={filter.key} className="flex flex-wrap items-center gap-north-xs">
               <span className="font-mono text-caption uppercase tracking-wider text-foreground-muted shrink-0">
                 {filter.label}:
               </span>
@@ -70,7 +70,7 @@ export function FilterBar({ filters, values, onChange, onClear }: FilterBarProps
                   type="date"
                   value={values[`${filter.key}_from`] || ''}
                   onChange={(e) => onChange(`${filter.key}_from`, e.target.value)}
-                  className="h-7 text-metadata w-32"
+                  className="h-7 text-metadata w-full sm:w-32"
                   placeholder="From"
                 />
               </div>
@@ -80,7 +80,7 @@ export function FilterBar({ filters, values, onChange, onClear }: FilterBarProps
                   type="date"
                   value={values[`${filter.key}_to`] || ''}
                   onChange={(e) => onChange(`${filter.key}_to`, e.target.value)}
-                  className="h-7 text-metadata w-32"
+                  className="h-7 text-metadata w-full sm:w-32"
                   placeholder="To"
                 />
               </div>

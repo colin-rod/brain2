@@ -195,6 +195,37 @@ export async function createPdfCapture(formData: FormData): Promise<CaptureResul
   return { id: data.id };
 }
 
+export async function deleteCapture(captureId: string): Promise<{ error?: string }> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return { error: 'Not authenticated' };
+
+  const { data: capture, error: fetchError } = await supabase
+    .from('captures')
+    .select('id, user_id, file_path')
+    .eq('id', captureId)
+    .eq('user_id', user.id)
+    .single();
+
+  if (fetchError || !capture) return { error: 'Capture not found' };
+
+  if (capture.file_path) {
+    await supabase.storage.from('captures').remove([capture.file_path]);
+  }
+
+  const { error: deleteError } = await supabase
+    .from('captures')
+    .delete()
+    .eq('id', captureId)
+    .eq('user_id', user.id);
+
+  if (deleteError) return { error: deleteError.message };
+  return {};
+}
+
 export async function fetchCaptures() {
   const supabase = await createClient();
   const {
